@@ -1,0 +1,264 @@
+// Velvet Signal – production schema
+// PostgreSQL + Prisma. Run: npx prisma generate && npx prisma migrate dev
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// -------------------------------------------
+// Users & auth
+// -------------------------------------------
+
+enum UserRole {
+  user
+  creator
+  admin
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  passwordHash  String?   @map("password_hash")
+  role          UserRole  @default(user)
+  emailVerified Boolean   @default(false) @map("email_verified")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt
+
+  sessions       Session[]
+  conversations  Conversation[]  @relation("UserConversations")
+  sentPayments   Payment[]       @relation("Payer")
+  transactions   Transaction[]
+
+  @@map("users")
+}
+
+model OtpRequest {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([expiresAt])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// -------------------------------------------
+// Models (creators / VIPs)
+// -------------------------------------------
+
+model Model {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  displayName String
+  email       String   @unique
+  passwordHash String?
+  avatarUrl   String?
+  bio         String?  @db.Text
+  status      ModelStatus @default(OFFLINE)
+  verifiedFace Boolean  @default(false)
+  vip         Boolean  @default(false)
+  location    String?
+  height      String?
+  weight      String?
+  profession  String?
+  education   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  media         Media[]
+  savedReplies  SavedReply[]
+}
+
+enum ModelStatus {
+  ONLINE
+  OFFLINE
+}
+
+model SavedReply {
+  id       String @id @default(cuid())
+  modelId  String
+  label    String
+  body     String @db.Text
+  createdAt DateTime @default(now())
+
+  model Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
+}
+
+// -------------------------------------------
+// Conversations & messages (User <-> Creator)
+// -------------------------------------------
+
+model Conversation {
+  id        String   @id @default(cuid())
+  userId    String
+  creatorId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation("UserConversations", fields: [userId], references: [id], onDelete: Cascade)
+  creator Creator @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([userId, creatorId])
+  @@index([userId])
+  @@index([creatorId])
+}
+
+model Message {
+  id             String    @id @default(cuid())
+  conversationId String
+  senderType     SenderType
+  body           String?   @db.Text
+  mediaUrl       String?
+  mediaType      MediaType?
+  deliveredAt    DateTime?
+  readAt         DateTime?
+  deletedAt      DateTime? @map("deleted_at")
+  createdAt      DateTime  @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+enum SenderType {
+  USER
+  CREATOR
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  VOICE
+}
+
+// -------------------------------------------
+// Creators (public profile + gallery)
+// -------------------------------------------
+
+model Creator {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  displayName String
+  avatarUrl   String?
+  bio         String?  @db.Text
+  location    String?
+  profession  String?
+  height      String?
+  weight      String?
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  media         CreatorMedia[]
+  conversations Conversation[]
+
+  @@map("creators")
+}
+
+model CreatorMedia {
+  id        String   @id @default(cuid())
+  creatorId String
+  url       String
+  type      CreatorMediaType @default(IMAGE)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  creator Creator @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([creatorId])
+  @@map("creator_media")
+}
+
+enum CreatorMediaType {
+  IMAGE
+  VIDEO
+}
+
+// -------------------------------------------
+// Media library (model uploads)
+// -------------------------------------------
+
+model Media {
+  id       String    @id @default(cuid())
+  modelId  String
+  url      String
+  type     MediaType
+  createdAt DateTime @default(now())
+
+  model Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
+}
+
+// -------------------------------------------
+// Payments
+// -------------------------------------------
+
+model Payment {
+  id             String   @id @default(cuid())
+  conversationId String?  // optional; links to Conversation if needed
+  payerId        String
+  amountCents    Int
+  currency       String   @default("USD")
+  status         PaymentStatus @default(PENDING)
+  stripePaymentId String?  @unique
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  payer User @relation("Payer", fields: [payerId], references: [id], onDelete: Cascade)
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+// -------------------------------------------
+// PayPal transactions (premium unlock, etc.)
+// -------------------------------------------
+
+model Transaction {
+  id              String            @id @default(cuid())
+  userId          String
+  amountCents     Int
+  currency        String            @default("USD")
+  status          TransactionStatus  @default(PENDING)
+  paypalOrderId   String?           @unique @map("paypal_order_id")
+  paypalCaptureId String?           @map("paypal_capture_id")
+  itemType        String?           @map("item_type")
+  itemId          String?           @map("item_id")
+  metadata        Json?
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([paypalOrderId])
+  @@index([status])
+  @@map("transactions")
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
