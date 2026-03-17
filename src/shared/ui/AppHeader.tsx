@@ -4,32 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
-const MENU_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/creators", label: "Creators" },
-  { href: "/messages", label: "Messages", auth: true },
-  { href: "/premium", label: "Premium", auth: true },
-  { href: "/creator/dashboard", label: "Dashboard", auth: true, role: "creator" },
-  { href: "/admin", label: "Admin", auth: true, role: "admin" },
-] as const;
-
-function HamburgerIcon({ open }: { open: boolean }) {
-  return (
-    <span className="relative flex h-6 w-5 flex-col justify-center gap-1.5">
-      <span
-        className={`block h-0.5 w-5 bg-current transition-all ${open ? "translate-y-[5px] rotate-45" : ""}`}
-      />
-      <span className={`block h-0.5 w-5 bg-current transition-all ${open ? "opacity-0 scale-0" : ""}`} />
-      <span
-        className={`block h-0.5 w-5 bg-current transition-all ${open ? "-translate-y-[5px] -rotate-45" : ""}`}
-      />
-    </span>
-  );
-}
-
 export function AppHeader() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<{ role: string } | null>(null);
 
   useEffect(() => {
@@ -41,51 +19,100 @@ export function AppHeader() {
 
   useEffect(() => setMenuOpen(false), [pathname]);
 
-  const filteredLinks = MENU_LINKS.filter((link) => {
-    if (link.auth && !user) return false;
-    if (link.role && user?.role !== link.role) return false;
-    return true;
-  });
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  const guestLinks = [
-    { href: "/login", label: "Login" },
-    { href: "/register", label: "Join" },
+  const navLinks = [
+    { href: "/creators", label: "Explore Creators" },
+    ...(user ? [
+      { href: "/messages", label: "Messages" },
+      { href: "/premium", label: "Premium" },
+    ] : []),
+    ...(user?.role === "creator" ? [{ href: "/creator/dashboard", label: "Dashboard" }] : []),
+    ...(user?.role === "admin" ? [{ href: "/admin", label: "Admin" }] : []),
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-[var(--bg-base)]/95 shadow-[0_1px_0_0_rgba(255,255,255,0.05)] backdrop-blur supports-[backdrop-filter]:bg-[var(--bg-base)]/80">
-      <div className="page-content mx-auto flex max-w-6xl items-center justify-between gap-4 py-3 sm:py-4">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
+          ? "bg-[rgba(7,7,11,0.92)] shadow-[0_4px_24px_rgba(0,0,0,0.5)] border-b border-[rgba(212,168,83,0.12)]"
+          : "bg-transparent border-b border-transparent"
+        }`}
+      style={{ backdropFilter: scrolled ? "blur(20px)" : "blur(0px)", WebkitBackdropFilter: scrolled ? "blur(20px)" : "blur(0px)" }}
+    >
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10 h-16">
+
+        {/* Logo */}
         <Link
           href="/"
-          className="font-[var(--font-heading)] text-lg font-semibold text-white focus-outline min-h-[44px] min-w-[44px] flex items-center"
+          className="flex items-center gap-2 focus-outline min-h-[44px] shrink-0"
+          aria-label="Velvet Signal home"
         >
-          Velvet
+          {/* Gem icon */}
+          <span className="relative flex h-8 w-8 items-center justify-center rounded-xl"
+            style={{ background: "linear-gradient(135deg, #d4a853 0%, #ff2d78 100%)" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M12 2L2 9l10 13 10-13L12 2z" fill="rgba(255,255,255,0.9)" />
+              <path d="M2 9h20M7 2l-5 7 10 13M17 2l5 7-10 13" stroke="rgba(255,255,255,0.3)" strokeWidth="0.5" />
+            </svg>
+          </span>
+          <span
+            className="font-[var(--font-heading)] text-xl font-bold tracking-tight"
+            style={{
+              background: "linear-gradient(135deg, #f0c97a 0%, #d4a853 45%, #ff2d78 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            Velvet Signal
+          </span>
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
-          {filteredLinks.map(({ href, label }) => (
+          {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className={`focus-outline rounded-full px-4 py-2.5 text-sm font-medium min-h-[44px] flex items-center transition-colors duration-200 ${
-                pathname === href ? "bg-white/10 text-white" : "text-white/80 hover:bg-white/5 hover:text-white"
-              }`}
+              className={`focus-outline rounded-full px-4 py-2 text-sm font-medium min-h-[44px] flex items-center transition-all duration-200 ${pathname === href
+                  ? "bg-[rgba(212,168,83,0.15)] text-[#f0c97a]"
+                  : "text-white/75 hover:text-white hover:bg-white/8"
+                }`}
             >
               {label}
             </Link>
           ))}
-          {!user && guestLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="focus-outline rounded-full px-4 py-2.5 text-sm font-medium min-h-[44px] flex items-center text-white/80 transition-colors duration-200 hover:bg-white/5 hover:text-white"
-            >
-              {label}
-            </Link>
-          ))}
-          {user && (
-            <form action="/api/auth/logout" method="POST" className="ml-1">
+        </nav>
+
+        {/* Right side actions */}
+        <div className="hidden md:flex items-center gap-2">
+          {!user ? (
+            <>
+              <Link
+                href="/login"
+                className="focus-outline rounded-full px-4 py-2 text-sm font-medium min-h-[44px] flex items-center text-white/75 transition-all duration-200 hover:text-white hover:bg-white/8"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                className="focus-outline rounded-full px-4 py-2 text-sm font-medium min-h-[44px] flex items-center text-white/80 transition-all duration-200 hover:text-white hover:bg-white/8"
+              >
+                Sign Up
+              </Link>
+              <Link
+                href="/register"
+                className="focus-outline pill-button-primary inline-flex items-center px-5 py-2 text-sm min-h-[44px]"
+              >
+                Join Now ✦
+              </Link>
+            </>
+          ) : (
+            <form action="/api/auth/logout" method="POST">
               <button
                 type="submit"
                 className="focus-outline rounded-full px-4 py-2.5 text-sm font-medium min-h-[44px] flex items-center text-white/60 transition-colors duration-200 hover:bg-white/5 hover:text-white"
@@ -94,54 +121,77 @@ export function AppHeader() {
               </button>
             </form>
           )}
-        </nav>
+        </div>
 
         {/* Mobile hamburger */}
         <button
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
-          className="focus-outline flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/90 transition-colors duration-200 hover:bg-white/10 active:bg-white/15 md:hidden"
+          className="focus-outline flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/90 transition-all duration-200 hover:bg-white/10 active:scale-95 md:hidden"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
         >
-          <HamburgerIcon open={menuOpen} />
+          <span className="relative flex h-5 w-5 flex-col justify-center gap-[5px]">
+            <span className={`block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ${menuOpen ? "translate-y-[7px] rotate-45" : ""}`} />
+            <span className={`block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ${menuOpen ? "opacity-0 scale-x-0" : ""}`} />
+            <span className={`block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ${menuOpen ? "-translate-y-[7px] -rotate-45" : ""}`} />
+          </span>
         </button>
       </div>
 
       {/* Mobile menu overlay */}
       <div
-        className={`fixed inset-0 z-40 bg-[var(--bg-base)]/98 backdrop-blur md:hidden ${menuOpen ? "visible" : "invisible pointer-events-none"}`}
-        style={{ top: "var(--header-height)" }}
+        className={`fixed inset-x-0 bottom-0 z-40 md:hidden transition-all duration-400 ${menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+        style={{ top: "64px", background: "rgba(7,7,11,0.97)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)" }}
         aria-hidden={!menuOpen}
       >
-        <nav
-          className="flex flex-col gap-1 p-4 pt-6"
-          aria-label="Main mobile"
-        >
-          {filteredLinks.map(({ href, label }) => (
+        {/* Gold top border */}
+        <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(212,168,83,0.4), transparent)" }} />
+
+        <nav className="flex flex-col gap-1 p-5 pt-6" aria-label="Main mobile">
+          {navLinks.map(({ href, label }, i) => (
             <Link
               key={href}
               href={href}
-              className="focus-outline flex min-h-[48px] items-center rounded-xl px-4 text-base font-medium text-white hover:bg-white/10"
+              className={`focus-outline flex min-h-[52px] items-center rounded-2xl px-5 text-base font-medium transition-all duration-200 ${pathname === href ? "bg-[rgba(212,168,83,0.12)] text-[#f0c97a]" : "text-white/80 hover:bg-white/8 hover:text-white"
+                }`}
+              style={{ animationDelay: `${i * 50}ms` }}
             >
               {label}
             </Link>
           ))}
-          {!user &&
-            guestLinks.map(({ href, label }) => (
+
+          {!user && (
+            <>
               <Link
-                key={href}
-                href={href}
-                className="focus-outline flex min-h-[48px] items-center rounded-xl px-4 text-base font-medium text-white hover:bg-white/10"
+                href="/login"
+                className="focus-outline flex min-h-[52px] items-center rounded-2xl px-5 text-base font-medium text-white/80 hover:bg-white/8 hover:text-white transition-all duration-200"
               >
-                {label}
+                Login
               </Link>
-            ))}
+              <Link
+                href="/register"
+                className="focus-outline flex min-h-[52px] items-center rounded-2xl px-5 text-base font-medium text-white/80 hover:bg-white/8 hover:text-white transition-all duration-200"
+              >
+                Sign Up
+              </Link>
+              <div className="mt-3 px-2">
+                <Link
+                  href="/register"
+                  className="pill-button-primary focus-outline flex w-full min-h-[52px] items-center justify-center rounded-2xl text-base font-semibold"
+                >
+                  Join Now ✦
+                </Link>
+              </div>
+            </>
+          )}
+
           {user && (
-            <form action="/api/auth/logout" method="POST" className="mt-2 border-t border-white/10 pt-4">
+            <form action="/api/auth/logout" method="POST" className="mt-3 border-t border-white/10 pt-4">
               <button
                 type="submit"
-                className="focus-outline flex min-h-[48px] w-full items-center rounded-xl px-4 text-base font-medium text-white/70 hover:bg-white/10"
+                className="focus-outline flex min-h-[52px] w-full items-center rounded-2xl px-5 text-base font-medium text-white/60 hover:bg-white/8 hover:text-white transition-all duration-200"
               >
                 Log out
               </button>

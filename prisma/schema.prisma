@@ -129,6 +129,8 @@ model Message {
   body           String?   @db.Text
   mediaUrl       String?
   mediaType      MediaType?
+  isPPV          Boolean   @default(false)
+  ppvPriceCents  Int?
   deliveredAt    DateTime?
   readAt         DateTime?
   deletedAt      DateTime? @map("deleted_at")
@@ -153,20 +155,25 @@ enum MediaType {
 // -------------------------------------------
 
 model Creator {
-  id          String   @id @default(cuid())
-  username    String   @unique
-  displayName String
-  avatarUrl   String?
-  bio         String?  @db.Text
-  location    String?
-  profession  String?
-  height      String?
-  weight      String?
-  verified    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(cuid())
+  username        String   @unique
+  displayName     String
+  avatarUrl       String?
+  bannerUrl       String?
+  bio             String?  @db.Text
+  location        String?
+  profession      String?
+  height          String?
+  weight          String?
+  verified        Boolean  @default(false)
+  followerCount   Int      @default(0)
+  subscriberCount Int      @default(0)
+  totalLikes      Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   media         CreatorMedia[]
+  posts         CreatorPost[]
   conversations Conversation[]
 
   @@map("creators")
@@ -189,6 +196,25 @@ model CreatorMedia {
 enum CreatorMediaType {
   IMAGE
   VIDEO
+}
+
+model CreatorPost {
+  id               String           @id @default(cuid())
+  creatorId        String
+  caption          String?          @db.Text
+  previewUrl       String
+  mediaUrl         String?
+  mediaType        CreatorMediaType @default(IMAGE)
+  isLocked         Boolean          @default(true)
+  unlockPriceCents Int              @default(1999)
+  likeCount        Int              @default(0)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  creator Creator @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  @@index([creatorId])
+  @@map("creator_posts")
 }
 
 // -------------------------------------------

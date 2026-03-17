@@ -58,7 +58,7 @@ export async function GET() {
       updatedAt: c.updatedAt,
     })),
     messagesByDay: messagesByDay.map((r) => ({
-      date: r.date instanceof Date ? r.date.toISOString().slice(0, 10) : String(r.date),
+      date: (r.date as any) instanceof Date ? (r.date as any).toISOString().slice(0, 10) : String(r.date),
       count: Number(r.count),
     })),
   });

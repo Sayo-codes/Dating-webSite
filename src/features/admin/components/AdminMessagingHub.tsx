@@ -1,0 +1,565 @@
+"use client";
+
+import { useEffect, useState, useRef, useCallback } from "react";
+import Image from "next/image";
+import { useSocket } from "@/features/chat/useSocket";
+
+/* ─── Types ─── */
+type CreatorItem = {
+  id: string;
+  username: string;
+  displayName: string;
+  avatarUrl: string | null;
+  conversationCount: number;
+};
+
+type ConversationItem = {
+  id: string;
+  userId: string;
+  creatorId: string;
+  user: { id: string; username: string; email: string };
+  creator: { id: string; username: string; displayName: string; avatarUrl: string | null };
+  unreadCount: number;
+  lastMessage: {
+    id: string;
+    body: string | null;
+    senderType: string;
+    mediaUrl: string | null;
+    mediaType: string | null;
+    isPPV: boolean;
+    createdAt: string;
+  } | null;
+  updatedAt: string;
+};
+
+type Message = {
+  id: string;
+  conversationId: string;
+  senderType: string;
+  body: string | null;
+  mediaUrl: string | null;
+  mediaType: string | null;
+  isPPV: boolean;
+  ppvPriceCents: number | null;
+  createdAt: string;
+};
+
+type SubscriberInfo = {
+  user: { id: string; username: string; email: string; createdAt: string } | null;
+  totalSpentCents: number;
+  isSubscribed: boolean;
+};
+
+const avatarPlaceholder =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle fill='%23333' cx='24' cy='24' r='24'/%3E%3C/svg%3E";
+
+/* ─── Icons ─── */
+function LockIcon({ size = 14 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+      <path d="M7 11V7a5 5 0 0110 0v4" />
+    </svg>
+  );
+}
+
+function AttachIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
+    </svg>
+  );
+}
+
+function SendIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13" />
+      <polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </svg>
+  );
+}
+
+/* ═══════════════════════════════════════════
+   MAIN COMPONENT
+   ═══════════════════════════════════════════ */
+export function AdminMessagingHub() {
+  // ─── State ───
+  const [creators, setCreators] = useState<CreatorItem[]>([]);
+  const [selectedCreatorId, setSelectedCreatorId] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
+  const [selectedConvId, setSelectedConvId] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loadingCreators, setLoadingCreators] = useState(true);
+  const [loadingConvs, setLoadingConvs] = useState(false);
+  const [loadingMsgs, setLoadingMsgs] = useState(false);
+  const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
+  const [isPPV, setIsPPV] = useState(false);
+  const [ppvPrice, setPpvPrice] = useState("19.99");
+  const [subscriberInfo, setSubscriberInfo] = useState<SubscriberInfo | null>(null);
+  const [unreadMap, setUnreadMap] = useState<Record<string, number>>({});
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { connected, join, leave, onMessageNew } = useSocket();
+
+  const selectedConv = conversations.find((c) => c.id === selectedConvId);
+  const selectedCreator = creators.find((c) => c.id === selectedCreatorId);
+
+  // ─── Fetch creators ───
+  useEffect(() => {
+    (async () => {
+      setLoadingCreators(true);
+      const res = await fetch("/api/admin/creators");
+      if (res.ok) {
+        const data = (await res.json()) as { creators: CreatorItem[] };
+        setCreators(data.creators ?? []);
+      }
+      setLoadingCreators(false);
+    })();
+  }, []);
+
+  // ─── Fetch conversations for selected creator ───
+  const fetchConversations = useCallback(async (creatorId: string) => {
+    setLoadingConvs(true);
+    const res = await fetch(`/api/admin/conversations?creatorId=${creatorId}`);
+    if (res.ok) {
+      const data = (await res.json()) as { conversations: ConversationItem[] };
+      const convs = data.conversations ?? [];
+      setConversations(convs);
+      // Update unread map
+      const map: Record<string, number> = {};
+      for (const c of convs) map[c.id] = c.unreadCount;
+      setUnreadMap((prev) => ({ ...prev, ...map }));
+    }
+    setLoadingConvs(false);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedCreatorId) {
+      setConversations([]);
+      setSelectedConvId(null);
+      return;
+    }
+    fetchConversations(selectedCreatorId);
+  }, [selectedCreatorId, fetchConversations]);
+
+  // ─── Fetch messages for selected conversation ───
+  useEffect(() => {
+    if (!selectedConvId) {
+      setMessages([]);
+      setSubscriberInfo(null);
+      return;
+    }
+    (async () => {
+      setLoadingMsgs(true);
+      const res = await fetch(`/api/admin/conversations/${selectedConvId}/messages`);
+      if (res.ok) {
+        const data = (await res.json()) as { messages: Message[] };
+        setMessages(data.messages ?? []);
+      }
+      // Mark as read
+      fetch(`/api/admin/conversations/${selectedConvId}/read`, { method: "POST" });
+      setUnreadMap((prev) => ({ ...prev, [selectedConvId]: 0 }));
+      // Fetch subscriber info
+      const subRes = await fetch(`/api/admin/conversations/${selectedConvId}/subscriber`);
+      if (subRes.ok) {
+        setSubscriberInfo(await subRes.json() as SubscriberInfo);
+      }
+      setLoadingMsgs(false);
+    })();
+  }, [selectedConvId]);
+
+  // ─── Socket: join conversation rooms ───
+  useEffect(() => {
+    if (!selectedConvId) return;
+    join(selectedConvId);
+    return () => leave(selectedConvId);
+  }, [selectedConvId, join, leave]);
+
+  // ─── Socket: receive new messages ───
+  useEffect(() => {
+    return onMessageNew((data: unknown) => {
+      const msg = data as Message;
+      if (msg.conversationId === selectedConvId) {
+        setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
+        // Mark as read immediately since admin is viewing
+        fetch(`/api/admin/conversations/${selectedConvId}/read`, { method: "POST" });
+      } else {
+        // Bump unread badge for other conversations
+        setUnreadMap((prev) => ({
+          ...prev,
+          [msg.conversationId]: (prev[msg.conversationId] ?? 0) + 1,
+        }));
+      }
+    });
+  }, [onMessageNew, selectedConvId]);
+
+  // ─── Auto-scroll ───
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // ─── Send message as creator ───
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!selectedConvId || (!text && !sending)) return;
+    setSending(true);
+    setInput("");
+    try {
+      const payload: Record<string, unknown> = { body: text || undefined };
+      if (isPPV) {
+        payload.isPPV = true;
+        payload.ppvPriceCents = Math.round(parseFloat(ppvPrice) * 100);
+      }
+      const res = await fetch(`/api/admin/conversations/${selectedConvId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { message: Message };
+        setMessages((prev) => [...prev, data.message]);
+        setIsPPV(false);
+      } else {
+        setInput(text);
+      }
+    } finally {
+      setSending(false);
+    }
+  };
+
+  // ─── Upload and send media ───
+  const uploadAndSendMedia = async (file: File) => {
+    if (!selectedConvId) return;
+    const isImage = file.type.startsWith("image/");
+    const isVideo = file.type.startsWith("video/");
+    if (!isImage && !isVideo) return;
+    const mediaType = isImage ? "IMAGE" : "VIDEO";
+    setSending(true);
+    try {
+      const presignRes = await fetch("/api/upload/presign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filename: file.name,
+          contentType: file.type,
+          context: "message",
+          conversationId: selectedConvId,
+          size: file.size,
+        }),
+      });
+      if (!presignRes.ok) throw new Error("Upload failed");
+      const { uploadUrl, publicUrl } = (await presignRes.json()) as { uploadUrl: string; publicUrl: string };
+      const putRes = await fetch(uploadUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+      if (!putRes.ok) throw new Error("Upload failed");
+
+      const payload: Record<string, unknown> = {
+        body: input.trim() || undefined,
+        mediaUrl: publicUrl,
+        mediaType,
+      };
+      if (isPPV) {
+        payload.isPPV = true;
+        payload.ppvPriceCents = Math.round(parseFloat(ppvPrice) * 100);
+      }
+      const msgRes = await fetch(`/api/admin/conversations/${selectedConvId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (msgRes.ok) {
+        const data = (await msgRes.json()) as { message: Message };
+        setMessages((prev) => [...prev, data.message]);
+        setInput("");
+        setIsPPV(false);
+      }
+    } finally {
+      setSending(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  /* ═══════════════════  RENDER  ═══════════════════ */
+  return (
+    <div className="admin-msg-hub" id="admin-messaging-hub">
+      {/* ── LEFT: Creator list ── */}
+      <aside className="admin-msg-creators">
+        <div className="admin-msg-panel-header">
+          <h2 className="text-sm font-semibold text-white">Creators</h2>
+          <span className="text-xs text-white/40">{creators.length}</span>
+        </div>
+        <div className="admin-msg-panel-body">
+          {loadingCreators ? (
+            <div className="p-4 text-xs text-white/40">Loading…</div>
+          ) : (
+            <ul className="divide-y divide-white/5">
+              {creators.map((c) => {
+                const isActive = c.id === selectedCreatorId;
+                // Total unread for this creator's conversations
+                const creatorUnread = conversations
+                  .filter((cv) => cv.creatorId === c.id)
+                  .reduce((sum, cv) => sum + (unreadMap[cv.id] ?? 0), 0);
+                return (
+                  <li key={c.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedCreatorId(c.id);
+                        setSelectedConvId(null);
+                      }}
+                      className={`admin-msg-list-item ${isActive ? "active" : ""}`}
+                    >
+                      <div className="admin-msg-avatar">
+                        <Image
+                          src={c.avatarUrl ?? avatarPlaceholder}
+                          alt=""
+                          fill
+                          className="object-cover"
+                          unoptimized={!!c.avatarUrl && !c.avatarUrl.startsWith("/")}
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-white">{c.displayName}</p>
+                        <p className="truncate text-xs text-white/40">
+                          {c.conversationCount} conversation{c.conversationCount !== 1 ? "s" : ""}
+                        </p>
+                      </div>
+                      {creatorUnread > 0 && (
+                        <span className="admin-msg-badge">{creatorUnread}</span>
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </aside>
+
+      {/* ── CENTER: Conversation list ── */}
+      <section className="admin-msg-convos">
+        <div className="admin-msg-panel-header">
+          <h2 className="text-sm font-semibold text-white">
+            {selectedCreator ? `${selectedCreator.displayName}'s Conversations` : "Conversations"}
+          </h2>
+          {connected && <span className="admin-msg-live-dot" />}
+        </div>
+        <div className="admin-msg-panel-body">
+          {!selectedCreatorId ? (
+            <div className="admin-msg-empty">Select a creator to view conversations</div>
+          ) : loadingConvs ? (
+            <div className="p-4 text-xs text-white/40">Loading…</div>
+          ) : conversations.length === 0 ? (
+            <div className="admin-msg-empty">No conversations yet</div>
+          ) : (
+            <ul className="divide-y divide-white/5">
+              {conversations.map((c) => {
+                const isActive = c.id === selectedConvId;
+                const unread = unreadMap[c.id] ?? 0;
+                return (
+                  <li key={c.id}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedConvId(c.id)}
+                      className={`admin-msg-list-item ${isActive ? "active" : ""}`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="truncate text-sm font-medium text-white">
+                            {c.user.username}
+                          </p>
+                          {unread > 0 && <span className="admin-msg-badge">{unread}</span>}
+                        </div>
+                        <p className="truncate text-xs text-white/40 mt-0.5">
+                          {c.lastMessage
+                            ? c.lastMessage.isPPV
+                              ? "🔒 PPV Message"
+                              : c.lastMessage.body ?? "📷 Media"
+                            : "No messages"}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-xs text-white/30">
+                        {c.lastMessage
+                          ? new Date(c.lastMessage.createdAt).toLocaleDateString(undefined, {
+                              month: "short",
+                              day: "numeric",
+                            })
+                          : ""}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </section>
+
+      {/* ── RIGHT: Chat window ── */}
+      <section className="admin-msg-chat">
+        {selectedConv ? (
+          <>
+            {/* Chat header */}
+            <div className="admin-msg-chat-header">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-white">
+                  {selectedConv.user.username}
+                  <span className="ml-2 text-xs text-white/40 font-normal">
+                    chatting with {selectedConv.creator.displayName}
+                  </span>
+                </p>
+                <p className="text-xs text-white/40 mt-0.5">{selectedConv.user.email}</p>
+              </div>
+              {/* Subscription badge */}
+              {subscriberInfo && (
+                <div className={`admin-msg-sub-badge ${subscriberInfo.isSubscribed ? "subscribed" : ""}`}>
+                  {subscriberInfo.isSubscribed ? (
+                    <>
+                      <span className="admin-msg-sub-dot active" />
+                      Subscriber · ${(subscriberInfo.totalSpentCents / 100).toFixed(2)} spent
+                    </>
+                  ) : (
+                    <>
+                      <span className="admin-msg-sub-dot" />
+                      Free user
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Messages */}
+            <div className="admin-msg-thread">
+              {loadingMsgs ? (
+                <div className="p-4 text-xs text-white/40 text-center">Loading messages…</div>
+              ) : messages.length === 0 ? (
+                <div className="admin-msg-empty">No messages in this conversation</div>
+              ) : (
+                messages.map((m) => {
+                  const isCreator = m.senderType === "CREATOR";
+                  return (
+                    <div key={m.id} className={`flex ${isCreator ? "justify-end" : "justify-start"}`}>
+                      <div
+                        className={`admin-msg-bubble ${isCreator ? "sent" : "received"} ${m.isPPV ? "ppv" : ""}`}
+                      >
+                        {m.isPPV && (
+                          <div className="admin-msg-ppv-label">
+                            <LockIcon size={12} />
+                            <span>PPV – ${((m.ppvPriceCents ?? 0) / 100).toFixed(2)}</span>
+                          </div>
+                        )}
+                        {m.body && <p className="text-sm whitespace-pre-wrap break-words">{m.body}</p>}
+                        {m.mediaUrl && (
+                          <div className="mt-1.5">
+                            {m.mediaType === "IMAGE" && (
+                              <a href={m.mediaUrl} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg">
+                                <img src={m.mediaUrl} alt="" className="max-h-40 w-auto object-cover" />
+                              </a>
+                            )}
+                            {m.mediaType === "VIDEO" && (
+                              <video src={m.mediaUrl} controls className="max-h-40 rounded-lg" preload="metadata" />
+                            )}
+                          </div>
+                        )}
+                        <p className={`mt-1 text-xs ${isCreator ? "text-[#05060a]/60" : "text-white/40"}`}>
+                          {new Date(m.createdAt).toLocaleTimeString(undefined, {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Composer */}
+            <div className="admin-msg-composer">
+              {/* PPV toggle */}
+              <div className="admin-msg-ppv-toggle">
+                <label className="admin-msg-ppv-switch">
+                  <input
+                    type="checkbox"
+                    checked={isPPV}
+                    onChange={(e) => setIsPPV(e.target.checked)}
+                  />
+                  <span className="admin-msg-ppv-slider" />
+                </label>
+                <span className="text-xs text-white/50">PPV</span>
+                {isPPV && (
+                  <div className="admin-msg-ppv-price">
+                    <span className="text-xs text-white/50">$</span>
+                    <input
+                      type="number"
+                      value={ppvPrice}
+                      onChange={(e) => setPpvPrice(e.target.value)}
+                      className="admin-msg-ppv-input"
+                      step="0.01"
+                      min="0.50"
+                    />
+                  </div>
+                )}
+              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  sendMessage();
+                }}
+                className="admin-msg-form"
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,video/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) uploadAndSendMedia(f);
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={sending}
+                  className="admin-msg-icon-btn"
+                  title="Attach media"
+                >
+                  <AttachIcon />
+                </button>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={`Message as ${selectedConv.creator.displayName}…`}
+                  className="admin-msg-input"
+                  disabled={sending}
+                />
+                <button
+                  type="submit"
+                  disabled={sending || !input.trim()}
+                  className="admin-msg-send-btn"
+                >
+                  <SendIcon />
+                </button>
+              </form>
+            </div>
+          </>
+        ) : (
+          <div className="admin-msg-empty h-full">
+            {selectedCreatorId
+              ? "Select a conversation to start messaging"
+              : "Select a creator from the left panel"}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}

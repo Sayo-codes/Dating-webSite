@@ -17,6 +17,18 @@ const AVATARS = {
   stella: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&h=400&fit=crop",
 };
 
+// Banner images (landscape, atmospheric)
+const BANNERS: Record<string, string> = {
+  eva: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&h=400&fit=crop",
+  jessie: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1200&h=400&fit=crop",
+  luna: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1200&h=400&fit=crop",
+  maya: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=400&fit=crop",
+  zoe: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&h=400&fit=crop",
+  ivy: "https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1200&h=400&fit=crop",
+  ruby: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&h=400&fit=crop",
+  stella: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200&h=400&fit=crop",
+};
+
 // Optional extra gallery images per creator (different from avatar for variety)
 const GALLERY_EXTRAS: Record<string, string[]> = {
   eva: [
@@ -53,6 +65,16 @@ const GALLERY_EXTRAS: Record<string, string[]> = {
   ],
 };
 
+// Post preview images (used for locked content feed)
+const POST_PREVIEWS = [
+  "https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=500&h=500&fit=crop",
+  "https://images.unsplash.com/photo-1502635385003-ee1e6a1a742d?w=500&h=500&fit=crop",
+  "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=500&h=500&fit=crop",
+  "https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=500&h=500&fit=crop",
+  "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=500&h=500&fit=crop",
+  "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&h=500&fit=crop",
+];
+
 const CREATOR_PROFILES: Array<{
   username: string;
   displayName: string;
@@ -62,6 +84,9 @@ const CREATOR_PROFILES: Array<{
   height: string;
   weight: string;
   verified: boolean;
+  followerCount: number;
+  subscriberCount: number;
+  totalLikes: number;
 }> = [
   {
     username: "eva",
@@ -72,6 +97,9 @@ const CREATOR_PROFILES: Array<{
     height: "5'6\"",
     weight: "125 lbs",
     verified: true,
+    followerCount: 24300,
+    subscriberCount: 1820,
+    totalLikes: 98400,
   },
   {
     username: "jessie",
@@ -82,6 +110,9 @@ const CREATOR_PROFILES: Array<{
     height: "5'7\"",
     weight: "130 lbs",
     verified: true,
+    followerCount: 31500,
+    subscriberCount: 2450,
+    totalLikes: 145000,
   },
   {
     username: "luna",
@@ -92,6 +123,9 @@ const CREATOR_PROFILES: Array<{
     height: "5'4\"",
     weight: "118 lbs",
     verified: false,
+    followerCount: 3200,
+    subscriberCount: 180,
+    totalLikes: 12500,
   },
   {
     username: "maya",
@@ -102,6 +136,9 @@ const CREATOR_PROFILES: Array<{
     height: "5'5\"",
     weight: "122 lbs",
     verified: true,
+    followerCount: 18700,
+    subscriberCount: 990,
+    totalLikes: 67200,
   },
   {
     username: "zoe",
@@ -112,6 +149,9 @@ const CREATOR_PROFILES: Array<{
     height: "5'8\"",
     weight: "128 lbs",
     verified: true,
+    followerCount: 12400,
+    subscriberCount: 640,
+    totalLikes: 41000,
   },
   {
     username: "ivy",
@@ -122,6 +162,9 @@ const CREATOR_PROFILES: Array<{
     height: "5'3\"",
     weight: "115 lbs",
     verified: false,
+    followerCount: 5600,
+    subscriberCount: 310,
+    totalLikes: 18900,
   },
   {
     username: "ruby",
@@ -132,6 +175,9 @@ const CREATOR_PROFILES: Array<{
     height: "5'9\"",
     weight: "132 lbs",
     verified: true,
+    followerCount: 42100,
+    subscriberCount: 3200,
+    totalLikes: 210000,
   },
   {
     username: "stella",
@@ -142,7 +188,17 @@ const CREATOR_PROFILES: Array<{
     height: "5'6\"",
     weight: "120 lbs",
     verified: true,
+    followerCount: 28900,
+    subscriberCount: 1560,
+    totalLikes: 89000,
   },
+];
+
+const POST_CAPTIONS = [
+  "New exclusive set just dropped 🔥",
+  "Behind the scenes from today's shoot ✨",
+  "Something special just for subscribers 💕",
+  "Weekend vibes – unlock to see more 🌅",
 ];
 
 async function main() {
@@ -176,32 +232,41 @@ async function main() {
     update: { passwordHash, emailVerified: true },
   });
 
-  // Create Creator profiles with unique avatars
+  // Create Creator profiles with unique avatars and premium fields
   const creators = await Promise.all(
     CREATOR_PROFILES.map((p) => {
       const avatarUrl = AVATARS[p.username as keyof typeof AVATARS] ?? AVATARS.eva;
+      const bannerUrl = BANNERS[p.username] ?? BANNERS.eva;
       return prisma.creator.upsert({
         where: { username: p.username },
         create: {
           username: p.username,
           displayName: p.displayName,
           avatarUrl,
+          bannerUrl,
           bio: p.bio,
           location: p.location,
           profession: p.profession,
           height: p.height,
           weight: p.weight,
           verified: p.verified,
+          followerCount: p.followerCount,
+          subscriberCount: p.subscriberCount,
+          totalLikes: p.totalLikes,
         },
         update: {
           displayName: p.displayName,
           avatarUrl,
+          bannerUrl,
           bio: p.bio,
           location: p.location,
           profession: p.profession,
           height: p.height,
           weight: p.weight,
           verified: p.verified,
+          followerCount: p.followerCount,
+          subscriberCount: p.subscriberCount,
+          totalLikes: p.totalLikes,
         },
       });
     })
@@ -220,10 +285,27 @@ async function main() {
         data: galleryUrls.map((url, i) => ({
           creatorId: c.id,
           url,
-          type: "IMAGE",
+          type: "IMAGE" as const,
           sortOrder: i,
         })),
       });
+    }
+  }
+
+  // Seed locked posts for each creator (only if none exist)
+  for (const c of creators) {
+    const postCount = await prisma.creatorPost.count({ where: { creatorId: c.id } });
+    if (postCount === 0) {
+      const postsToCreate = POST_PREVIEWS.slice(0, 4).map((url, i) => ({
+        creatorId: c.id,
+        caption: POST_CAPTIONS[i % POST_CAPTIONS.length],
+        previewUrl: url,
+        mediaType: i === 2 ? ("VIDEO" as const) : ("IMAGE" as const),
+        isLocked: i < 3, // first 3 locked, last unlocked
+        unlockPriceCents: 1999,
+        likeCount: Math.floor(Math.random() * 500) + 50,
+      }));
+      await prisma.creatorPost.createMany({ data: postsToCreate });
     }
   }
 

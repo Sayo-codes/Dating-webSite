@@ -29,20 +29,43 @@ export async function getCreatorByUsername(username: string) {
       media: {
         orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
       },
+      posts: {
+        orderBy: { createdAt: "desc" },
+      },
     },
   });
   if (!creator) return null;
+
+  const photoCount = creator.media.filter((m) => m.type === "IMAGE").length;
+  const videoCount = creator.media.filter((m) => m.type === "VIDEO").length;
+
   return {
     id: creator.id,
     username: creator.username,
     displayName: creator.displayName,
     avatarUrl: creator.avatarUrl,
+    bannerUrl: creator.bannerUrl,
     bio: creator.bio,
     location: creator.location,
     profession: creator.profession,
     height: creator.height,
     weight: creator.weight,
     verified: creator.verified,
+    followerCount: creator.followerCount,
+    subscriberCount: creator.subscriberCount,
+    totalLikes: creator.totalLikes,
+    photoCount,
+    videoCount,
     gallery: creator.media.map((m) => ({ id: m.id, url: m.url, type: m.type })),
+    posts: creator.posts.map((p) => ({
+      id: p.id,
+      caption: p.caption,
+      previewUrl: p.previewUrl,
+      mediaType: p.mediaType,
+      isLocked: p.isLocked,
+      unlockPriceCents: p.unlockPriceCents,
+      likeCount: p.likeCount,
+      createdAt: p.createdAt.toISOString(),
+    })),
   };
 }

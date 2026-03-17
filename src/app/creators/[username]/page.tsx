@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getCreatorByUsername } from "@/features/creators/data";
 import { getCurrentUser } from "@/shared/lib/auth";
-import { CreatorProfileView } from "@/features/creators/components/CreatorProfileView";
+import { PremiumCreatorProfile } from "@/features/creators/components/PremiumCreatorProfile";
 
 type Props = { params: Promise<{ username: string }> };
 
@@ -25,7 +25,7 @@ export default async function CreatorProfilePage({ params }: Props) {
     currentUser.role === "creator" &&
     currentUser.username.toLowerCase() === creator.username.toLowerCase();
   return (
-    <CreatorProfileView
+    <PremiumCreatorProfile
       creator={creator}
       isLoggedIn={!!currentUser}
       isOwnProfile={isOwnProfile}

@@ -13,9 +13,7 @@ export default async function AdminLayout({
       <div className="flex min-h-screen flex-col sm:flex-row">
         <AdminSidebar />
         <div className="min-w-0 flex-1 overflow-auto">
-          <div className="page-content mx-auto max-w-6xl py-8">
-            {children}
-          </div>
+          {children}
         </div>
       </div>
     </div>
