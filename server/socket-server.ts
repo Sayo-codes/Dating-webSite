@@ -7,7 +7,7 @@ import http from "node:http";
 import { Server } from "socket.io";
 import * as jose from "jose";
 
-const PORT = Number(process.env.SOCKET_PORT) || 3001;
+const PORT = Number(process.env.PORT || process.env.SOCKET_PORT || 3001);
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET ?? "dev-secret-change-in-production"
 );
@@ -28,6 +28,13 @@ async function verifyToken(token: string): Promise<{ sub: string } | null> {
 }
 
 const httpServer = http.createServer((req, res) => {
+  // Health check for monitoring/hosting uptime checks
+  if (req.method === "GET" && (req.url === "/health" || req.url === "/")) {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({ status: "ok", timestamp: new Date().toISOString() }));
+    return;
+  }
+
   if (req.method === "POST" && req.url === "/internal/emit") {
     let body = "";
     req.on("data", (chunk) => { body += chunk; });
@@ -59,7 +66,10 @@ const httpServer = http.createServer((req, res) => {
 });
 
 const io = new Server(httpServer, {
-  cors: { origin: process.env.NEXT_PUBLIC_APP_ORIGIN ?? "http://localhost:3000", credentials: true },
+  cors: { 
+    origin: process.env.NEXT_PUBLIC_APP_ORIGIN ? process.env.NEXT_PUBLIC_APP_ORIGIN.split(",") : "http://localhost:3000",
+    credentials: true 
+  },
 });
 
 io.on("connection", async (socket) => {
