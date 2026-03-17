@@ -110,5 +110,5 @@ export async function requireAdmin(): Promise<{
     const { redirect } = await import("next/navigation");
     redirect("/login");
   }
-  return user;
+  return user!;
 }

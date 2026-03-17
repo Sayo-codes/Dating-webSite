@@ -68,7 +68,7 @@ export function PremiumPayButton({
     <PayPalButtons
       createOrder={createOrder}
       onApprove={onApprove}
-      onError={(err) => onError?.(err.message ?? "PayPal error")}
+      onError={(err) => onError?.((err as Record<string, string>)?.message ?? "PayPal error")}
       style={{ layout: "vertical", color: "gold", shape: "rect", label: "paypal" }}
     />
   );

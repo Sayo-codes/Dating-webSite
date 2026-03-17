@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
+import { TransactionStatus } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   const user = await getCurrentUser();
@@ -17,15 +18,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const where: { userId: string; status: string; itemType?: string | null; itemId?: string | null } = {
-    userId: user.id,
-    status: "COMPLETED",
-  };
-  if (itemType) where.itemType = itemType;
-  if (itemId) where.itemId = itemId;
-
   const count = await prisma.transaction.count({
-    where,
+    where: {
+      userId: user.id,
+      status: TransactionStatus.COMPLETED,
+      ...(itemType ? { itemType } : {}),
+      ...(itemId ? { itemId } : {}),
+    },
   });
 
   return NextResponse.json({ unlocked: count > 0 });

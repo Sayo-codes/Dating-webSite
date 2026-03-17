@@ -51,7 +51,7 @@ export async function requireAuth(): Promise<NonNullable<Awaited<ReturnType<type
     const { redirect } = await import("next/navigation");
     redirect("/login");
   }
-  return user;
+  return user!;
 }
 
 /**
