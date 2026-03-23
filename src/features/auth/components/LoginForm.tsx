@@ -55,7 +55,7 @@ export function LoginForm() {
         setError(data.error ?? "Login failed");
         return;
       }
-      router.push("/");
+      router.push("/creators");
       router.refresh();
     } finally {
       setLoading(false);

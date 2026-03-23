@@ -136,3 +136,46 @@ export async function verifyWebhookSignature(params: {
   const data = (await res.json()) as { verification_status: string };
   return data.verification_status === "SUCCESS";
 }
+
+/* ─── PayPal Subscriptions (Recurring) ─── */
+
+/**
+ * Create a PayPal product + plan for a subscription (if not already cached).
+ * In production, you'd create these once on PayPal and store the plan ID.
+ * For now we use the plan IDs from env vars.
+ */
+export async function getPayPalPlanId(tier: "vip" | "elite"): Promise<string> {
+  const envKey = tier === "vip" ? "PAYPAL_VIP_PLAN_ID" : "PAYPAL_ELITE_PLAN_ID";
+  const planId = process.env[envKey];
+  if (!planId) {
+    throw new Error(`${envKey} env var not set. Create a subscription plan in PayPal dashboard.`);
+  }
+  return planId;
+}
+
+/**
+ * Get subscription details from PayPal
+ */
+export async function getSubscriptionDetails(subscriptionId: string): Promise<{
+  id: string;
+  status: string;
+  subscriber?: { email_address?: string };
+  billing_info?: {
+    next_billing_time?: string;
+    last_payment?: { amount?: { value: string; currency_code: string } };
+  };
+}> {
+  const token = await getAccessToken();
+  const res = await fetch(`${BASE_URL}/v1/billing/subscriptions/${subscriptionId}`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`PayPal get subscription failed: ${err}`);
+  }
+  return res.json();
+}
+

@@ -21,7 +21,7 @@ const PLANS = [
     {
         id: "vip",
         name: "VIP",
-        price: "$29",
+        price: "$19.99",
         period: "per month",
         tagline: "Most popular",
         features: [
@@ -31,7 +31,7 @@ const PLANS = [
             "Priority response queue",
             "Verified badge on profile",
         ],
-        cta: "Start VIP — $29/mo",
+        cta: "Start VIP — $19.99/mo",
         ctaHref: "/register",
         highlighted: true,
         badge: "Most Popular",
@@ -39,7 +39,7 @@ const PLANS = [
     {
         id: "elite",
         name: "Elite",
-        price: "$79",
+        price: "$49.99",
         period: "per month",
         tagline: "The ultimate experience",
         features: [
@@ -50,7 +50,7 @@ const PLANS = [
             "Early access to new talent",
             "No ads, ever",
         ],
-        cta: "Go Elite — $79/mo",
+        cta: "Go Elite — $49.99/mo",
         ctaHref: "/register",
         highlighted: false,
         badge: "Premium",

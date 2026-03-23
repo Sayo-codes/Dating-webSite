@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { withAdmin } from "@/shared/api/auth-guard";
 import { prisma } from "@/shared/lib/prisma";
 
+export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const auth = await withAdmin();
+  if (auth instanceof NextResponse) return auth;
+  const { id: creatorId } = await context.params;
+  const media = await prisma.creatorMedia.findMany({
+    where: { creatorId },
+    orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+  });
+  return NextResponse.json({ media });
+}
+
 export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const auth = await withAdmin();
   if (auth instanceof NextResponse) return auth;

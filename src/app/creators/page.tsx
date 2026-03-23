@@ -5,8 +5,8 @@ import { PageContainer } from "@/shared/ui/PageContainer";
 import { GlassCard } from "@/shared/ui/GlassCard";
 
 export const metadata = {
-  title: "Creators",
-  description: "Browse verified creators",
+  title: "Explore Creators ✦ Velvet Signal",
+  description: "Browse verified creators on Velvet Signal",
 };
 
 export default async function CreatorsPage() {
@@ -17,10 +17,13 @@ export default async function CreatorsPage() {
       <div className="space-y-10">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="section-heading mb-1">Browse</p>
+            <p className="section-heading mb-1">✦ Browse</p>
             <h1 className="text-title font-[var(--font-heading)] text-2xl font-semibold leading-tight text-white sm:text-3xl">
-              Creators
+              Explore Creators
             </h1>
+            <p className="mt-2 text-sm text-white/50">
+              Discover exclusive content from verified creators
+            </p>
           </div>
           <Link
             href="/"
@@ -38,7 +41,7 @@ export default async function CreatorsPage() {
             </p>
           </GlassCard>
         ) : (
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3" role="list">
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4" role="list">
             {creators.map((creator) => (
               <li key={creator.id}>
                 <CreatorCard creator={creator} />

@@ -9,6 +9,7 @@ export function AppHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<{ role: string } | null>(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -16,6 +17,25 @@ export function AppHeader() {
       .then((data) => setUser(data?.user ?? null))
       .catch(() => setUser(null));
   }, []);
+
+  // Fetch unread message count when logged in
+  useEffect(() => {
+    if (!user) return;
+    async function fetchUnread() {
+      try {
+        const res = await fetch("/api/conversations/unread-count");
+        if (res.ok) {
+          const data = (await res.json()) as { count: number };
+          setUnreadCount(data.count ?? 0);
+        }
+      } catch {
+        // silently fail
+      }
+    }
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000); // poll every 30s
+    return () => clearInterval(interval);
+  }, [user]);
 
   useEffect(() => setMenuOpen(false), [pathname]);
 
@@ -26,11 +46,7 @@ export function AppHeader() {
   }, []);
 
   const navLinks = [
-    { href: "/creators", label: "Explore Creators" },
-    ...(user ? [
-      { href: "/messages", label: "Messages" },
-      { href: "/premium", label: "Premium" },
-    ] : []),
+    { href: "/creators", label: "✦ Explore Creators" },
     ...(user?.role === "creator" ? [{ href: "/creator/dashboard", label: "Dashboard" }] : []),
     ...(user?.role === "admin" ? [{ href: "/admin", label: "Admin" }] : []),
   ];
@@ -90,6 +106,28 @@ export function AppHeader() {
 
         {/* Right side actions */}
         <div className="hidden md:flex items-center gap-2">
+          {/* Messages icon - only when logged in */}
+          {user && (
+            <Link
+              href="/messages"
+              className={`focus-outline relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 ${pathname === "/messages"
+                  ? "bg-[rgba(212,168,83,0.15)] text-[#f0c97a]"
+                  : "text-white/70 hover:text-white hover:bg-white/8"
+                }`}
+              aria-label={`Messages${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
+              title="Messages"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#ff2d78] px-1.5 text-[10px] font-bold text-white shadow-[0_0_8px_rgba(255,45,120,0.6)] animate-scale-in">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </Link>
+          )}
+
           {!user ? (
             <>
               <Link
@@ -161,6 +199,27 @@ export function AppHeader() {
               {label}
             </Link>
           ))}
+
+          {/* Messages link in mobile with badge */}
+          {user && (
+            <Link
+              href="/messages"
+              className={`focus-outline flex min-h-[52px] items-center justify-between rounded-2xl px-5 text-base font-medium transition-all duration-200 ${pathname === "/messages" ? "bg-[rgba(212,168,83,0.12)] text-[#f0c97a]" : "text-white/80 hover:bg-white/8 hover:text-white"
+                }`}
+            >
+              <span className="flex items-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                Messages
+              </span>
+              {unreadCount > 0 && (
+                <span className="flex h-6 min-w-[24px] items-center justify-center rounded-full bg-[#ff2d78] px-2 text-xs font-bold text-white">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </Link>
+          )}
 
           {!user && (
             <>

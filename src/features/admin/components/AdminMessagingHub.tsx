@@ -50,6 +50,13 @@ type SubscriberInfo = {
   isSubscribed: boolean;
 };
 
+type MediaVaultItem = {
+  id: string;
+  url: string;
+  type: string;
+  createdAt: string;
+};
+
 const avatarPlaceholder =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle fill='%23333' cx='24' cy='24' r='24'/%3E%3C/svg%3E";
 
@@ -80,6 +87,17 @@ function SendIcon() {
   );
 }
 
+function VaultIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+      <circle cx="12" cy="12" r="4" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="12" x2="14" y2="14" />
+    </svg>
+  );
+}
+
 /* ═══════════════════════════════════════════
    MAIN COMPONENT
    ═══════════════════════════════════════════ */
@@ -96,9 +114,14 @@ export function AdminMessagingHub() {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [isPPV, setIsPPV] = useState(false);
-  const [ppvPrice, setPpvPrice] = useState("19.99");
+  const [ppvPrice, setPpvPrice] = useState("10.00");
   const [subscriberInfo, setSubscriberInfo] = useState<SubscriberInfo | null>(null);
   const [unreadMap, setUnreadMap] = useState<Record<string, number>>({});
+
+  // Media Vault state
+  const [showVault, setShowVault] = useState(false);
+  const [vaultMedia, setVaultMedia] = useState<MediaVaultItem[]>([]);
+  const [loadingVault, setLoadingVault] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -128,7 +151,6 @@ export function AdminMessagingHub() {
       const data = (await res.json()) as { conversations: ConversationItem[] };
       const convs = data.conversations ?? [];
       setConversations(convs);
-      // Update unread map
       const map: Record<string, number> = {};
       for (const c of convs) map[c.id] = c.unreadCount;
       setUnreadMap((prev) => ({ ...prev, ...map }));
@@ -159,10 +181,8 @@ export function AdminMessagingHub() {
         const data = (await res.json()) as { messages: Message[] };
         setMessages(data.messages ?? []);
       }
-      // Mark as read
       fetch(`/api/admin/conversations/${selectedConvId}/read`, { method: "POST" });
       setUnreadMap((prev) => ({ ...prev, [selectedConvId]: 0 }));
-      // Fetch subscriber info
       const subRes = await fetch(`/api/admin/conversations/${selectedConvId}/subscriber`);
       if (subRes.ok) {
         setSubscriberInfo(await subRes.json() as SubscriberInfo);
@@ -170,6 +190,21 @@ export function AdminMessagingHub() {
       setLoadingMsgs(false);
     })();
   }, [selectedConvId]);
+
+  // ─── Fetch media vault for creator ───
+  const fetchVault = useCallback(async (creatorId: string) => {
+    setLoadingVault(true);
+    try {
+      const res = await fetch(`/api/admin/creators/${creatorId}/gallery`);
+      if (res.ok) {
+        const data = (await res.json()) as { media: MediaVaultItem[] };
+        setVaultMedia(data.media ?? []);
+      }
+    } catch {
+      // silent
+    }
+    setLoadingVault(false);
+  }, []);
 
   // ─── Socket: join conversation rooms ───
   useEffect(() => {
@@ -184,10 +219,8 @@ export function AdminMessagingHub() {
       const msg = data as Message;
       if (msg.conversationId === selectedConvId) {
         setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
-        // Mark as read immediately since admin is viewing
         fetch(`/api/admin/conversations/${selectedConvId}/read`, { method: "POST" });
       } else {
-        // Bump unread badge for other conversations
         setUnreadMap((prev) => ({
           ...prev,
           [msg.conversationId]: (prev[msg.conversationId] ?? 0) + 1,
@@ -230,6 +263,39 @@ export function AdminMessagingHub() {
     }
   };
 
+  // ─── Send media from vault ───
+  const sendVaultMedia = async (media: MediaVaultItem) => {
+    if (!selectedConvId) return;
+    setSending(true);
+    try {
+      const payload: Record<string, unknown> = {
+        body: input.trim() || undefined,
+        mediaUrl: media.url,
+        mediaType: media.type,
+      };
+      if (isPPV) {
+        payload.isPPV = true;
+        // Default: $10 for image, $25 for video
+        const defaultPrice = media.type === "VIDEO" ? "25.00" : "10.00";
+        payload.ppvPriceCents = Math.round(parseFloat(ppvPrice || defaultPrice) * 100);
+      }
+      const res = await fetch(`/api/admin/conversations/${selectedConvId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { message: Message };
+        setMessages((prev) => [...prev, data.message]);
+        setInput("");
+        setIsPPV(false);
+        setShowVault(false);
+      }
+    } finally {
+      setSending(false);
+    }
+  };
+
   // ─── Upload and send media ───
   const uploadAndSendMedia = async (file: File) => {
     if (!selectedConvId) return;
@@ -266,7 +332,8 @@ export function AdminMessagingHub() {
       };
       if (isPPV) {
         payload.isPPV = true;
-        payload.ppvPriceCents = Math.round(parseFloat(ppvPrice) * 100);
+        const defaultPrice = mediaType === "VIDEO" ? "25.00" : "10.00";
+        payload.ppvPriceCents = Math.round(parseFloat(ppvPrice || defaultPrice) * 100);
       }
       const msgRes = await fetch(`/api/admin/conversations/${selectedConvId}/messages`, {
         method: "POST",
@@ -291,7 +358,7 @@ export function AdminMessagingHub() {
       {/* ── LEFT: Creator list ── */}
       <aside className="admin-msg-creators">
         <div className="admin-msg-panel-header">
-          <h2 className="text-sm font-semibold text-white">Creators</h2>
+          <h2 className="text-sm font-semibold text-white">✦ Creators</h2>
           <span className="text-xs text-white/40">{creators.length}</span>
         </div>
         <div className="admin-msg-panel-body">
@@ -301,7 +368,6 @@ export function AdminMessagingHub() {
             <ul className="divide-y divide-white/5">
               {creators.map((c) => {
                 const isActive = c.id === selectedCreatorId;
-                // Total unread for this creator's conversations
                 const creatorUnread = conversations
                   .filter((cv) => cv.creatorId === c.id)
                   .reduce((sum, cv) => sum + (unreadMap[cv.id] ?? 0), 0);
@@ -312,6 +378,7 @@ export function AdminMessagingHub() {
                       onClick={() => {
                         setSelectedCreatorId(c.id);
                         setSelectedConvId(null);
+                        setShowVault(false);
                       }}
                       className={`admin-msg-list-item ${isActive ? "active" : ""}`}
                     >
@@ -330,6 +397,8 @@ export function AdminMessagingHub() {
                           {c.conversationCount} conversation{c.conversationCount !== 1 ? "s" : ""}
                         </p>
                       </div>
+                      {/* Online status indicator */}
+                      <span className="admin-msg-live-dot" />
                       {creatorUnread > 0 && (
                         <span className="admin-msg-badge">{creatorUnread}</span>
                       )}
@@ -346,7 +415,7 @@ export function AdminMessagingHub() {
       <section className="admin-msg-convos">
         <div className="admin-msg-panel-header">
           <h2 className="text-sm font-semibold text-white">
-            {selectedCreator ? `${selectedCreator.displayName}'s Conversations` : "Conversations"}
+            {selectedCreator ? `${selectedCreator.displayName}'s Inbox` : "Conversations"}
           </h2>
           {connected && <span className="admin-msg-live-dot" />}
         </div>
@@ -366,7 +435,10 @@ export function AdminMessagingHub() {
                   <li key={c.id}>
                     <button
                       type="button"
-                      onClick={() => setSelectedConvId(c.id)}
+                      onClick={() => {
+                        setSelectedConvId(c.id);
+                        setShowVault(false);
+                      }}
                       className={`admin-msg-list-item ${isActive ? "active" : ""}`}
                     >
                       <div className="min-w-0 flex-1">
@@ -481,6 +553,52 @@ export function AdminMessagingHub() {
               <div ref={messagesEndRef} />
             </div>
 
+            {/* Media Vault overlay */}
+            {showVault && (
+              <div className="border-t border-white/6 bg-[rgba(14,10,22,0.95)] p-4 max-h-[300px] overflow-y-auto">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-[var(--accent-gold)]">✦ Media Vault — {selectedCreator?.displayName}</h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowVault(false)}
+                    className="text-xs text-white/40 hover:text-white"
+                  >
+                    Close ✕
+                  </button>
+                </div>
+                {loadingVault ? (
+                  <p className="text-xs text-white/40">Loading vault…</p>
+                ) : vaultMedia.length === 0 ? (
+                  <p className="text-xs text-white/40">No media in vault. Upload via Creator management.</p>
+                ) : (
+                  <div className="grid grid-cols-4 gap-2">
+                    {vaultMedia.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => sendVaultMedia(m)}
+                        disabled={sending}
+                        className="relative aspect-square overflow-hidden rounded-lg border border-white/10 transition hover:border-[var(--accent-gold)] hover:shadow-[0_0_12px_rgba(212,168,83,0.3)] disabled:opacity-50"
+                      >
+                        {m.type === "IMAGE" ? (
+                          <img src={m.url} alt="" className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-white/5 text-white/40">
+                            <span className="text-2xl">🎬</span>
+                          </div>
+                        )}
+                        {isPPV && (
+                          <div className="absolute inset-x-0 bottom-0 bg-black/70 px-1 py-0.5 text-center text-[10px] font-bold text-[var(--accent-gold)]">
+                            PPV ${ppvPrice}
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Composer */}
             <div className="admin-msg-composer">
               {/* PPV toggle */}
@@ -489,11 +607,14 @@ export function AdminMessagingHub() {
                   <input
                     type="checkbox"
                     checked={isPPV}
-                    onChange={(e) => setIsPPV(e.target.checked)}
+                    onChange={(e) => {
+                      setIsPPV(e.target.checked);
+                      if (e.target.checked) setPpvPrice("10.00");
+                    }}
                   />
                   <span className="admin-msg-ppv-slider" />
                 </label>
-                <span className="text-xs text-white/50">PPV</span>
+                <span className="text-xs text-white/50">🔒 PPV</span>
                 {isPPV && (
                   <div className="admin-msg-ppv-price">
                     <span className="text-xs text-white/50">$</span>
@@ -507,6 +628,7 @@ export function AdminMessagingHub() {
                     />
                   </div>
                 )}
+                <span className="text-[10px] text-white/30 ml-auto">Default: $10 photo / $25 video</span>
               </div>
               <form
                 onSubmit={(e) => {
@@ -534,6 +656,22 @@ export function AdminMessagingHub() {
                 >
                   <AttachIcon />
                 </button>
+                {/* Media Vault button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (showVault) {
+                      setShowVault(false);
+                    } else if (selectedCreatorId) {
+                      fetchVault(selectedCreatorId);
+                      setShowVault(true);
+                    }
+                  }}
+                  className={`admin-msg-icon-btn ${showVault ? "!text-[var(--accent-gold)]" : ""}`}
+                  title="Media Vault"
+                >
+                  <VaultIcon />
+                </button>
                 <input
                   type="text"
                   value={input}
@@ -554,9 +692,14 @@ export function AdminMessagingHub() {
           </>
         ) : (
           <div className="admin-msg-empty h-full">
-            {selectedCreatorId
-              ? "Select a conversation to start messaging"
-              : "Select a creator from the left panel"}
+            <div className="flex flex-col items-center gap-3">
+              <span className="text-4xl">✦</span>
+              <p>
+                {selectedCreatorId
+                  ? "Select a conversation to start messaging"
+                  : "Select a creator from the left panel"}
+              </p>
+            </div>
           </div>
         )}
       </section>

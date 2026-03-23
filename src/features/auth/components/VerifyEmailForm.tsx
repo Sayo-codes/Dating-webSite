@@ -30,7 +30,7 @@ export function VerifyEmailForm({ initialEmail }: Props) {
         return;
       }
       setSuccess(true);
-      window.location.href = "/";
+      window.location.href = "/creators";
     } finally {
       setLoading(false);
     }

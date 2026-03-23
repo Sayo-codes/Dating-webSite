@@ -1,27 +1,29 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { CreatorPostItem } from "@/lib/types/creator";
 
 type Props = {
   post: CreatorPostItem;
   creatorName: string;
+  creatorId: string;
 };
 
-function formatPrice(cents: number): string {
-  return "$" + (cents / 100).toFixed(2);
-}
+export function LockedPostCard({ post, creatorName, creatorId }: Props) {
+  const priceLabel = (post.unlockPriceCents / 100).toFixed(2);
+  const subscribeHref = `/premium?creator=${encodeURIComponent(creatorId)}`;
 
-export function LockedPostCard({ post, creatorName }: Props) {
   return (
     <div className="locked-post glass-card" id={`post-${post.id}`}>
       {/* Blurred preview */}
       <div className="locked-post__preview">
         <Image
           src={post.previewUrl}
-          alt={post.caption ?? "Locked content"}
+          alt={post.caption ?? `Exclusive post by ${creatorName}`}
           fill
           className="locked-post__image"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           unoptimized
+          style={post.isLocked ? { filter: "blur(24px)" } : undefined}
         />
         {post.isLocked && <div className="locked-post__blur-overlay" />}
       </div>
@@ -44,10 +46,14 @@ export function LockedPostCard({ post, creatorName }: Props) {
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
           </div>
-          <p className="locked-overlay__text">Exclusive Content</p>
-          <button className="locked-overlay__unlock pill-button-primary" type="button">
-            Subscribe to unlock – {formatPrice(post.unlockPriceCents)}/month
-          </button>
+          <p className="locked-overlay__text">✦ Exclusive Content</p>
+          <Link
+            href={subscribeHref}
+            className="locked-overlay__unlock pill-button-primary inline-flex min-h-[48px] items-center justify-center text-center"
+            style={{ background: "linear-gradient(135deg, #ff2d78 0%, #d4a853 100%)" }}
+          >
+            Subscribe to Unlock – ${priceLabel}/mo
+          </Link>
         </div>
       )}
 

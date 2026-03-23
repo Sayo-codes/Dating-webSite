@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { PageContainer } from "@/shared/ui/PageContainer";
 import { GlassCard } from "@/shared/ui/GlassCard";
-import { Badge } from "@/shared/ui/Badge";
 import { StatusDot } from "@/shared/ui/StatusDot";
 import { PrimaryButton, SecondaryButton } from "@/shared/ui";
 import { CreatorStatsBar } from "./CreatorStatsBar";
@@ -13,6 +12,7 @@ type Props = {
   creator: CreatorProfile;
   isLoggedIn?: boolean;
   isOwnProfile?: boolean;
+  isSubscribed?: boolean;
 };
 
 const bannerPlaceholder =
@@ -21,7 +21,7 @@ const bannerPlaceholder =
 const avatarPlaceholder =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23c778ff'/%3E%3Cstop offset='100%25' style='stop-color:%23d4a853'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23g)' width='200' height='200' rx='100'/%3E%3C/svg%3E";
 
-export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Props) {
+export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile, isSubscribed }: Props) {
   const bannerSrc = creator.bannerUrl ?? bannerPlaceholder;
   const avatarSrc = creator.avatarUrl ?? avatarPlaceholder;
   const isOnline = true;
@@ -143,19 +143,26 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Pro
               <>
                 <Link href={`/messages?creator=${encodeURIComponent(creator.id)}`} className="min-w-0 flex-1 sm:flex-none">
                   <PrimaryButton className="w-full">
-                    Send message
+                    ✦ Send message
                   </PrimaryButton>
                 </Link>
-                <Link href={`/messages?creator=${encodeURIComponent(creator.id)}`} className="min-w-0 flex-1 sm:flex-none">
-                  <SecondaryButton className="w-full">
-                    Subscribe
-                  </SecondaryButton>
-                </Link>
+                {!isSubscribed && !isOwnProfile && (
+                  <Link href={`/premium?creator=${encodeURIComponent(creator.id)}`} className="min-w-0 flex-1 sm:flex-none">
+                    <SecondaryButton className="w-full">
+                      Subscribe — $19.99/mo
+                    </SecondaryButton>
+                  </Link>
+                )}
+                {isSubscribed && (
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(61,255,154,0.3)] bg-[rgba(61,255,154,0.08)] px-5 py-2.5 text-sm font-medium text-[#3dff9a]">
+                    <StatusDot status="online" /> Subscribed
+                  </div>
+                )}
               </>
             ) : (
               <Link href="/login" className="min-w-0 flex-1 sm:flex-none">
                 <PrimaryButton className="w-full">
-                  Send message
+                  ✦ Subscribe to unlock — $19.99/mo
                 </PrimaryButton>
               </Link>
             )}
@@ -164,7 +171,7 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Pro
           {/* ── About ── */}
           {creator.bio && (
             <GlassCard padding="md" className="animate-fade-up-delay-2">
-              <p className="section-heading mb-3">About</p>
+              <p className="section-heading mb-3">✦ About</p>
               <p className="text-sm leading-relaxed text-[var(--text-secondary)] whitespace-pre-wrap">
                 {creator.bio}
               </p>
@@ -173,7 +180,7 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Pro
 
           {/* ── Details ── */}
           <GlassCard padding="md" className="grid gap-4 sm:grid-cols-2 animate-fade-up-delay-3">
-            <p className="section-heading sm:col-span-2">Details</p>
+            <p className="section-heading sm:col-span-2">✦ Details</p>
             {creator.profession && (
               <div className="space-y-1">
                 <p className="text-caption">Profession</p>
@@ -200,12 +207,12 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Pro
             )}
           </GlassCard>
 
-          {/* ── Gallery ── */}
+          {/* ── Gallery with blur for non-subscribers ── */}
           {creator.gallery.length > 0 && (
             <div className="animate-fade-up-delay-3">
-              <p className="section-heading mb-4">Gallery</p>
+              <p className="section-heading mb-4">✦ Gallery</p>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
-                {creator.gallery.slice(0, 8).map((m) => (
+                {creator.gallery.slice(0, 8).map((m, idx) => (
                   <div
                     key={m.id}
                     className="relative aspect-square overflow-hidden rounded-xl bg-white/5 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.6)]"
@@ -217,20 +224,49 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Pro
                       className="object-cover"
                       sizes="120px"
                       unoptimized={m.url.startsWith("data:") || !m.url.startsWith("/")}
+                      style={!isSubscribed && idx > 0 ? { filter: "blur(24px)" } : undefined}
                     />
+                    {/* Blur overlay + lock icon for non-subscribers (skip first image as preview) */}
+                    {!isSubscribed && idx > 0 && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-[rgba(7,7,11,0.30)] backdrop-blur-sm z-10">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[rgba(212,168,83,0.15)] border border-[rgba(212,168,83,0.35)]">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#d4a853" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                          </svg>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
+              {/* Subscribe CTA below gallery for non-subscribers */}
+              {!isSubscribed && !isOwnProfile && (
+                <div className="mt-4 text-center">
+                  <Link
+                    href={isLoggedIn ? `/premium?creator=${encodeURIComponent(creator.id)}` : "/login"}
+                    className="pill-button-primary focus-outline inline-flex min-h-[48px] items-center justify-center rounded-full px-8 py-3 text-sm font-semibold"
+                    style={{ background: "linear-gradient(135deg, #ff2d78 0%, #d4a853 100%)" }}
+                  >
+                    🔒 Subscribe to Unlock — $19.99/mo
+                  </Link>
+                </div>
+              )}
             </div>
           )}
 
           {/* ── Locked Content Feed ── */}
           <div className="animate-fade-up-delay-4">
-            <p className="section-heading mb-4">Exclusive Content</p>
+            <p className="section-heading mb-4">✦ Exclusive Content</p>
             {creator.posts.length > 0 ? (
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 {creator.posts.map((post) => (
-                  <LockedPostCard key={post.id} post={post} creatorName={creator.displayName} />
+                  <LockedPostCard
+                    key={post.id}
+                    post={isSubscribed ? { ...post, isLocked: false } : post}
+                    creatorName={creator.displayName}
+                    creatorId={creator.id}
+                  />
                 ))}
               </div>
             ) : (
