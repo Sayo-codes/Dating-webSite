@@ -1,3 +1,4 @@
+import { DiscoverHomeBottomSpotlight } from "./DiscoverHomeBottomSpotlight";
 import { DashboardHeader } from "./DashboardHeader";
 import { CreatorDiscoverCard } from "./CreatorDiscoverCard";
 import type { DiscoverCreatorRow } from "../data";
@@ -54,6 +55,8 @@ export function LoggedInDiscoverHome({ user, unreadCount, creators }: Props) {
             ))}
           </ul>
         )}
+
+        <DiscoverHomeBottomSpotlight />
       </main>
     </div>
   );

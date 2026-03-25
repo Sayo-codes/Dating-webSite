@@ -1,13 +1,6 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/shared/lib/auth";
-import {
-  HeroSection,
-  StatsSection,
-  CreatorSliderSection,
-  TrendingCreatorsSection,
-  TestimonialsSection,
-  PricingSection,
-} from "@/features/landing";
+import { HeroSection, StatsSection, TestimonialsSection } from "@/features/landing";
 import { PrimaryButton } from "@/shared/ui";
 import { LoggedInDiscoverHome } from "@/features/dashboard/components/LoggedInDiscoverHome";
 import { getDiscoverFeedForUser, getUnreadMessageCountForUser } from "@/features/dashboard/data";
@@ -37,10 +30,7 @@ export default async function Home() {
 
         <div className="flex flex-col gap-20 py-20 sm:gap-28 sm:py-28">
           <StatsSection />
-          <CreatorSliderSection />
-          <TrendingCreatorsSection />
           <TestimonialsSection />
-          <PricingSection />
 
           <div className="px-4 sm:px-6 lg:px-10">
             <div

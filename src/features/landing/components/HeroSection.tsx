@@ -1,42 +1,6 @@
 import Link from "next/link";
 import { PrimaryButton } from "@/shared/ui/PrimaryButton";
 
-const CREATOR_PREVIEWS = [
-  {
-    name: "Aria V.",
-    age: 24,
-    tag: "VIP Model",
-    gradient: "linear-gradient(135deg, #d4a853 0%, #ff2d78 100%)",
-    quote: "Online tonight for exclusive live chat 💋",
-    initials: "AV",
-    delay: "0s",
-    position: "top-4 right-4",
-    rotation: "rotate-2",
-  },
-  {
-    name: "Sophia K.",
-    age: 26,
-    tag: "Elite",
-    gradient: "linear-gradient(135deg, #c778ff 0%, #ff2d78 100%)",
-    quote: "Private sessions available. Verified ✦",
-    initials: "SK",
-    delay: "0.4s",
-    position: "bottom-6 right-0",
-    rotation: "-rotate-1",
-  },
-  {
-    name: "Luna M.",
-    age: 23,
-    tag: "Verified",
-    gradient: "linear-gradient(135deg, #ff2d78 0%, #d4a853 100%)",
-    quote: "Accepting requests now 🌙",
-    initials: "LM",
-    delay: "0.8s",
-    position: "top-1/2 -left-4",
-    rotation: "rotate-1",
-  },
-];
-
 export function HeroSection() {
   return (
     <section
@@ -61,10 +25,7 @@ export function HeroSection() {
       />
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10 py-16 sm:py-20 lg:py-24">
-        <div className="grid gap-12 lg:grid-cols-[1fr_480px] lg:items-center">
-
-          {/* Left: Text Content */}
-          <div className="space-y-7 text-center lg:text-left">
+        <div className="mx-auto max-w-3xl space-y-7 text-center lg:mx-0 lg:max-w-2xl lg:text-left">
 
             {/* Badge */}
             <p
@@ -143,59 +104,6 @@ export function HeroSection() {
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Right: Floating Creator Cards */}
-          <div className="relative mx-auto h-[460px] w-full max-w-sm lg:mx-0" aria-hidden="true">
-            {/* Glow orb behind cards */}
-            <div
-              className="absolute inset-0 rounded-full opacity-30 blur-[80px]"
-              style={{ background: "radial-gradient(circle, rgba(212,168,83,0.5) 0%, rgba(255,45,120,0.3) 50%, transparent 70%)" }}
-            />
-
-            {CREATOR_PREVIEWS.map((creator, i) => (
-              <div
-                key={creator.name}
-                className={`absolute w-56 ${creator.position} ${creator.rotation}`}
-                style={{
-                  animation: `float ${5 + i}s ease-in-out infinite`,
-                  animationDelay: creator.delay,
-                }}
-              >
-                <div
-                  className="glass-card glass-card--gold shimmer-overlay p-4 space-y-3"
-                  style={{ borderRadius: "20px" }}
-                >
-                  {/* Avatar + name row */}
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="h-11 w-11 rounded-2xl flex items-center justify-center text-white font-bold text-sm shrink-0"
-                      style={{ background: creator.gradient }}
-                    >
-                      {creator.initials}
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-white">{creator.name} · {creator.age}</p>
-                      <p className="flex items-center gap-1.5 text-[0.65rem] text-white/55">
-                        <span className="status-dot status-dot--online" />
-                        Online · {creator.tag}
-                      </p>
-                    </div>
-                  </div>
-                  {/* Quote */}
-                  <p className="text-xs text-white/60 leading-relaxed italic">&ldquo;{creator.quote}&rdquo;</p>
-                  {/* Chat button */}
-                  <button
-                    aria-label={`Chat with ${creator.name}`}
-                    className="w-full rounded-full py-2 text-xs font-semibold text-white transition-all duration-200 hover:scale-105"
-                    style={{ background: "var(--gradient-primary)", boxShadow: "0 4px 16px rgba(212,168,83,0.3)" }}
-                  >
-                    Chat Now ✦
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
