@@ -1,13 +1,23 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/shared/lib/auth";
-import { HeroSection, StatsSection, TestimonialsSection } from "@/features/landing";
+import {
+  HeroSection,
+  StatsSection,
+  WhyVelvetSection,
+  TestimonialsSection,
+  LandingFooter,
+} from "@/features/landing";
 import { PrimaryButton } from "@/shared/ui";
 import { LoggedInDiscoverHome } from "@/features/dashboard/components/LoggedInDiscoverHome";
-import { getDiscoverFeedForUser, getUnreadMessageCountForUser } from "@/features/dashboard/data";
+import {
+  getDiscoverFeedForUser,
+  getUnreadMessageCountForUser,
+} from "@/features/dashboard/data";
 
 export default async function Home() {
   const user = await getCurrentUser();
 
+  // ── Logged-in: render dashboard ──────────────────────────────────────────
   if (user) {
     const [creators, unreadCount] = await Promise.all([
       getDiscoverFeedForUser(user.id),
@@ -23,32 +33,45 @@ export default async function Home() {
     );
   }
 
+  // ── Public: Tinder-style luxury landing page ─────────────────────────────
   return (
     <div className="min-h-screen text-white overflow-x-hidden">
       <main className="flex flex-col">
+
+        {/* 1. Full-viewport hero */}
         <HeroSection />
 
-        <div className="flex flex-col gap-20 py-20 sm:gap-28 sm:py-28">
+        <div className="flex flex-col gap-24 py-24 sm:gap-32 sm:py-32">
+
+          {/* 2. Platform stats */}
           <StatsSection />
+
+          {/* 3. Why Velvet Signal — 4 feature cards */}
+          <WhyVelvetSection />
+
+          {/* 4. Testimonials */}
           <TestimonialsSection />
 
+          {/* 5. Final CTA block */}
           <div className="px-4 sm:px-6 lg:px-10">
             <div
               className="relative overflow-hidden rounded-[28px] p-10 text-center sm:p-16"
               style={{
-                background: "linear-gradient(135deg, rgba(212,168,83,0.12) 0%, rgba(255,45,120,0.10) 100%)",
+                background:
+                  "linear-gradient(135deg, rgba(212,168,83,0.12) 0%, rgba(255,45,120,0.10) 100%)",
                 border: "1px solid rgba(212,168,83,0.25)",
                 backdropFilter: "blur(24px)",
               }}
             >
+              {/* Glow accents */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute -top-16 left-1/4 h-48 w-48 rounded-full opacity-30 blur-3xl"
+                className="pointer-events-none absolute -top-20 left-1/4 h-56 w-56 rounded-full opacity-30 blur-3xl"
                 style={{ background: "#d4a853" }}
               />
               <div
                 aria-hidden
-                className="pointer-events-none absolute -bottom-16 right-1/4 h-48 w-48 rounded-full opacity-20 blur-3xl"
+                className="pointer-events-none absolute -bottom-20 right-1/4 h-56 w-56 rounded-full opacity-22 blur-3xl"
                 style={{ background: "#ff2d78" }}
               />
 
@@ -59,7 +82,8 @@ export default async function Home() {
                 <h2
                   className="font-[var(--font-heading)] text-3xl font-bold sm:text-4xl lg:text-5xl"
                   style={{
-                    background: "linear-gradient(135deg, #f0c97a 0%, #d4a853 40%, #ff2d78 100%)",
+                    background:
+                      "linear-gradient(135deg, #f0c97a 0%, #d4a853 40%, #ff2d78 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
@@ -68,7 +92,8 @@ export default async function Home() {
                   Begin Your Exclusive Journey
                 </h2>
                 <p className="mx-auto mt-4 max-w-md text-sm text-white/55 sm:text-base">
-                  Join thousands of members already experiencing the most private, luxurious creator platform available.
+                  Join thousands of members already experiencing the most private, luxurious
+                  creator platform available.
                 </p>
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                   <Link href="/register">
@@ -88,6 +113,9 @@ export default async function Home() {
             </div>
           </div>
         </div>
+
+        {/* 7. Footer */}
+        <LandingFooter />
       </main>
     </div>
   );

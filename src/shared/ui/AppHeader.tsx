@@ -45,11 +45,17 @@ export function AppHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const navLinks = [
-    { href: "/creators", label: "✦ Explore Creators" },
+  // Logged-out: no nav links (Login / Join Now buttons handle auth)
+  const guestNavLinks: { href: string; label: string }[] = [];
+
+  // Logged-in app links
+  const authNavLinks = [
+    { href: "/creators", label: "✦ Explore" },
     ...(user?.role === "creator" ? [{ href: "/creator/dashboard", label: "Dashboard" }] : []),
     ...(user?.role === "admin" ? [{ href: "/admin", label: "Admin" }] : []),
   ];
+
+  const navLinks = user ? authNavLinks : guestNavLinks;
 
   return (
     <header

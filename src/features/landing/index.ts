@@ -5,3 +5,5 @@ export { CreatorSliderSection } from "./components/CreatorSliderSection";
 export { TrendingCreatorsSection } from "./components/TrendingCreatorsSection";
 export { TestimonialsSection } from "./components/TestimonialsSection";
 export { PricingSection } from "./components/PricingSection";
+export { WhyVelvetSection } from "./components/WhyVelvetSection";
+export { LandingFooter } from "./components/LandingFooter";
