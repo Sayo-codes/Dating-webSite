@@ -1,3 +1,4 @@
+import { CreatorSliderSection, TrendingCreatorsSection } from "@/features/landing";
 import { DiscoverHomeBottomSpotlight } from "./DiscoverHomeBottomSpotlight";
 import { DashboardHeader } from "./DashboardHeader";
 import { CreatorDiscoverCard } from "./CreatorDiscoverCard";
@@ -35,15 +36,16 @@ export function LoggedInDiscoverHome({ user, unreadCount, creators }: Props) {
             <p className="mt-2 text-sm text-white/50">Check back soon — new talent is onboarding.</p>
           </div>
         ) : (
-          <ul className="grid grid-cols-2 gap-2.5 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+          <ul className="grid grid-cols-2 gap-2.5 overflow-visible py-1 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
             {creators.map((c) => (
-              <li key={c.id} className="min-w-0">
+              <li key={c.id} className="min-w-0 overflow-visible">
                 <CreatorDiscoverCard
                   creator={{
                     id: c.id,
                     username: c.username,
                     displayName: c.displayName,
                     imageUrl: c.imageUrl,
+                    location: c.location,
                     matchPercent: c.matchPercent,
                     distanceLabel: c.distanceLabel,
                     displayAge: c.displayAge,
@@ -55,6 +57,11 @@ export function LoggedInDiscoverHome({ user, unreadCount, creators }: Props) {
             ))}
           </ul>
         )}
+
+        <div className="mt-14 flex flex-col gap-14 sm:mt-16 sm:gap-20">
+          <CreatorSliderSection />
+          <TrendingCreatorsSection />
+        </div>
 
         <DiscoverHomeBottomSpotlight />
       </main>

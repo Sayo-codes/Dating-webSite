@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const TRENDING = [
     {
         rank: 1,
@@ -74,18 +76,7 @@ const TRENDING = [
         gradient: "linear-gradient(135deg, #22d3ee 0%, #d4a853 100%)",
         online: false,
         rating: "4.6",
-        chats: "720",
-    },
-    {
-        rank: 8,
-        initials: "IK",
-        name: "Isla K.",
-        age: 22,
-        type: "New · Verified",
-        gradient: "linear-gradient(135deg, #ff6fa3 0%, #d4a853 100%)",
-        online: true,
-        rating: "4.5",
-        chats: "890",
+        chats: "680",
     },
 ];
 
@@ -183,14 +174,14 @@ export function TrendingCreatorsSection() {
                             </div>
 
                             {/* Button */}
-                            <button
-                                type="button"
-                                className="focus-outline mt-1 w-full rounded-full py-2 text-xs font-semibold text-white transition-all duration-200 hover:scale-105"
+                            <Link
+                                href="/creators"
+                                className="focus-outline mt-1 flex w-full items-center justify-center rounded-full py-2 text-center text-xs font-semibold text-white transition-all duration-200 hover:scale-105"
                                 style={{ background: "var(--gradient-primary)", boxShadow: "0 4px 16px rgba(212,168,83,0.25)" }}
                                 aria-label={`Chat with ${creator.name}`}
                             >
                                 Chat Now
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 ))}

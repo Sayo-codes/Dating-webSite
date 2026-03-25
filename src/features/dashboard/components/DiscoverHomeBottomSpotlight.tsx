@@ -8,9 +8,21 @@ const SPOTLIGHT = [
     tag: "VIP Model",
     gradient: "linear-gradient(135deg, #d4a853 0%, #ff2d78 100%)",
     quote: "Online tonight for exclusive live chat 💋",
-    position: "top-0 right-0 sm:right-4",
+    position: "top-2 right-0 sm:right-2",
     rotation: "rotate-2",
     delay: "0s",
+    z: "z-30",
+  },
+  {
+    name: "Luna M.",
+    age: 23,
+    initials: "LM",
+    tag: "Verified",
+    gradient: "linear-gradient(135deg, #ff2d78 0%, #d4a853 100%)",
+    quote: "Accepting requests now 🌙",
+    position: "top-[34%] -left-1 sm:left-2",
+    rotation: "rotate-1",
+    delay: "0.8s",
     z: "z-20",
   },
   {
@@ -20,7 +32,7 @@ const SPOTLIGHT = [
     tag: "Elite",
     gradient: "linear-gradient(135deg, #c778ff 0%, #ff2d78 100%)",
     quote: "Private sessions available. Verified ✦",
-    position: "bottom-0 left-0 sm:left-6",
+    position: "bottom-4 right-0 sm:bottom-2 sm:right-4",
     rotation: "-rotate-1",
     delay: "0.4s",
     z: "z-10",
@@ -36,7 +48,7 @@ export function DiscoverHomeBottomSpotlight() {
       <h2 id="discover-spotlight-heading" className="sr-only">
         Featured creators
       </h2>
-      <div className="relative mx-auto h-[min(420px,70vw)] w-full max-w-sm sm:h-[400px]">
+      <div className="relative mx-auto h-[min(520px,92vw)] w-full max-w-md overflow-visible px-2 sm:h-[480px] sm:max-w-lg">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0 rounded-full opacity-25 blur-[72px]"

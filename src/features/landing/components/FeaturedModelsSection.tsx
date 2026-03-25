@@ -1,9 +1,8 @@
- "use client";
+"use client";
 
 import { GlassCard } from "@/shared/ui/GlassCard";
-import { PrimaryButton } from "@/shared/ui/PrimaryButton";
-import { StatusDot } from "@/shared/ui/StatusDot";
 import { useFeaturedModels } from "@/features/models/hooks/useFeaturedModels";
+import { CreatorCard } from "@/components/CreatorCard";
 import type { ModelSummary } from "@/lib/types/model";
 
 export function FeaturedModelsSection() {
@@ -32,11 +31,11 @@ export function FeaturedModelsSection() {
         </GlassCard>
       ) : (
         <div
-          className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2"
+          className="-mx-4 flex gap-5 overflow-x-auto px-4 pb-2 pt-1"
           aria-label="Featured models list"
         >
           {featuredModels.map((model) => (
-            <FeaturedModelCard key={model.name} model={model} />
+            <FeaturedModelCard key={model.username} model={model} />
           ))}
         </div>
       )}
@@ -44,53 +43,31 @@ export function FeaturedModelsSection() {
   );
 }
 
-type FeaturedModelCardProps = {
-  model: ModelSummary;
-};
+function FeaturedModelCard({ model }: { model: ModelSummary }) {
+  const isVip = model.tags.some((t) => t.toUpperCase().includes("VIP"));
 
-function FeaturedModelCard({ model }: FeaturedModelCardProps) {
   return (
-    <button
-      type="button"
-      className="glass-card glass-card--interactive focus-outline min-w-[220px] flex-1 cursor-pointer text-left"
-      aria-label={`Open chat with ${model.name}`}
-    >
-      <div className="flex flex-col gap-3 p-4">
-        <div className="h-32 rounded-2xl bg-[radial-gradient(circle_at_top,#ffffff33,transparent_55%),linear-gradient(135deg,#c778ff,#4dd5ff)]" />
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-semibold">{model.name}</p>
-            <p className="flex items-center gap-2 text-[0.7rem] text-white/60">
-              <StatusDot status={model.status} />
-              {model.status === "online" ? "Online" : "Offline"}
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-1 text-[0.65rem] text-white/60">
-            {model.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full border border-fuchsia-400/40 bg-fuchsia-500/10 px-2 py-0.5"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-        <PrimaryButton className="w-full py-2 text-xs font-semibold tracking-wide">
-          Chat Now
-        </PrimaryButton>
-      </div>
-    </button>
+    <div className="w-[min(100%,280px)] shrink-0 snap-start">
+      <CreatorCard
+        creatorId=""
+        username={model.username}
+        name={model.name}
+        age={model.age}
+        location={model.location}
+        imageUrl={model.imageUrl}
+        isVIP={isVip}
+      />
+    </div>
   );
 }
 
 function FeaturedModelsSkeleton() {
   return (
-    <div className="-mx-4 flex gap-4 overflow-x-auto px-4 pb-2">
+    <div className="-mx-4 flex gap-5 overflow-x-auto px-4 pb-2">
       {Array.from({ length: 3 }).map((_, index) => (
         <GlassCard
           key={`skeleton-${index}`}
-          className="min-w-[220px] flex-1 p-4 skeleton"
+          className="h-[420px] min-w-[260px] shrink-0 skeleton"
           aria-hidden="true"
         >
           <span className="sr-only">Loading</span>
@@ -99,5 +76,3 @@ function FeaturedModelsSkeleton() {
     </div>
   );
 }
-
-

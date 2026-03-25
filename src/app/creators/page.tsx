@@ -41,9 +41,9 @@ export default async function CreatorsPage() {
             </p>
           </GlassCard>
         ) : (
-          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4" role="list">
+          <ul className="grid grid-cols-1 gap-4 overflow-visible py-1 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4" role="list">
             {creators.map((creator) => (
-              <li key={creator.id}>
+              <li key={creator.id} className="overflow-visible">
                 <CreatorCard creator={creator} />
               </li>
             ))}

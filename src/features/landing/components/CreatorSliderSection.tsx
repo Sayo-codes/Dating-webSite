@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef } from "react";
 
 const FEATURED_CREATORS = [
@@ -7,7 +8,7 @@ const FEATURED_CREATORS = [
         initials: "AV",
         name: "Aria V.",
         age: 24,
-        tags: ["VIP", "Live"],
+        tags: ["VIP", "LIVE"],
         gradient: "linear-gradient(135deg, #d4a853 0%, #ff2d78 100%)",
         online: true,
         chats: "2.1k",
@@ -16,7 +17,7 @@ const FEATURED_CREATORS = [
         initials: "SK",
         name: "Sophia K.",
         age: 26,
-        tags: ["Elite", "Exclusive"],
+        tags: ["ELITE", "EXCLUSIVE"],
         gradient: "linear-gradient(135deg, #c778ff 0%, #ff2d78 100%)",
         online: true,
         chats: "3.8k",
@@ -25,7 +26,7 @@ const FEATURED_CREATORS = [
         initials: "LM",
         name: "Luna M.",
         age: 23,
-        tags: ["Verified"],
+        tags: ["VERIFIED"],
         gradient: "linear-gradient(135deg, #ff2d78 0%, #d4a853 100%)",
         online: true,
         chats: "1.5k",
@@ -34,7 +35,7 @@ const FEATURED_CREATORS = [
         initials: "NR",
         name: "Nova R.",
         age: 25,
-        tags: ["VIP", "Video"],
+        tags: ["VIP", "VIDEO"],
         gradient: "linear-gradient(135deg, #22d3ee 0%, #c778ff 100%)",
         online: false,
         chats: "4.2k",
@@ -43,7 +44,7 @@ const FEATURED_CREATORS = [
         initials: "ZB",
         name: "Zara B.",
         age: 28,
-        tags: ["Elite"],
+        tags: ["ELITE"],
         gradient: "linear-gradient(135deg, #d4a853 0%, #c778ff 100%)",
         online: true,
         chats: "2.9k",
@@ -52,7 +53,7 @@ const FEATURED_CREATORS = [
         initials: "IK",
         name: "Isla K.",
         age: 22,
-        tags: ["Verified", "New"],
+        tags: ["VERIFIED", "NEW"],
         gradient: "linear-gradient(135deg, #ff6fa3 0%, #d4a853 100%)",
         online: true,
         chats: "890",
@@ -171,14 +172,14 @@ export function CreatorSliderSection() {
                             </div>
 
                             {/* CTA */}
-                            <button
-                                type="button"
-                                className="focus-outline w-full rounded-full py-2.5 text-xs font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-[0_4px_20px_rgba(212,168,83,0.4)]"
+                            <Link
+                                href="/creators"
+                                className="focus-outline flex w-full items-center justify-center rounded-full py-2.5 text-center text-xs font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-[0_4px_20px_rgba(212,168,83,0.4)]"
                                 style={{ background: "var(--gradient-primary)" }}
                                 aria-label={`Chat with ${creator.name}`}
                             >
                                 Chat Now ✦
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 ))}
