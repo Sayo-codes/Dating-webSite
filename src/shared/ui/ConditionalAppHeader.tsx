@@ -31,6 +31,8 @@ export function ConditionalAppHeader() {
     };
   }, [pathname]);
 
+  if (pathname.startsWith("/admin")) return null;
+
   if (!showMarketingHeader) return null;
   return <AppHeader />;
 }
