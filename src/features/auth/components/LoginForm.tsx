@@ -10,7 +10,23 @@ type FieldErrors = {
   password?: string;
 };
 
-export function LoginForm() {
+type LoginFormProps = {
+  /**
+   * Where to go after login. If omitted, admins → `/admin`, everyone else → `/` (discover home).
+   * Pass explicitly (e.g. `?next=/messages` or `/admin` from preview) to override.
+   */
+  redirectTo?: string;
+  submitLabel?: string;
+  showCancel?: boolean;
+};
+
+type LoginResponseUser = { role?: string };
+
+export function LoginForm({
+  redirectTo,
+  submitLabel,
+  showCancel = true,
+}: LoginFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -50,12 +66,22 @@ export function LoginForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json().catch(() => ({}));
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        user?: LoginResponseUser;
+      };
       if (!res.ok) {
         setError(data.error ?? "Login failed");
         return;
       }
-      router.push("/creators");
+      const user = data.user;
+      const dest =
+        redirectTo != null && redirectTo !== ""
+          ? redirectTo
+          : user?.role === "admin"
+            ? "/admin"
+            : "/";
+      router.push(dest);
       router.refresh();
     } finally {
       setLoading(false);
@@ -118,13 +144,15 @@ export function LoginForm() {
             disabled={loading}
             loading={loading}
           >
-            {loading ? "Signing in…" : "Log in"}
+            {loading ? "Signing in…" : (submitLabel ?? "Log in")}
           </PrimaryButton>
-          <Link href="/" className="min-w-0 flex-1 sm:flex-none">
-            <SecondaryButton type="button" className="w-full">
-              Cancel
-            </SecondaryButton>
-          </Link>
+          {showCancel && (
+            <Link href="/" className="min-w-0 flex-1 sm:flex-none">
+              <SecondaryButton type="button" className="w-full">
+                Cancel
+              </SecondaryButton>
+            </Link>
+          )}
         </div>
       </form>
     </GlassCard>

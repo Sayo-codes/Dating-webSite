@@ -1,15 +1,18 @@
 import { VerifyEmailForm } from "@/features/auth/components/VerifyEmailForm";
 import { PageContainer } from "@/shared/ui/PageContainer";
+import { safeInternalPath } from "@/shared/lib/safe-redirect";
 
 export const metadata = {
   title: "Verify email",
   description: "Enter the code we sent to your email",
 };
 
-type SearchParams = { searchParams: Promise<{ email?: string }> };
+type SearchParams = { searchParams: Promise<{ email?: string; next?: string }> };
 
 export default async function VerifyEmailPage({ searchParams }: SearchParams) {
-  const { email } = await searchParams;
+  const { email, next } = await searchParams;
+  const afterVerify = safeInternalPath(next) ?? "/";
+
   return (
     <PageContainer className="min-h-screen items-center justify-center px-4 py-8">
       <div className="w-full max-w-md space-y-6">
@@ -22,7 +25,7 @@ export default async function VerifyEmailPage({ searchParams }: SearchParams) {
             We sent a 6-digit code. Enter it below.
           </p>
         </div>
-        <VerifyEmailForm initialEmail={email ?? ""} />
+        <VerifyEmailForm initialEmail={email ?? ""} redirectAfterVerify={afterVerify} />
       </div>
     </PageContainer>
   );

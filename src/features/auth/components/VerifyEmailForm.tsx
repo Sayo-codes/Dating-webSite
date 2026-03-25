@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { GlassCard, Input, PrimaryButton, SecondaryButton } from "@/shared/ui";
 
-type Props = { initialEmail: string };
+type Props = { initialEmail: string; redirectAfterVerify?: string };
 
-export function VerifyEmailForm({ initialEmail }: Props) {
+export function VerifyEmailForm({ initialEmail, redirectAfterVerify = "/" }: Props) {
   const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
@@ -30,7 +30,7 @@ export function VerifyEmailForm({ initialEmail }: Props) {
         return;
       }
       setSuccess(true);
-      window.location.href = "/creators";
+      window.location.href = redirectAfterVerify;
     } finally {
       setLoading(false);
     }

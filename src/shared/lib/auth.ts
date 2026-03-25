@@ -108,7 +108,7 @@ export async function requireAdmin(): Promise<{
   const user = await getCurrentUser();
   if (!user || user.role !== "admin") {
     const { redirect } = await import("next/navigation");
-    redirect("/login");
+    redirect("/login?next=/admin");
   }
   return user!;
 }

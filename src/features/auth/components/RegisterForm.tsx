@@ -12,7 +12,12 @@ type FieldErrors = {
   age?: string;
 };
 
-export function RegisterForm() {
+type RegisterFormProps = {
+  /** After registration (e.g. `/join-admin` for agency invites) */
+  redirectAfterRegister?: string;
+};
+
+export function RegisterForm({ redirectAfterRegister }: RegisterFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -75,10 +80,12 @@ export function RegisterForm() {
         return;
       }
       if (data.requiresVerification) {
-        router.push("/verify-email?email=" + encodeURIComponent(email));
+        const q = new URLSearchParams({ email });
+        if (redirectAfterRegister) q.set("next", redirectAfterRegister);
+        router.push(`/verify-email?${q.toString()}`);
         return;
       }
-      router.push("/");
+      router.push(redirectAfterRegister ?? "/");
       router.refresh();
     } finally {
       setLoading(false);

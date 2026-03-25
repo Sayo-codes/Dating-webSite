@@ -1,13 +1,19 @@
 import Link from "next/link";
 import { RegisterForm } from "@/features/auth/components/RegisterForm";
 import { PageContainer } from "@/shared/ui/PageContainer";
+import { safeInternalPath } from "@/shared/lib/safe-redirect";
 
 export const metadata = {
   title: "Join",
   description: "Create your account",
 };
 
-export default function RegisterPage() {
+type Props = { searchParams: Promise<{ next?: string }> };
+
+export default async function RegisterPage({ searchParams }: Props) {
+  const { next } = await searchParams;
+  const nextPath = safeInternalPath(next);
+
   return (
     <PageContainer size="narrow" className="min-h-screen items-center justify-center gap-8 px-4 py-8 sm:gap-10 sm:py-10">
       <div className="w-full max-w-full space-y-6 sm:space-y-8">
@@ -18,12 +24,15 @@ export default function RegisterPage() {
           </h1>
           <p className="mt-3 text-subtitle text-sm leading-relaxed">
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-white underline underline-offset-2 transition-colors duration-200 hover:no-underline hover:text-white/90">
+            <Link
+              href={nextPath ? `/login?next=${encodeURIComponent(nextPath)}` : "/login"}
+              className="font-medium text-white underline underline-offset-2 transition-colors duration-200 hover:no-underline hover:text-white/90"
+            >
               Log in
             </Link>
           </p>
         </header>
-        <RegisterForm />
+        <RegisterForm redirectAfterRegister={nextPath} />
         <p className="text-center">
           <Link
             href="/"
