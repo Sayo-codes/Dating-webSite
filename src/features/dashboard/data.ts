@@ -58,6 +58,7 @@ export async function getDiscoverFeedForUser(userId: string): Promise<DiscoverCr
 
   return creators.map((c, index) => {
     const { matchPercent, distanceLabel, displayAge } = enrichForViewer(userId, c.id, c.location);
+    const age = c.age != null && Number.isFinite(c.age) ? c.age : displayAge;
     const isSubscribed = subscribed.has(c.id);
     const thumb = c.media[0]?.url ?? c.avatarUrl;
     const showLockedOverlay = !isSubscribed && index % 3 === 1;
@@ -70,7 +71,7 @@ export async function getDiscoverFeedForUser(userId: string): Promise<DiscoverCr
       location: c.location,
       matchPercent,
       distanceLabel,
-      displayAge,
+      displayAge: age,
       showLockedOverlay,
       isSubscribed,
     };

@@ -117,10 +117,10 @@ Only users with `role = 'admin'` can access admin. Use the user you set to admin
 | What | How |
 |------|-----|
 | **Dashboard** | `/admin` – counts (users, creators, conversations, messages) and links. |
-| **Creators** | `/admin/creators` – list, create new creator, edit (username, display name, bio, verified, etc.), add/remove gallery items. |
+| **Models** | `/admin/models` – list all creators, **Create New Model** (modal + S3 avatar/banner), delete with confirmation. `/admin/creators` redirects here. **Media vault** still adds gallery per creator. |
 | **Messages** | `/admin/messages` – list conversations; open one to see messages; **Hide** a message (soft-delete). |
 | **Analytics** | `/admin/analytics` – counts, recent users/conversations, messages-by-day chart. |
-
+ 
 ### Optional: uploads (S3)
 
 Set in `.env`: `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_PUBLIC_URL` (and optionally `S3_REGION`, `S3_ENDPOINT`). Then:

@@ -15,6 +15,7 @@ export async function getCreatorsList() {
     id: c.id,
     username: c.username,
     displayName: c.displayName,
+    age: c.age,
     avatarUrl: c.avatarUrl,
     verified: c.verified,
     location: c.location,

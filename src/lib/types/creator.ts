@@ -2,6 +2,7 @@ export type CreatorListItem = {
   id: string;
   username: string;
   displayName: string;
+  age?: number | null;
   avatarUrl: string | null;
   verified: boolean;
   location: string | null;

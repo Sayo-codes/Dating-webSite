@@ -159,6 +159,7 @@ model Creator {
   id              String   @id @default(cuid())
   username        String   @unique
   displayName     String
+  age             Int?
   avatarUrl       String?
   bannerUrl       String?
   bio             String?  @db.Text

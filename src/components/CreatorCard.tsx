@@ -49,11 +49,13 @@ function displayAgeFromId(seed: string): number {
 }
 
 export function creatorListItemToCardProps(creator: CreatorListItem): CreatorCardProps {
+  const age =
+    creator.age != null && Number.isFinite(creator.age) ? creator.age : displayAgeFromId(creator.id);
   return {
     creatorId: creator.id,
     username: creator.username,
     name: creator.displayName,
-    age: displayAgeFromId(creator.id),
+    age,
     location: creator.location?.trim() || "Near you",
     imageUrl: creator.galleryThumbnail ?? creator.avatarUrl,
     isVIP: creator.verified,
@@ -102,7 +104,7 @@ export function CreatorCard({
 
   return (
     <article
-      className={`group/cc relative w-full max-w-full origin-center overflow-visible transition-transform duration-300 ease-out [aspect-ratio:5/7] hover:z-10 hover:scale-[1.02] ${className}`.trim()}
+      className={`group/cc relative w-full max-w-full origin-center overflow-visible transition-transform duration-300 ease-out [aspect-ratio:3/5] min-h-[min(92vw,520px)] sm:min-h-[480px] hover:z-10 hover:scale-[1.02] ${className}`.trim()}
     >
       {/* Thick glowing gradient frame (Figma: energetic orange/pink rim → site pink + gold) */}
       <div
@@ -113,11 +115,11 @@ export function CreatorCard({
           className="flex h-full min-h-0 flex-col overflow-hidden bg-[#07070b]"
           style={{ borderRadius: borderRadiusInner }}
         >
-          {/* Photo region (~85% feel): image + bottom glass row */}
+          {/* Photo-first: flex-1 grows; chrome stays compact */}
           <div className="relative min-h-0 flex-1">
             <Link
               href={profileHref}
-              className="absolute inset-x-0 top-0 bottom-[6rem] z-[1] block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a853] focus-visible:ring-offset-2 focus-visible:ring-offset-[#07070b]"
+              className="absolute inset-x-0 top-0 bottom-[4.5rem] z-[1] block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a853] focus-visible:ring-offset-2 focus-visible:ring-offset-[#07070b] sm:bottom-[4.75rem]"
               aria-label={`Open ${name} profile`}
             />
 
@@ -125,7 +127,7 @@ export function CreatorCard({
               src={src}
               alt=""
               fill
-              className={`object-cover object-top transition-transform duration-500 ease-out group-hover/cc:scale-[1.03] ${
+              className={`object-cover object-[center_18%] transition-transform duration-500 ease-out group-hover/cc:scale-[1.03] ${
                 showLockedOverlay ? "scale-105 blur-[14px]" : ""
               }`}
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 320px"
@@ -136,7 +138,7 @@ export function CreatorCard({
             {/* Warm “golden hour” wash (Figma lighting → pink/gold on dark) */}
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-[#07070b] via-[#07070b]/20 to-transparent"
+              className="pointer-events-none absolute inset-0 z-[2] bg-gradient-to-t from-[#07070b] via-[#07070b]/12 via-40% to-transparent"
             />
             <div
               aria-hidden
@@ -183,58 +185,57 @@ export function CreatorCard({
               </span>
             )}
 
-            {/* Figma: full-width glass band; text left, two icons right in one row */}
+            {/* Compact glass band: large name, slim icon row (~40px) */}
             <div className="absolute inset-x-0 bottom-0 z-20">
               <div
-                className="flex items-center justify-between gap-3 border-t border-white/[0.1] px-4 py-3 backdrop-blur-[14px]"
+                className="flex items-center justify-between gap-2 border-t border-white/[0.1] px-3 py-2 backdrop-blur-[12px] sm:gap-3 sm:px-3.5 sm:py-2.5"
                 style={{
-                  background: "linear-gradient(180deg, rgba(7,7,11,0.2) 0%, rgba(7,7,11,0.72) 45%, rgba(7,7,11,0.88) 100%)",
+                  background: "linear-gradient(180deg, rgba(7,7,11,0.15) 0%, rgba(7,7,11,0.78) 55%, rgba(7,7,11,0.9) 100%)",
                   boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)",
                 }}
               >
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-[var(--font-heading)] text-[15px] font-bold leading-tight tracking-tight text-white sm:text-base">
-                    {name}, {age}
+                <div className="min-w-0 flex-1 pr-1">
+                  <p className="truncate font-[var(--font-heading)] text-[1.05rem] font-bold leading-snug tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)] sm:text-lg md:text-xl">
+                    <span className="text-white">{name}</span>
+                    <span className="text-[#f0c97a]">, {age}</span>
                   </p>
-                  <p className="mt-1 flex items-center gap-1.5 text-[13px] font-normal leading-snug text-[#f0c97a]">
-                    <MapPin className="h-3.5 w-3.5 shrink-0 text-[#f0c97a]" strokeWidth={2} aria-hidden />
+                  <p className="mt-0.5 flex items-center gap-1.5 text-xs font-medium leading-snug text-[#f0c97a] drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)] sm:text-[0.8125rem]">
+                    <MapPin className="h-3.5 w-3.5 shrink-0 text-[#f0c97a]" strokeWidth={2.25} aria-hidden />
                     <span className="truncate">{locationLine}</span>
                   </p>
                 </div>
 
-                <div className="flex shrink-0 flex-row items-center gap-2.5">
-                  {/* Figma: light rounded-square + pink gift */}
+                <div className="flex shrink-0 flex-row items-center gap-2">
                   <Link
                     href={tipHref}
                     onClick={(e) => e.stopPropagation()}
-                    className="focus-outline flex h-11 w-11 items-center justify-center rounded-2xl bg-white/95 text-[#ff2d78] shadow-[0_4px_14px_rgba(0,0,0,0.25)] transition-transform hover:scale-105 active:scale-95"
+                    className="focus-outline flex h-10 w-10 items-center justify-center rounded-xl bg-white/95 text-[#ff2d78] shadow-[0_3px_10px_rgba(0,0,0,0.28)] transition-transform hover:scale-[1.04] active:scale-95 sm:h-[42px] sm:w-[42px] sm:rounded-[13px]"
                     aria-label={`Send a tip to ${name}`}
                   >
-                    <Gift className="h-[20px] w-[20px]" strokeWidth={2.25} aria-hidden />
+                    <Gift className="h-[17px] w-[17px] sm:h-[18px] sm:w-[18px]" strokeWidth={2.25} aria-hidden />
                   </Link>
-                  {/* Figma: pink circle + white chat */}
                   <Link
                     href={chatHref}
                     onClick={(e) => e.stopPropagation()}
-                    className="focus-outline flex h-11 w-11 items-center justify-center rounded-full bg-[#ff2d78] text-white shadow-[0_4px_18px_rgba(255,45,120,0.5)] transition-transform hover:scale-105 active:scale-95"
+                    className="focus-outline flex h-10 w-10 items-center justify-center rounded-full bg-[#ff2d78] text-white shadow-[0_3px_14px_rgba(255,45,120,0.45)] transition-transform hover:scale-[1.04] active:scale-95 sm:h-[42px] sm:w-[42px]"
                     aria-label={`Message ${name}`}
                   >
-                    <MessageCircle className="h-[20px] w-[20px]" strokeWidth={2.25} aria-hidden />
+                    <MessageCircle className="h-[17px] w-[17px] sm:h-[18px] sm:w-[18px]" strokeWidth={2.25} aria-hidden />
                   </Link>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Figma: dedicated footer band with wide pill button */}
+          {/* Slim footer — Follow stays elegant without stealing photo height */}
           <div
-            className="relative z-20 shrink-0 border-t border-white/[0.06] bg-[#121015] px-4 py-3 sm:py-3.5"
+            className="relative z-20 shrink-0 border-t border-white/[0.06] bg-[#121015] px-3 py-2 sm:px-3.5 sm:py-2"
             style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.04)" }}
           >
             <button
               type="button"
               onClick={handleFollow}
-              className="focus-outline w-full rounded-full bg-gradient-to-r from-[#ff2d78] to-[#d4a853] py-3.5 text-center text-[15px] font-semibold tracking-wide text-white shadow-[0_6px_24px_rgba(255,45,120,0.4)] transition-[filter,transform] duration-200 hover:brightness-[1.08] hover:shadow-[0_8px_28px_rgba(212,168,83,0.35)] active:scale-[0.99] sm:py-4"
+              className="focus-outline w-full rounded-full bg-gradient-to-r from-[#ff2d78] to-[#d4a853] py-2 text-center text-[13px] font-semibold tracking-wide text-white shadow-[0_4px_18px_rgba(255,45,120,0.32)] transition-[filter,transform] duration-200 hover:brightness-[1.08] hover:shadow-[0_6px_22px_rgba(212,168,83,0.28)] active:scale-[0.99] sm:py-2.5 sm:text-sm"
             >
               {isSubscribed ? "Following ✦" : "Follow +"}
             </button>

@@ -19,7 +19,7 @@ export default async function AdminDashboardPage() {
 
   const cards = [
     { label: "Users", value: userCount, href: "/admin/analytics", color: "from-[var(--accent-primary)]/20 to-[var(--accent-secondary)]/20" },
-    { label: "Creators", value: creatorCount, href: "/admin/creators", color: "from-[var(--accent-tertiary)]/20 to-[var(--accent-primary)]/20" },
+    { label: "Models", value: creatorCount, href: "/admin/models", color: "from-[var(--accent-tertiary)]/20 to-[var(--accent-primary)]/20" },
     { label: "Conversations", value: conversationCount, href: "/admin/messages", color: "from-[var(--accent-secondary)]/20 to-[var(--accent-tertiary)]/20" },
     { label: "Messages", value: messageCount, href: "/admin/messages", color: "from-white/10 to-white/5" },
   ];
@@ -57,7 +57,7 @@ export default async function AdminDashboardPage() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/admin/creators?new=1"
+                  href="/admin/models?new=1"
                   className="text-[var(--accent-primary)] hover:underline"
                 >
                   Create creator profile
@@ -84,7 +84,7 @@ export default async function AdminDashboardPage() {
           <section className="rounded-[var(--radius-card)] border border-white/10 bg-[var(--bg-elevated)] p-6">
             <h2 className="section-heading mb-4">Admin</h2>
             <p className="text-sm text-white/70">
-              Use the sidebar to navigate to Creators, Messages, and Analytics.
+              Use the sidebar to navigate to Models, Messages, and Analytics.
             </p>
           </section>
         </div>

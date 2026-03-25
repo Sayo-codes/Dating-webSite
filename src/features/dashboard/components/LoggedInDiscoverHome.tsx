@@ -36,9 +36,9 @@ export function LoggedInDiscoverHome({ user, unreadCount, creators }: Props) {
             <p className="mt-2 text-sm text-white/50">Check back soon — new talent is onboarding.</p>
           </div>
         ) : (
-          <ul className="grid grid-cols-2 gap-2.5 overflow-visible py-1 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-5">
+          <ul className="grid grid-cols-2 gap-3 overflow-visible py-2 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 lg:gap-6">
             {creators.map((c) => (
-              <li key={c.id} className="min-w-0 overflow-visible">
+              <li key={c.id} className="min-w-0 overflow-visible pt-1">
                 <CreatorDiscoverCard
                   creator={{
                     id: c.id,
