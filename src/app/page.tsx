@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getCurrentUser } from "@/shared/lib/auth";
 import {
-  HeroSection,
   StatsSection,
   WhyVelvetSection,
   TestimonialsSection,
@@ -9,6 +8,7 @@ import {
 } from "@/features/landing";
 import { PrimaryButton } from "@/shared/ui";
 import { LoggedInDiscoverHome } from "@/features/dashboard/components/LoggedInDiscoverHome";
+import { LandingHero } from "@/components/LandingHero";
 import {
   getDiscoverFeedForUser,
   getUnreadMessageCountForUser,
@@ -37,9 +37,8 @@ export default async function Home() {
   return (
     <div className="min-h-screen text-white overflow-x-hidden">
       <main className="flex flex-col">
-
         {/* 1. Full-viewport hero */}
-        <HeroSection />
+        <LandingHero />
 
         <div className="flex flex-col gap-24 py-24 sm:gap-32 sm:py-32">
 
@@ -97,7 +96,10 @@ export default async function Home() {
                 </p>
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                   <Link href="/register">
-                    <PrimaryButton size="lg" className="px-10 text-base font-semibold">
+                    <PrimaryButton
+                      size="lg"
+                      className="px-10 text-base font-semibold opacity-100 shadow-[0_12px_30px_rgba(212,168,83,0.35)]"
+                    >
                       Join Now — It&apos;s Free ✦
                     </PrimaryButton>
                   </Link>

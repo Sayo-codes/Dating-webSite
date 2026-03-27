@@ -180,6 +180,9 @@ export function HeroSection() {
           Meet high-quality creators &amp; genuine connections in a&nbsp;luxurious,&nbsp;safe space.{" "}
           <span className="text-white/80">Private. Exclusive. Verified.</span>
         </p>
+        <p className="animate-fade-up-delay-2 mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-white/70 sm:text-base">
+          Non-stop fun 24h 🚀 Connect with models anytime on Rsdate
+        </p>
 
         {/* CTA buttons */}
         <div className="animate-fade-up-delay-3 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -188,16 +191,8 @@ export function HeroSection() {
             id="hero-cta-primary"
             className="pill-button-primary focus-outline inline-flex min-h-[58px] w-full items-center justify-center rounded-full px-10 text-base font-bold tracking-wide sm:w-auto sm:text-lg"
           >
-            Create Free Account ✦
+            Join Here ✦
           </Link>
-          <a
-            href="#why-velvet"
-            id="hero-cta-secondary"
-            className="focus-outline inline-flex min-h-[58px] w-full items-center justify-center rounded-full border px-9 text-base font-semibold text-white/80 transition-all duration-300 hover:border-[rgba(212,168,83,0.5)] hover:bg-[rgba(212,168,83,0.08)] hover:text-[#f0c97a] sm:w-auto"
-            style={{ borderColor: "rgba(255,255,255,0.14)", backdropFilter: "blur(8px)" }}
-          >
-            Learn More
-          </a>
         </div>
 
         {/* Trust line */}

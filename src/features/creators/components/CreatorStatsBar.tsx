@@ -1,30 +1,15 @@
 type StatItem = {
   label: string;
-  value: number;
+  value: string;
   icon: string;
 };
 
-function formatCount(n: number): string {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace(/\.0$/, "") + "M";
-  if (n >= 1_000) return (n / 1_000).toFixed(1).replace(/\.0$/, "") + "K";
-  return n.toString();
-}
-
-type Props = {
-  followers: number;
-  subscribers: number;
-  photos: number;
-  videos: number;
-  totalLikes: number;
-};
-
-export function CreatorStatsBar({ followers, subscribers, photos, videos, totalLikes }: Props) {
+export function CreatorStatsBar() {
   const stats: StatItem[] = [
-    { label: "Followers", value: followers, icon: "👥" },
-    { label: "Subscribers", value: subscribers, icon: "⭐" },
-    { label: "Photos", value: photos, icon: "📷" },
-    { label: "Videos", value: videos, icon: "🎬" },
-    { label: "Likes", value: totalLikes, icon: "❤️" },
+    { label: "Earned", value: "$8.2K", icon: "💰" },
+    { label: "Subscribers", value: "17.4K", icon: "⭐" },
+    { label: "Rating", value: "4.9", icon: "✦" },
+    { label: "Tips", value: "$12.5K", icon: "🎁" },
   ];
 
   return (
@@ -32,7 +17,7 @@ export function CreatorStatsBar({ followers, subscribers, photos, videos, totalL
       {stats.map((stat) => (
         <div key={stat.label} className="stat-item">
           <span className="stat-icon">{stat.icon}</span>
-          <span className="stat-value">{formatCount(stat.value)}</span>
+          <span className="stat-value">{stat.value}</span>
           <span className="stat-label">{stat.label}</span>
         </div>
       ))}

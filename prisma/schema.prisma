@@ -22,20 +22,20 @@ enum UserRole {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  username      String    @unique
-  passwordHash  String?   @map("password_hash")
-  role          UserRole  @default(user)
-  emailVerified Boolean   @default(false) @map("email_verified")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt
+  id            String   @id @default(cuid())
+  email         String   @unique
+  username      String   @unique
+  passwordHash  String?  @map("password_hash")
+  role          UserRole @default(user)
+  emailVerified Boolean  @default(false) @map("email_verified")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt
 
-  sessions       Session[]
-  conversations  Conversation[]  @relation("UserConversations")
-  sentPayments   Payment[]       @relation("Payer")
-  transactions   Transaction[]
-  subscriptions  Subscription[]
+  sessions      Session[]
+  conversations Conversation[] @relation("UserConversations")
+  sentPayments  Payment[]      @relation("Payer")
+  transactions  Transaction[]
+  subscriptions Subscription[]
 
   @@map("users")
 }
@@ -66,26 +66,26 @@ model Session {
 // -------------------------------------------
 
 model Model {
-  id          String   @id @default(cuid())
-  slug        String   @unique
-  displayName String
-  email       String   @unique
+  id           String      @id @default(cuid())
+  slug         String      @unique
+  displayName  String
+  email        String      @unique
   passwordHash String?
-  avatarUrl   String?
-  bio         String?  @db.Text
-  status      ModelStatus @default(OFFLINE)
-  verifiedFace Boolean  @default(false)
-  vip         Boolean  @default(false)
-  location    String?
-  height      String?
-  weight      String?
-  profession  String?
-  education   String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  avatarUrl    String?
+  bio          String?     @db.Text
+  status       ModelStatus @default(OFFLINE)
+  verifiedFace Boolean     @default(false)
+  vip          Boolean     @default(false)
+  location     String?
+  height       String?
+  weight       String?
+  profession   String?
+  education    String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
-  media         Media[]
-  savedReplies  SavedReply[]
+  media        Media[]
+  savedReplies SavedReply[]
 }
 
 enum ModelStatus {
@@ -94,10 +94,10 @@ enum ModelStatus {
 }
 
 model SavedReply {
-  id       String @id @default(cuid())
-  modelId  String
-  label    String
-  body     String @db.Text
+  id        String   @id @default(cuid())
+  modelId   String
+  label     String
+  body      String   @db.Text
   createdAt DateTime @default(now())
 
   model Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
@@ -114,8 +114,8 @@ model Conversation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user    User    @relation("UserConversations", fields: [userId], references: [id], onDelete: Cascade)
-  creator Creator @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  user     User      @relation("UserConversations", fields: [userId], references: [id], onDelete: Cascade)
+  creator  Creator   @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   messages Message[]
 
   @@unique([userId, creatorId])
@@ -124,18 +124,18 @@ model Conversation {
 }
 
 model Message {
-  id             String    @id @default(cuid())
+  id             String     @id @default(cuid())
   conversationId String
   senderType     SenderType
-  body           String?   @db.Text
+  body           String?    @db.Text
   mediaUrl       String?
   mediaType      MediaType?
-  isPPV          Boolean   @default(false)
+  isPPV          Boolean    @default(false)
   ppvPriceCents  Int?
   deliveredAt    DateTime?
   readAt         DateTime?
-  deletedAt      DateTime? @map("deleted_at")
-  createdAt      DateTime  @default(now())
+  deletedAt      DateTime?  @map("deleted_at")
+  createdAt      DateTime   @default(now())
 
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 }
@@ -169,7 +169,10 @@ model Creator {
   weight          String?
   verified        Boolean  @default(false)
   followerCount   Int      @default(0)
+  earnedCents     Int      @default(0)
   subscriberCount Int      @default(0)
+  rating          Float    @default(0)
+  totalTipsCents  Int      @default(0)
   totalLikes      Int      @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -183,12 +186,12 @@ model Creator {
 }
 
 model CreatorMedia {
-  id        String   @id @default(cuid())
+  id        String           @id @default(cuid())
   creatorId String
   url       String
   type      CreatorMediaType @default(IMAGE)
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
+  sortOrder Int              @default(0)
+  createdAt DateTime         @default(now())
 
   creator Creator @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
@@ -225,11 +228,11 @@ model CreatorPost {
 // -------------------------------------------
 
 model Media {
-  id       String    @id @default(cuid())
-  modelId  String
-  url      String
-  type     MediaType
-  createdAt DateTime @default(now())
+  id        String    @id @default(cuid())
+  modelId   String
+  url       String
+  type      MediaType
+  createdAt DateTime  @default(now())
 
   model Model @relation(fields: [modelId], references: [id], onDelete: Cascade)
 }
@@ -239,15 +242,15 @@ model Media {
 // -------------------------------------------
 
 model Payment {
-  id             String   @id @default(cuid())
-  conversationId String?  // optional; links to Conversation if needed
-  payerId        String
-  amountCents    Int
-  currency       String   @default("USD")
-  status         PaymentStatus @default(PENDING)
-  stripePaymentId String?  @unique
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id              String        @id @default(cuid())
+  conversationId  String? // optional; links to Conversation if needed
+  payerId         String
+  amountCents     Int
+  currency        String        @default("USD")
+  status          PaymentStatus @default(PENDING)
+  stripePaymentId String?       @unique
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   payer User @relation("Payer", fields: [payerId], references: [id], onDelete: Cascade)
 }
@@ -268,7 +271,7 @@ model Transaction {
   userId          String
   amountCents     Int
   currency        String            @default("USD")
-  status          TransactionStatus  @default(PENDING)
+  status          TransactionStatus @default(PENDING)
   paypalOrderId   String?           @unique @map("paypal_order_id")
   paypalCaptureId String?           @map("paypal_capture_id")
   itemType        String?           @map("item_type")
@@ -297,17 +300,17 @@ enum TransactionStatus {
 // -------------------------------------------
 
 model Subscription {
-  id                 String             @id @default(cuid())
-  userId             String
-  creatorId          String
-  planId             String             @default("vip")    // "vip" or "elite"
-  priceCents         Int                @default(1999)
-  paypalSubscriptionId String?          @unique @map("paypal_subscription_id")
-  status             SubscriptionStatus @default(ACTIVE)
-  currentPeriodStart DateTime           @default(now()) @map("current_period_start")
-  currentPeriodEnd   DateTime           @map("current_period_end")
-  createdAt          DateTime           @default(now()) @map("created_at")
-  updatedAt          DateTime           @updatedAt @map("updated_at")
+  id                   String             @id @default(cuid())
+  userId               String
+  creatorId            String
+  planId               String             @default("vip") // "vip" or "elite"
+  priceCents           Int                @default(1999)
+  paypalSubscriptionId String?            @unique @map("paypal_subscription_id")
+  status               SubscriptionStatus @default(ACTIVE)
+  currentPeriodStart   DateTime           @default(now()) @map("current_period_start")
+  currentPeriodEnd     DateTime           @map("current_period_end")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   creator Creator @relation(fields: [creatorId], references: [id], onDelete: Cascade)
@@ -325,4 +328,3 @@ enum SubscriptionStatus {
   EXPIRED
   PAST_DUE
 }
-

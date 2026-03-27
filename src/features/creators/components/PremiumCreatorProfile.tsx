@@ -128,13 +128,7 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile, isSub
 
           {/* ── Stats bar ── */}
           <div className="animate-fade-up-delay-1">
-            <CreatorStatsBar
-              followers={creator.followerCount}
-              subscribers={creator.subscriberCount}
-              photos={creator.photoCount}
-              videos={creator.videoCount}
-              totalLikes={creator.totalLikes}
-            />
+            <CreatorStatsBar />
           </div>
 
           {/* ── Action buttons ── */}

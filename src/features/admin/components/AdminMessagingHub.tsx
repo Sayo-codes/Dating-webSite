@@ -144,13 +144,18 @@ export function AdminMessagingHub() {
   }, []);
 
   // ─── Fetch conversations for selected creator ───
-  const fetchConversations = useCallback(async (creatorId: string) => {
+  const fetchConversations = useCallback(async (creatorId?: string | null) => {
     setLoadingConvs(true);
-    const res = await fetch(`/api/admin/conversations?creatorId=${creatorId}`);
+    const url = creatorId ? `/api/admin/conversations?creatorId=${creatorId}` : "/api/admin/conversations";
+    const res = await fetch(url);
     if (res.ok) {
       const data = (await res.json()) as { conversations: ConversationItem[] };
       const convs = data.conversations ?? [];
       setConversations(convs);
+      setSelectedConvId((prev) => {
+        if (prev && convs.some((c) => c.id === prev)) return prev;
+        return convs[0]?.id ?? null;
+      });
       const map: Record<string, number> = {};
       for (const c of convs) map[c.id] = c.unreadCount;
       setUnreadMap((prev) => ({ ...prev, ...map }));
@@ -159,11 +164,6 @@ export function AdminMessagingHub() {
   }, []);
 
   useEffect(() => {
-    if (!selectedCreatorId) {
-      setConversations([]);
-      setSelectedConvId(null);
-      return;
-    }
     fetchConversations(selectedCreatorId);
   }, [selectedCreatorId, fetchConversations]);
 
@@ -366,6 +366,24 @@ export function AdminMessagingHub() {
             <div className="p-4 text-xs text-white/40">Loading…</div>
           ) : (
             <ul className="divide-y divide-white/5">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedCreatorId(null);
+                    setShowVault(false);
+                  }}
+                  className={`admin-msg-list-item ${selectedCreatorId === null ? "active" : ""}`}
+                >
+                  <div className="admin-msg-avatar flex items-center justify-center bg-white/10 text-xs font-semibold text-white/70">
+                    ✦
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-white">All creators</p>
+                    <p className="truncate text-xs text-white/40">Show every conversation</p>
+                  </div>
+                </button>
+              </li>
               {creators.map((c) => {
                 const isActive = c.id === selectedCreatorId;
                 const creatorUnread = conversations
@@ -415,14 +433,12 @@ export function AdminMessagingHub() {
       <section className="admin-msg-convos">
         <div className="admin-msg-panel-header">
           <h2 className="text-sm font-semibold text-white">
-            {selectedCreator ? `${selectedCreator.displayName}'s Inbox` : "Conversations"}
+            {selectedCreator ? `${selectedCreator.displayName}'s Inbox` : "All Conversations"}
           </h2>
           {connected && <span className="admin-msg-live-dot" />}
         </div>
         <div className="admin-msg-panel-body">
-          {!selectedCreatorId ? (
-            <div className="admin-msg-empty">Select a creator to view conversations</div>
-          ) : loadingConvs ? (
+          {loadingConvs ? (
             <div className="p-4 text-xs text-white/40">Loading…</div>
           ) : conversations.length === 0 ? (
             <div className="admin-msg-empty">No conversations yet</div>
