@@ -11,7 +11,6 @@ export function ConditionalAppHeader() {
   const pathname = usePathname();
   const [showMarketingHeader, setShowMarketingHeader] = useState(true);
 
-  if (pathname === "/") return null;
   useEffect(() => {
     if (pathname !== "/") {
       setShowMarketingHeader(true);
@@ -32,8 +31,10 @@ export function ConditionalAppHeader() {
     };
   }, [pathname]);
 
+  // All hooks are above — safe to do early returns below
+  if (pathname === "/") return null;
   if (pathname.startsWith("/admin")) return null;
-
   if (!showMarketingHeader) return null;
+
   return <AppHeader />;
 }
