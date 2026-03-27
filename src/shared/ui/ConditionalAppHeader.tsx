@@ -11,6 +11,7 @@ export function ConditionalAppHeader() {
   const pathname = usePathname();
   const [showMarketingHeader, setShowMarketingHeader] = useState(true);
 
+  if (pathname === "/") return null;
   useEffect(() => {
     if (pathname !== "/") {
       setShowMarketingHeader(true);

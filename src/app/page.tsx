@@ -9,6 +9,7 @@ import {
 import { PrimaryButton } from "@/shared/ui";
 import { LoggedInDiscoverHome } from "@/features/dashboard/components/LoggedInDiscoverHome";
 import { LandingHero } from "@/components/LandingHero";
+import { LandingNav } from "@/components/LandingNav";
 import {
   getDiscoverFeedForUser,
   getUnreadMessageCountForUser,
@@ -35,7 +36,8 @@ export default async function Home() {
 
   // ── Public: Tinder-style luxury landing page ─────────────────────────────
   return (
-    <div className="min-h-screen text-white overflow-x-hidden">
+    <div className="relative min-h-screen overflow-x-hidden text-white">
+      <LandingNav />
       <main className="flex flex-col">
         {/* 1. Full-viewport hero */}
         <LandingHero />
