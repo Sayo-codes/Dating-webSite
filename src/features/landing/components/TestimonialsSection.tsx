@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const TESTIMONIALS = [
     {
         initials: "JM",
@@ -75,9 +77,41 @@ function StarRating({ count }: { count: number }) {
 
 export function TestimonialsSection() {
     return (
-        <section className="section-shell" aria-labelledby="testimonials-heading">
+        <section className="section-shell relative overflow-hidden" aria-labelledby="testimonials-heading">
+
+            {/* ── IMAGE 3: Laughing couple — background accent conveying joy & trust ── */}
+            <div className="absolute inset-0 overflow-hidden z-0">
+                <Image
+                    src="/images/landing/couple-outdoors.jpg"
+                    alt=""
+                    fill
+                    className="object-cover object-[center_25%]"
+                    sizes="100vw"
+                    quality={75}
+                    style={{ filter: "brightness(0.1) saturate(0.8) blur(3px)" }}
+                />
+                {/* Dark gradient overlay for readability */}
+                <div
+                    className="absolute inset-0"
+                    aria-hidden
+                    style={{
+                        background:
+                            "linear-gradient(180deg, rgba(7,7,11,0.95) 0%, rgba(7,7,11,0.5) 30%, rgba(7,7,11,0.5) 70%, rgba(7,7,11,0.95) 100%)",
+                    }}
+                />
+                {/* Warm tint accent */}
+                <div
+                    className="absolute inset-0"
+                    aria-hidden
+                    style={{
+                        background:
+                            "radial-gradient(ellipse 60% 40% at 30% 50%, rgba(212,168,83,0.06) 0%, transparent 70%)",
+                    }}
+                />
+            </div>
+
             {/* Header */}
-            <div className="px-4 text-center sm:px-6 lg:px-10">
+            <div className="relative z-10 px-4 text-center sm:px-6 lg:px-10">
                 <p className="section-heading mb-2 flex items-center justify-center gap-2">
                     <span>💬</span> Testimonials
                 </p>
@@ -100,7 +134,7 @@ export function TestimonialsSection() {
             </div>
 
             {/* Cards */}
-            <div className="grid gap-4 px-4 sm:px-6 lg:px-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="relative z-10 grid gap-4 px-4 sm:px-6 lg:px-10 sm:grid-cols-2 lg:grid-cols-3">
                 {TESTIMONIALS.map((t, i) => (
                     <blockquote
                         key={t.name}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import Image from "next/image";
 
 const TRUST_STATS = [
   { value: "18,230+", label: "Members" },
@@ -52,45 +52,72 @@ export function HeroSection() {
       className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden"
       aria-labelledby="hero-heading"
     >
-      {/* ── Deep dark base ── */}
+      {/* ── IMAGE 1: Intimate couple — hero background for romantic atmosphere ── */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/landing/couple-intimate.jpg"
+          alt=""
+          fill
+          className="object-cover object-[center_30%]"
+          sizes="100vw"
+          priority
+          quality={85}
+          style={{ filter: "brightness(0.55) saturate(1.3)" }}
+        />
+      </div>
+
+      {/* ── Deep dark overlay with romantic gradient ── */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 z-[1]"
         style={{
           background:
-            "radial-gradient(ellipse 120% 90% at 50% 50%, #130a1f 0%, #0a050f 45%, #07070b 100%)",
+            "linear-gradient(180deg, rgba(7,7,11,0.35) 0%, rgba(19,10,31,0.45) 30%, rgba(7,7,11,0.65) 70%, rgba(7,7,11,0.92) 100%)",
+        }}
+      />
+
+      {/* ── Rose / gold tint overlay for warmth ── */}
+      <div
+        className="absolute inset-0 z-[2]"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(ellipse 120% 90% at 50% 50%, rgba(212,168,83,0.12) 0%, rgba(255,45,120,0.08) 40%, transparent 70%)",
+          mixBlendMode: "screen",
         }}
       />
 
       {/* ── Romantic atmospheric blobs ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-[10%] top-[15%] h-[520px] w-[520px] rounded-full opacity-30 blur-[140px]"
+        className="pointer-events-none absolute left-[10%] top-[15%] z-[3] h-[520px] w-[520px] rounded-full opacity-25 blur-[140px]"
         style={{ background: "radial-gradient(circle, #d4a853 0%, transparent 70%)" }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute right-[8%] top-[20%] h-[480px] w-[480px] rounded-full opacity-22 blur-[120px]"
+        className="pointer-events-none absolute right-[8%] top-[20%] z-[3] h-[480px] w-[480px] rounded-full opacity-18 blur-[120px]"
         style={{ background: "radial-gradient(circle, #ff2d78 0%, transparent 70%)" }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-[5%] left-[30%] h-[400px] w-[400px] rounded-full opacity-18 blur-[110px]"
+        className="pointer-events-none absolute bottom-[5%] left-[30%] z-[3] h-[400px] w-[400px] rounded-full opacity-15 blur-[110px]"
         style={{ background: "radial-gradient(circle, #c778ff 0%, transparent 70%)" }}
       />
       {/* Center warm glow — simulate couple / connection */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-12 blur-[160px]"
+        className="pointer-events-none absolute left-1/2 top-1/2 z-[3] h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10 blur-[160px]"
         style={{ background: "radial-gradient(circle, rgba(212,168,83,0.6) 0%, rgba(255,45,120,0.3) 50%, transparent 75%)" }}
       />
 
       {/* ── Bokeh particles ── */}
-      <BokeParticles />
+      <div className="z-[4]">
+        <BokeParticles />
+      </div>
 
-      {/* ── Vignette overlay ── */}
+      {/* ── Soft vignette overlay ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute inset-0 z-[5]"
         style={{
           background:
             "radial-gradient(ellipse 100% 100% at 50% 50%, transparent 30%, rgba(7,7,11,0.6) 80%, rgba(7,7,11,0.9) 100%)",
@@ -100,7 +127,7 @@ export function HeroSection() {
       {/* ── Couple silhouette SVG illustration ── */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.07]"
+        className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center opacity-[0.04]"
       >
         <svg
           viewBox="0 0 800 600"
@@ -161,6 +188,7 @@ export function HeroSection() {
         <h1
           id="hero-heading"
           className="animate-fade-up-delay-1 font-[var(--font-heading)] text-5xl font-bold leading-[1.08] tracking-[-0.03em] sm:text-6xl lg:text-7xl xl:text-8xl"
+          style={{ textShadow: "0 2px 40px rgba(0,0,0,0.5)" }}
         >
           Find Your{" "}
           <span
@@ -176,16 +204,31 @@ export function HeroSection() {
         </h1>
 
         {/* Sub-headline */}
-        <p className="animate-fade-up-delay-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/60 sm:text-xl">
+        <p
+          className="animate-fade-up-delay-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/70 sm:text-xl"
+          style={{ textShadow: "0 1px 20px rgba(0,0,0,0.4)" }}
+        >
           Meet high-quality creators &amp; genuine connections in a&nbsp;luxurious,&nbsp;safe space.{" "}
-          <span className="text-white/80">Private. Exclusive. Verified.</span>
-        </p>
-        <p className="animate-fade-up-delay-2 mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-white/70 sm:text-base">
-          Non-stop fun 24h 🚀 Connect with models anytime on Rsdate
+          <span className="text-white/90">Private. Exclusive. Verified.</span>
         </p>
 
-        {/* CTA buttons */}
-        <div className="animate-fade-up-delay-3 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+        {/* Secondary tagline */}
+        <p
+          className="animate-fade-up-delay-2 mx-auto mt-4 flex items-center justify-center gap-2 text-base font-medium tracking-wide sm:text-lg"
+          style={{
+            background: "linear-gradient(135deg, #f0c97a 0%, #ff6fa3 50%, #ff2d78 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            textShadow: "none",
+          }}
+        >
+          <span style={{ WebkitTextFillColor: "initial", filter: "none" }}>🚀</span>
+          Non-stop fun 24h — Connect with models anytime on Rsdate
+        </p>
+
+        {/* CTA button */}
+        <div className="animate-fade-up-delay-3 mt-10 flex justify-center">
           <Link
             href="/register"
             id="hero-cta-primary"
@@ -237,7 +280,7 @@ export function HeroSection() {
 
       {/* ── Scroll hint ── */}
       <div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/25 animate-fade-in"
+        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-2 text-white/25 animate-fade-in"
         aria-hidden
         style={{ animationDelay: "1.8s" }}
       >

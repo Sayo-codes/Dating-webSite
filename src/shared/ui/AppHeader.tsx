@@ -135,20 +135,23 @@ export function AppHeader() {
           )}
 
           {!user ? (
-            <>
+            <div className="flex items-center gap-2">
+              {/* Login — ghost border button */}
               <Link
                 href="/login"
-                className="focus-outline rounded-full px-4 py-2 text-sm font-medium min-h-[44px] flex items-center text-white/75 transition-all duration-200 hover:text-white hover:bg-white/8"
+                className="focus-outline inline-flex min-h-[42px] items-center justify-center rounded-full border px-5 text-sm font-semibold text-white/85 transition-all duration-200 hover:border-[rgba(212,168,83,0.6)] hover:bg-[rgba(212,168,83,0.08)] hover:text-[#f0c97a]"
+                style={{ borderColor: "rgba(255,255,255,0.22)" }}
               >
                 Login
               </Link>
+              {/* Sign Up — solid gold-to-pink pill */}
               <Link
                 href="/register"
-                className="focus-outline rounded-full px-4 py-2 text-sm font-medium min-h-[44px] flex items-center text-white/80 transition-all duration-200 hover:text-white hover:bg-white/8"
+                className="focus-outline pill-button-primary inline-flex min-h-[42px] items-center justify-center rounded-full px-5 text-sm font-bold"
               >
-                Sign Up
+                Sign Up ✦
               </Link>
-            </>
+            </div>
           ) : (
             <form action="/api/auth/logout" method="POST">
               <button
@@ -229,12 +232,14 @@ export function AppHeader() {
               >
                 Login
               </Link>
-              <Link
-                href="/register"
-                className="focus-outline flex min-h-[52px] items-center rounded-2xl px-5 text-base font-medium text-white/80 hover:bg-white/8 hover:text-white transition-all duration-200"
-              >
-                Sign Up
-              </Link>
+              <div className="mt-2 px-2">
+                <Link
+                  href="/register"
+                  className="pill-button-primary focus-outline flex w-full min-h-[52px] items-center justify-center rounded-2xl text-base font-bold"
+                >
+                  Sign Up ✦
+                </Link>
+              </div>
             </>
           )}
 

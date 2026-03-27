@@ -34,6 +34,9 @@ export type CreatorProfile = {
   verified: boolean;
   followerCount: number;
   subscriberCount: number;
+  earnedCents: number;
+  rating: number;
+  totalTipsCents: number;
   totalLikes: number;
   photoCount: number;
   videoCount: number;

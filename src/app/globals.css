@@ -1189,3 +1189,49 @@ textarea:focus-visible,
 .admin-msg-ppv-input::-webkit-inner-spin-button {
   display: none;
 }
+
+/* =========================================
+   LANDING PAGE — IMAGE ENHANCEMENTS
+   ========================================= */
+
+/* Smoother glass card hover with lift + glow */
+.glass-card {
+  transition:
+    border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-slow) var(--ease-out),
+    transform var(--duration-normal) var(--ease-out),
+    background-color var(--duration-normal) var(--ease-out);
+}
+
+/* Enhanced pill button glow — softer, more romantic */
+.pill-button-primary {
+  box-shadow:
+    0 0 20px rgba(212, 168, 83, 0.35),
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+.pill-button-primary:hover:not(:disabled) {
+  box-shadow:
+    0 0 36px rgba(212, 168, 83, 0.5),
+    0 0 20px rgba(255, 45, 120, 0.2),
+    0 8px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Romantic soft focus image mask */
+.landing-image-mask {
+  mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 60%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 60%, transparent 100%);
+}
+
+/* Subtle grain overlay for premium texture */
+.grain-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  z-index: 20;
+}

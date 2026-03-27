@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { GlassCard } from "@/shared/ui/GlassCard";
 
 const STATS = [
@@ -26,9 +27,41 @@ const STATS = [
 
 export function StatsSection() {
   return (
-    <section className="section-shell" aria-labelledby="stats-heading">
+    <section className="section-shell relative" aria-labelledby="stats-heading">
       <h2 id="stats-heading" className="sr-only">Platform Statistics</h2>
-      <div className="grid gap-4 px-4 sm:px-6 lg:px-10 sm:grid-cols-3">
+
+      {/* ── IMAGE 2: Couple outdoors — ambient background for connection feel ── */}
+      <div className="absolute inset-0 -top-24 -bottom-24 overflow-hidden rounded-3xl z-0">
+        <Image
+          src="/images/landing/couple-laughing.jpg"
+          alt=""
+          fill
+          className="object-cover object-center"
+          sizes="100vw"
+          quality={75}
+          style={{ filter: "brightness(0.35) saturate(1.2) blur(1px)" }}
+        />
+        {/* Gradient fade edges for seamless blending */}
+        <div
+          className="absolute inset-0"
+          aria-hidden
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(7,7,11,1) 0%, rgba(7,7,11,0.3) 15%, rgba(7,7,11,0.1) 50%, rgba(7,7,11,0.3) 85%, rgba(7,7,11,1) 100%)",
+          }}
+        />
+        {/* Warm rose tint */}
+        <div
+          className="absolute inset-0"
+          aria-hidden
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255,45,120,0.06) 0%, transparent 70%)",
+          }}
+        />
+      </div>
+
+      <div className="relative z-10 grid gap-4 px-4 sm:px-6 lg:px-10 sm:grid-cols-3">
         {STATS.map((stat, i) => (
           <GlassCard
             key={stat.label}
