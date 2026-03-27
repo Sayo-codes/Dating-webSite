@@ -31,6 +31,9 @@ export function LandingHero() {
             <h1 className="font-[var(--font-heading)] text-4xl font-bold leading-tight tracking-[-0.02em] sm:text-6xl lg:text-7xl">
               Find your perfect match ✦
             </h1>
+            <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-white/75 sm:text-xl">
+              Non-stop fun 24h 🚀 Connect with models anytime on Rsdate
+            </p>
             <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/80 sm:text-xl">
               Private. Exclusive. Verified connections with premium creators in a refined, secure space.
             </p>
