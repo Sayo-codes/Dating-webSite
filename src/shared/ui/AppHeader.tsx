@@ -148,12 +148,6 @@ export function AppHeader() {
               >
                 Sign Up
               </Link>
-              <Link
-                href="/register"
-                className="focus-outline pill-button-primary inline-flex items-center px-5 py-2 text-sm min-h-[44px]"
-              >
-                Join Now ✦
-              </Link>
             </>
           ) : (
             <form action="/api/auth/logout" method="POST">
@@ -241,14 +235,6 @@ export function AppHeader() {
               >
                 Sign Up
               </Link>
-              <div className="mt-3 px-2">
-                <Link
-                  href="/register"
-                  className="pill-button-primary focus-outline flex w-full min-h-[52px] items-center justify-center rounded-2xl text-base font-semibold"
-                >
-                  Join Now ✦
-                </Link>
-              </div>
             </>
           )}
 

@@ -25,27 +25,7 @@ export function LandingHero() {
       />
 
       <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 sm:px-6 lg:px-10">
-        <header className="flex items-center justify-between py-5 sm:py-7">
-          <Link href="/" className="font-[var(--font-heading)] text-lg font-bold tracking-wide text-white sm:text-xl">
-            Velvet Signal
-          </Link>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link
-              href="/login"
-              className="focus-outline inline-flex min-h-[42px] items-center justify-center rounded-full border border-white/25 bg-[#07070b]/75 px-4 text-sm font-medium text-white/90 transition-colors hover:border-[#d4a853]/50 hover:text-[#f0c97a]"
-            >
-              Login
-            </Link>
-            <Link
-              href="/register"
-              className="focus-outline inline-flex min-h-[42px] items-center justify-center rounded-full bg-gradient-to-r from-[#d4a853] to-[#ff2d78] px-5 text-sm font-semibold text-white shadow-[0_10px_30px_rgba(212,168,83,0.35)] transition-[filter,transform] duration-200 hover:brightness-110 hover:scale-[1.01]"
-            >
-              Join Now ✦
-            </Link>
-          </div>
-        </header>
-
-        <div className="flex flex-1 items-center justify-center pb-16 pt-10 sm:pb-24">
+        <div className="flex flex-1 items-center justify-center pb-16 pt-24 sm:pb-24 sm:pt-28">
           <div className="mx-auto max-w-3xl text-center">
             <p className="section-heading mb-3">✦ Private Luxury Dating</p>
             <h1 className="font-[var(--font-heading)] text-4xl font-bold leading-tight tracking-[-0.02em] sm:text-6xl lg:text-7xl">
