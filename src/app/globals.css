@@ -854,8 +854,58 @@ textarea:focus-visible,
 }
 @media (max-width: 768px) {
   .admin-msg-hub {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: unset;
+    grid-template-rows: unset;
+    height: calc(100dvh - 3.5rem);
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  .admin-msg-creators,
+  .admin-msg-convos,
+  .admin-msg-chat {
+    flex: 1 1 0;
+    min-height: 0;
+    border-right: none;
+    width: 100%;
+  }
+  .admin-msg-panel-header {
+    padding: 12px 16px;
+    min-height: 52px;
+  }
+  .admin-msg-list-item {
+    padding: 12px 16px;
+    min-height: 52px;
+  }
+  .admin-msg-composer {
+    padding: 8px 12px calc(env(safe-area-inset-bottom, 8px) + 8px);
+  }
+}
+
+/* Back button — mobile panel navigation */
+.admin-msg-back-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 150ms;
+  flex-shrink: 0;
+}
+.admin-msg-back-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+@media (max-width: 768px) {
+  .admin-msg-back-btn {
+    display: flex;
   }
 }
 
@@ -1235,3 +1285,302 @@ textarea:focus-visible,
   mix-blend-mode: overlay;
   z-index: 20;
 }
+
+/* =========================================
+   MOBILE POLISH
+   ========================================= */
+
+/* ── Admin sidebar: horizontal scroll on mobile ── */
+@media (max-width: 639px) {
+  /* Sidebar becomes a compact horizontal bar on mobile */
+  .admin-sidebar-mobile-nav {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 2px;
+    padding: 8px 12px;
+  }
+  .admin-sidebar-mobile-nav::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ── Admin messaging hub: mobile layout ── */
+@media (max-width: 768px) {
+  .admin-msg-hub {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+    height: calc(100dvh - 3.5rem);
+    border-radius: 0;
+    border: none;
+  }
+
+  /* Hide panels that aren't active on mobile via data attributes */
+  .admin-msg-creators,
+  .admin-msg-convos {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .admin-msg-panel-header {
+    padding: 12px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--bg-elevated);
+  }
+
+  .admin-msg-list-item {
+    padding: 12px 16px;
+    min-height: 56px;
+    gap: 12px;
+  }
+
+  .admin-msg-avatar {
+    width: 42px;
+    height: 42px;
+  }
+
+  .admin-msg-list-item p.truncate {
+    font-size: 0.9375rem;
+  }
+
+  /* Chat improvements on mobile */
+  .admin-msg-chat-header {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+
+  .admin-msg-thread {
+    padding: 12px;
+  }
+
+  .admin-msg-bubble {
+    max-width: 85%;
+    padding: 10px 14px;
+    font-size: 0.9375rem;
+  }
+
+  /* Composer */
+  .admin-msg-composer {
+    padding: 8px 10px 12px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  .admin-msg-input {
+    font-size: 16px; /* prevents iOS zoom */
+    padding: 10px 16px;
+    min-height: 44px;
+  }
+
+  .admin-msg-icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .admin-msg-send-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .admin-msg-ppv-toggle {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .admin-msg-ppv-toggle span:last-child {
+    width: 100%;
+    text-align: left;
+    margin-left: 0;
+  }
+
+  /* Vault grid on mobile */
+  .admin-msg-hub .grid-cols-4 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Admin dashboard cards ── */
+@media (max-width: 639px) {
+  .page-content {
+    padding-left: 12px;
+    padding-right: 12px;
+    padding-top: 16px;
+    padding-bottom: 32px;
+  }
+
+  /* Make admin stat cards stack vertically with good spacing */
+  .page-content .grid.gap-4 {
+    gap: 12px;
+  }
+
+  .page-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .page-content h2 {
+    font-size: 0.8rem;
+  }
+}
+
+/* ── Admin sidebar mobile improvements ── */
+@media (max-width: 639px) {
+  aside[class*="flex w-full shrink-0 flex-col border-b"] {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--bg-elevated);
+  }
+
+  aside[class*="flex w-full shrink-0 flex-col border-b"] nav {
+    display: flex;
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 4px;
+    padding: 8px 12px;
+    flex-wrap: nowrap;
+  }
+
+  aside[class*="flex w-full shrink-0 flex-col border-b"] nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  aside[class*="flex w-full shrink-0 flex-col border-b"] nav a {
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-height: 40px;
+    padding: 8px 16px;
+    font-size: 0.8125rem;
+    border-radius: 999px;
+  }
+
+  /* Hide the back-to-site footer link on mobile to save space */
+  aside[class*="flex w-full shrink-0 flex-col border-b"] > div:last-child {
+    display: none;
+  }
+}
+
+/* ── General mobile polish ── */
+@media (max-width: 768px) {
+  /* Hero section title */
+  h1[id="hero-heading"] {
+    font-size: 2.5rem;
+    line-height: 1.1;
+  }
+
+  /* Trust stats bar — tighter on mobile */
+  .premium-stats {
+    gap: 2px;
+    padding: 10px 8px;
+  }
+
+  .stat-item {
+    padding: 6px 8px;
+    min-width: 60px;
+  }
+
+  .stat-value {
+    font-size: 1rem;
+  }
+
+  .stat-label {
+    font-size: 0.625rem;
+  }
+
+  /* Glass cards on mobile — slightly less rounded, tighter padding */
+  .glass-card {
+    border-radius: 16px;
+  }
+
+  /* Section heading spacing on mobile */
+  .section-heading {
+    font-size: 0.6875rem;
+  }
+
+  /* Locked post cards — mobile grid */
+  .locked-post__footer {
+    padding: 10px 12px;
+  }
+
+  /* Landing CTA buttons — full width on mobile */
+  .pill-button-primary {
+    min-height: 48px;
+  }
+
+  /* Improve readability of body text on mobile */
+  body {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Safe area padding for bottom navigation on notched phones */
+  .admin-msg-composer,
+  .admin-msg-hub {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Creator card improvements */
+  .premium-banner {
+    height: 200px;
+  }
+
+  .premium-avatar {
+    width: 110px;
+    height: 110px;
+  }
+
+  .premium-avatar-wrapper {
+    margin-top: -55px;
+  }
+}
+
+/* ── Very small screens (< 380px) ── */
+@media (max-width: 380px) {
+  h1[id="hero-heading"] {
+    font-size: 2rem;
+  }
+
+  .admin-msg-bubble {
+    max-width: 92%;
+    padding: 8px 12px;
+  }
+
+  .admin-msg-input {
+    padding: 8px 12px;
+  }
+}
+
+/* ── Smooth scrolling and momentum on mobile panels ── */
+.admin-msg-panel-body,
+.admin-msg-thread {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ── Mobile: back button in admin messaging hub panels ── */
+.admin-msg-back-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  transition: background 150ms;
+  flex-shrink: 0;
+}
+.admin-msg-back-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+@media (max-width: 768px) {
+  .admin-msg-back-btn {
+    display: flex;
+  }
+}
+

@@ -59,11 +59,15 @@ export function AppHeader() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
-          ? "bg-[rgba(7,7,11,0.92)] shadow-[0_4px_24px_rgba(0,0,0,0.5)] border-b border-[rgba(212,168,83,0.12)]"
-          : "bg-transparent border-b border-transparent"
+      className={`sticky top-0 z-50 transition-all duration-300 border-b ${scrolled
+          ? "shadow-[0_4px_24px_rgba(0,0,0,0.5)] border-[rgba(212,168,83,0.12)]"
+          : "border-[rgba(255,255,255,0.06)]"
         }`}
-      style={{ backdropFilter: scrolled ? "blur(20px)" : "blur(0px)", WebkitBackdropFilter: scrolled ? "blur(20px)" : "blur(0px)" }}
+      style={{
+        background: scrolled ? "rgba(7,7,11,0.98)" : "rgba(7,7,11,0.95)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+      }}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10 h-16">
 

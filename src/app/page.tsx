@@ -56,7 +56,7 @@ export default async function Home() {
           {/* 5. Final CTA block — IMAGE 4: Couple embrace for emotional connection */}
           <div className="px-4 sm:px-6 lg:px-10">
             <div
-              className="relative overflow-hidden rounded-[28px] p-10 text-center sm:p-16"
+              className="relative overflow-hidden rounded-[20px] p-6 text-center sm:rounded-[28px] sm:p-16"
               style={{
                 border: "1px solid rgba(212,168,83,0.35)",
                 boxShadow:
@@ -126,7 +126,7 @@ export default async function Home() {
                   Join thousands of members already experiencing the most private, luxurious
                   creator platform available.
                 </p>
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
                   <Link href="/register">
                     <PrimaryButton size="lg" className="px-10 text-base font-semibold">
                       Join Now — It&apos;s Free ✦

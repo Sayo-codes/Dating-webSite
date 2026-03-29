@@ -4,6 +4,19 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import Image from "next/image";
 import { useSocket } from "@/features/chat/useSocket";
 
+/* ─── Hook: detect mobile ─── */
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${breakpoint}px)`);
+    setIsMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, [breakpoint]);
+  return isMobile;
+}
+
 /* ─── Types ─── */
 type CreatorItem = {
   id: string;
@@ -123,12 +136,16 @@ export function AdminMessagingHub() {
   const [vaultMedia, setVaultMedia] = useState<MediaVaultItem[]>([]);
   const [loadingVault, setLoadingVault] = useState(false);
 
+  // Mobile panel navigation: "creators" | "convos" | "chat"
+  const [mobileView, setMobileView] = useState<"creators" | "convos" | "chat">("creators");
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { connected, join, leave, onMessageNew } = useSocket();
 
   const selectedConv = conversations.find((c) => c.id === selectedConvId);
   const selectedCreator = creators.find((c) => c.id === selectedCreatorId);
+  const isMobile = useIsMobile();
 
   // ─── Fetch creators ───
   useEffect(() => {
@@ -356,7 +373,11 @@ export function AdminMessagingHub() {
   return (
     <div className="admin-msg-hub" id="admin-messaging-hub">
       {/* ── LEFT: Creator list ── */}
-      <aside className="admin-msg-creators">
+      <aside
+        className="admin-msg-creators"
+        style={isMobile && mobileView !== "creators" ? { display: "none" } : undefined}
+        data-mobile-panel="creators"
+      >
         <div className="admin-msg-panel-header">
           <h2 className="text-sm font-semibold text-white">✦ Creators</h2>
           <span className="text-xs text-white/40">{creators.length}</span>
@@ -372,6 +393,7 @@ export function AdminMessagingHub() {
                   onClick={() => {
                     setSelectedCreatorId(null);
                     setShowVault(false);
+                    setMobileView("convos");
                   }}
                   className={`admin-msg-list-item ${selectedCreatorId === null ? "active" : ""}`}
                 >
@@ -397,6 +419,7 @@ export function AdminMessagingHub() {
                         setSelectedCreatorId(c.id);
                         setSelectedConvId(null);
                         setShowVault(false);
+                        setMobileView("convos");
                       }}
                       className={`admin-msg-list-item ${isActive ? "active" : ""}`}
                     >
@@ -430,11 +453,25 @@ export function AdminMessagingHub() {
       </aside>
 
       {/* ── CENTER: Conversation list ── */}
-      <section className="admin-msg-convos">
+      <section
+        className="admin-msg-convos"
+        data-mobile-panel="convos"
+        style={isMobile && mobileView !== "convos" ? { display: "none" } : undefined}
+      >
         <div className="admin-msg-panel-header">
-          <h2 className="text-sm font-semibold text-white">
-            {selectedCreator ? `${selectedCreator.displayName}'s Inbox` : "All Conversations"}
-          </h2>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="admin-msg-back-btn"
+              onClick={() => setMobileView("creators")}
+              aria-label="Back to creators"
+            >
+              ←
+            </button>
+            <h2 className="text-sm font-semibold text-white">
+              {selectedCreator ? `${selectedCreator.displayName}'s Inbox` : "All Conversations"}
+            </h2>
+          </div>
           {connected && <span className="admin-msg-live-dot" />}
         </div>
         <div className="admin-msg-panel-body">
@@ -454,6 +491,7 @@ export function AdminMessagingHub() {
                       onClick={() => {
                         setSelectedConvId(c.id);
                         setShowVault(false);
+                        setMobileView("chat");
                       }}
                       className={`admin-msg-list-item ${isActive ? "active" : ""}`}
                     >
@@ -490,19 +528,31 @@ export function AdminMessagingHub() {
       </section>
 
       {/* ── RIGHT: Chat window ── */}
-      <section className="admin-msg-chat">
+      <section
+        className="admin-msg-chat"
+        data-mobile-panel="chat"
+        style={isMobile && mobileView !== "chat" ? { display: "none" } : undefined}
+      >
         {selectedConv ? (
           <>
             {/* Chat header */}
             <div className="admin-msg-chat-header">
+              <button
+                type="button"
+                className="admin-msg-back-btn"
+                onClick={() => setMobileView("convos")}
+                aria-label="Back to conversations"
+              >
+                ←
+              </button>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-semibold text-white">
                   {selectedConv.user.username}
-                  <span className="ml-2 text-xs text-white/40 font-normal">
+                  <span className="ml-2 text-xs text-white/40 font-normal max-sm:hidden">
                     chatting with {selectedConv.creator.displayName}
                   </span>
                 </p>
-                <p className="text-xs text-white/40 mt-0.5">{selectedConv.user.email}</p>
+                <p className="text-xs text-white/40 mt-0.5 max-sm:truncate">{selectedConv.user.email}</p>
               </div>
               {/* Subscription badge */}
               {subscriberInfo && (
@@ -510,12 +560,14 @@ export function AdminMessagingHub() {
                   {subscriberInfo.isSubscribed ? (
                     <>
                       <span className="admin-msg-sub-dot active" />
-                      Subscriber · ${(subscriberInfo.totalSpentCents / 100).toFixed(2)} spent
+                      <span className="max-sm:hidden">Subscriber · ${(subscriberInfo.totalSpentCents / 100).toFixed(2)} spent</span>
+                      <span className="sm:hidden">Sub</span>
                     </>
                   ) : (
                     <>
                       <span className="admin-msg-sub-dot" />
-                      Free user
+                      <span className="max-sm:hidden">Free user</span>
+                      <span className="sm:hidden">Free</span>
                     </>
                   )}
                 </div>

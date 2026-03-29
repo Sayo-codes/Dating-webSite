@@ -25,10 +25,10 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <div className="page-content mx-auto max-w-6xl py-8">
-      <div className="space-y-8">
+    <div className="page-content mx-auto max-w-6xl py-6 sm:py-8">
+      <div className="space-y-6 sm:space-y-8">
         <div>
-          <h1 className="font-[var(--font-heading)] text-2xl font-semibold text-white">
+          <h1 className="font-[var(--font-heading)] text-xl font-semibold text-white sm:text-2xl">
             Dashboard
           </h1>
           <p className="mt-1 text-sm text-white/60">
@@ -36,15 +36,15 @@ export default async function AdminDashboardPage() {
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {cards.map(({ label, value, href, color }) => (
             <Link
               key={label}
               href={href}
-              className={`rounded-[var(--radius-card)] border border-white/10 bg-gradient-to-br ${color} p-6 transition hover:border-white/20`}
+              className={`rounded-[var(--radius-card)] border border-white/10 bg-gradient-to-br ${color} p-4 sm:p-6 transition hover:border-white/20`}
             >
-              <p className="text-sm font-medium text-white/70">{label}</p>
-              <p className="mt-2 font-[var(--font-heading)] text-3xl font-semibold text-white">
+              <p className="text-xs sm:text-sm font-medium text-white/70">{label}</p>
+              <p className="mt-1.5 sm:mt-2 font-[var(--font-heading)] text-2xl sm:text-3xl font-semibold text-white">
                 {value.toLocaleString()}
               </p>
             </Link>
