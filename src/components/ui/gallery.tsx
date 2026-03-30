@@ -1,44 +1,35 @@
 "use client";
 
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-  AnimatePresence,
-} from "motion/react";
-import Image from "next/image";
+import { Ref, forwardRef, useState, useEffect } from "react";
+import Image, { ImageProps } from "next/image";
+import { motion, useMotionValue } from "motion/react";
 import Link from "next/link";
-import React, { useCallback, useEffect, useRef, useState } from "react";
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
 export interface GalleryImage {
   id: string;
   src: string;
   alt: string;
-  /** Creator name displayed on the card */
   creator?: string;
-  /** e.g. "Verified ✦ Elite"  */
   badge?: string;
-  /** Accent colour for the card glow (defaults to gold) */
   accentColor?: string;
 }
 
 interface PhotoGalleryProps {
   images: GalleryImage[];
-  /** Section heading; default "Featured Creators ✦" */
   heading?: string;
-  /** CTA button label; default "Browse All Creators ✦" */
   ctaLabel?: string;
-  /** CTA button href; default "/creators" */
   ctaHref?: string;
+  animationDelay?: number;
 }
 
-/* ─── Helpers ─────────────────────────────────────────────────────────────────── */
-const clamp = (n: number, min: number, max: number) =>
-  Math.min(Math.max(n, min), max);
+/* ─── Helpers ────────────────────────────────────────────────────────────────── */
+function getRandomNumberInRange(min: number, max: number): number {
+  if (min >= max) throw new Error("Min value should be less than max value");
+  return Math.random() * (max - min) + min;
+}
 
-function useMobile(breakpoint = 768) {
+function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
@@ -50,325 +41,240 @@ function useMobile(breakpoint = 768) {
   return isMobile;
 }
 
-/* ─── Single Card ─────────────────────────────────────────────────────────────── */
-function GalleryCard({
-  image,
-  index,
-  total,
-  onClick,
+/* ─── MotionImage (forwardRef wrapper for next/image) ───────────────────────── */
+const MotionImage = motion.create(
+  forwardRef(function MotionImageInner(
+    props: ImageProps,
+    ref: Ref<HTMLImageElement>
+  ) {
+    return <Image ref={ref} {...props} />;
+  })
+);
+
+/* ─── Photo Card ─────────────────────────────────────────────────────────────── */
+type Direction = "left" | "right";
+
+function Photo({
+  src,
+  alt,
+  className,
+  direction,
+  width,
+  height,
+  creator,
+  badge,
+  accentColor = "#d4a853",
   isMobile,
 }: {
-  image: GalleryImage;
-  index: number;
-  total: number;
-  onClick: (id: string) => void;
+  src: string;
+  alt: string;
+  className?: string;
+  direction?: Direction;
+  width: number;
+  height: number;
+  creator?: string;
+  badge?: string;
+  accentColor?: string;
   isMobile: boolean;
 }) {
-  const accent = image.accentColor ?? "#d4a853";
+  const [rotation, setRotation] = useState<number>(0);
+  const x = useMotionValue(200);
+  const y = useMotionValue(200);
 
-  /* Spread cards in an arc */
-  const spread = isMobile ? 8 : 14;
-  const baseRotate = ((index - (total - 1) / 2) / (total - 1)) * spread;
+  useEffect(() => {
+    const randomRotation =
+      getRandomNumberInRange(1, 4) * (direction === "left" ? -1 : 1);
+    setRotation(randomRotation);
+  }, [direction]);
 
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  /* Softer spring config on mobile */
-  const springCfg = isMobile
-    ? { stiffness: 120, damping: 22, mass: 0.8 }
-    : { stiffness: 220, damping: 28, mass: 1 };
-
-  const rotateX = useSpring(useTransform(y, [-80, 80], [6, -6]), springCfg);
-  const rotateY = useSpring(useTransform(x, [-80, 80], [-8, 8]), springCfg);
-  const scale = useSpring(1, springCfg);
-  const z = useSpring(0, springCfg);
-
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (isMobile) return;
-      const rect = e.currentTarget.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      x.set(clamp(e.clientX - cx, -80, 80));
-      y.set(clamp(e.clientY - cy, -80, 80));
-    },
-    [isMobile, x, y]
-  );
-
-  const handleMouseEnter = useCallback(() => {
+  function handleMouse(event: React.MouseEvent) {
     if (isMobile) return;
-    scale.set(1.06);
-    z.set(30);
-  }, [isMobile, scale, z]);
+    const rect = event.currentTarget.getBoundingClientRect();
+    x.set(event.clientX - rect.left);
+    y.set(event.clientY - rect.top);
+  }
 
-  const handleMouseLeave = useCallback(() => {
-    x.set(0);
-    y.set(0);
-    scale.set(1);
-    z.set(0);
-  }, [x, y, scale, z]);
+  const resetMouse = () => {
+    x.set(200);
+    y.set(200);
+  };
 
-  /* Staggered entrance */
-  const enterDelay = index * 0.07;
+  /* ── Mobile-safe motion props ── */
+  const dragProps = isMobile
+    ? {}
+    : {
+        drag: true as const,
+        dragConstraints: { left: 0, right: 0, top: 0, bottom: 0 },
+      };
+
+  const hoverAnimation = isMobile
+    ? {}
+    : {
+        scale: 1.1,
+        rotateZ: 2 * (direction === "left" ? -1 : 1),
+        zIndex: 9999,
+      };
+
+  const tapAnimation = isMobile
+    ? { scale: 1.04 }
+    : { scale: 1.2, zIndex: 9999 };
+
+  const dragAnimation = isMobile ? {} : { scale: 1.1, zIndex: 9999 };
 
   return (
     <motion.div
-      className="relative flex-shrink-0 cursor-pointer select-none"
-      style={{
-        width: isMobile ? 160 : 200,
-        height: isMobile ? 230 : 280,
-        zIndex: z,
-        originX: 0.5,
-        originY: 1,
-      }}
-      initial={{ opacity: 0, y: isMobile ? 20 : 40, rotate: baseRotate }}
-      animate={{ opacity: 1, y: 0, rotate: baseRotate }}
-      transition={{
-        delay: enterDelay,
-        duration: isMobile ? 0.4 : 0.6,
-        ease: [0.33, 1, 0.68, 1],
-      }}
-      whileHover={isMobile ? {} : { rotate: 0, zIndex: 50 }}
-      onClick={() => onClick(image.id)}
-      aria-label={`View ${image.creator ?? image.alt}`}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onClick(image.id)}
+      {...dragProps}
+      whileTap={tapAnimation}
+      whileHover={hoverAnimation}
+      whileDrag={dragAnimation}
+      initial={{ rotate: 0 }}
+      animate={{ rotate: rotation }}
+      style={{ width, height, perspective: 400 }}
+      className={`${className ?? ""} relative mx-auto shrink-0 ${
+        isMobile ? "cursor-pointer" : "cursor-grab active:cursor-grabbing"
+      }`}
+      onMouseMove={handleMouse}
+      onMouseLeave={resetMouse}
+      draggable={false}
     >
-      <motion.div
+      <div
+        className="relative h-full w-full overflow-hidden rounded-3xl"
         style={{
-          rotateX: isMobile ? 0 : rotateX,
-          rotateY: isMobile ? 0 : rotateY,
-          scale,
-          perspective: 800,
-          width: "100%",
-          height: "100%",
+          boxShadow: `0 12px 40px rgba(0,0,0,0.6), inset 0 0 0 1px ${accentColor}22`,
         }}
-        onMouseMove={handleMouseMove}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        className="relative rounded-2xl overflow-hidden"
       >
-        {/* Photo */}
-        <Image
-          src={image.src}
-          alt={image.alt}
+        <MotionImage
+          className="rounded-3xl object-cover"
           fill
-          className="object-cover object-top"
-          sizes="(max-width: 768px) 160px, 200px"
+          src={src}
+          alt={alt}
+          sizes={`${width}px`}
           draggable={false}
         />
 
-        {/* Gradient overlay – bottom fade */}
+        {/* Bottom gradient for text */}
         <div
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0 pointer-events-none rounded-3xl"
           style={{
             background:
-              "linear-gradient(180deg, transparent 40%, rgba(7,7,11,0.85) 100%)",
+              "linear-gradient(180deg, transparent 35%, rgba(7,7,11,0.85) 100%)",
           }}
-        />
-
-        {/* Accent glow border */}
-        <div
-          className="absolute inset-0 rounded-2xl pointer-events-none"
-          style={{
-            boxShadow: `inset 0 0 0 1px ${accent}33, 0 8px 32px rgba(0,0,0,0.5)`,
-          }}
-        />
-
-        {/* Shimmer sheen */}
-        <motion.div
-          className="absolute inset-0 pointer-events-none rounded-2xl"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%)",
-            originX: 0,
-          }}
-          initial={{ opacity: 0 }}
-          whileHover={{ opacity: isMobile ? 0 : 1 }}
-          transition={{ duration: 0.25 }}
         />
 
         {/* Badge */}
-        {image.badge && (
+        {badge && (
           <div
             className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full text-[0.55rem] font-bold uppercase tracking-widest"
             style={{
-              background: `${accent}20`,
-              border: `1px solid ${accent}50`,
-              color: accent,
+              background: `${accentColor}20`,
+              border: `1px solid ${accentColor}50`,
+              color: accentColor,
               backdropFilter: "blur(6px)",
             }}
           >
-            {image.badge}
+            {badge}
           </div>
         )}
 
         {/* Creator name */}
-        {image.creator && (
+        {creator && (
           <div className="absolute bottom-3 left-3 right-3">
             <p
               className="text-sm font-semibold text-white leading-tight truncate"
               style={{ textShadow: "0 1px 8px rgba(0,0,0,0.8)" }}
             >
-              {image.creator}
+              {creator}
             </p>
           </div>
         )}
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
 
-/* ─── Lightbox ────────────────────────────────────────────────────────────────── */
-function Lightbox({
-  image,
-  onClose,
-}: {
-  image: GalleryImage;
-  onClose: () => void;
-}) {
-  const accent = image.accentColor ?? "#d4a853";
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [onClose]);
-
-  return (
-    <motion.div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Viewing ${image.creator ?? image.alt}`}
-    >
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0"
-        style={{ background: "rgba(7,7,11,0.92)", backdropFilter: "blur(16px)" }}
-      />
-
-      {/* Card */}
-      <motion.div
-        className="relative z-10 rounded-3xl overflow-hidden"
-        style={{
-          width: "min(90vw, 420px)",
-          aspectRatio: "3/4",
-          boxShadow: `0 32px 80px rgba(0,0,0,0.8), 0 0 60px ${accent}30`,
-          border: `1px solid ${accent}40`,
-        }}
-        initial={{ scale: 0.88, opacity: 0, y: 24 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.88, opacity: 0, y: 24 }}
-        transition={{ duration: 0.3, ease: [0.33, 1, 0.68, 1] }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Image
-          src={image.src}
-          alt={image.alt}
-          fill
-          className="object-cover object-top"
-          sizes="420px"
-          priority
-        />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, transparent 45%, rgba(7,7,11,0.9) 100%)",
-          }}
-        />
-        {image.creator && (
-          <div className="absolute bottom-5 left-5 right-5">
-            {image.badge && (
-              <span
-                className="inline-block mb-1.5 px-2.5 py-0.5 rounded-full text-[0.6rem] font-bold uppercase tracking-widest"
-                style={{
-                  background: `${accent}25`,
-                  border: `1px solid ${accent}55`,
-                  color: accent,
-                }}
-              >
-                {image.badge}
-              </span>
-            )}
-            <p className="text-lg font-bold text-white">{image.creator}</p>
-          </div>
-        )}
-
-        {/* Close button */}
-        <button
-          className="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center text-white/70 hover:text-white transition-colors"
-          style={{
-            background: "rgba(7,7,11,0.7)",
-            border: "1px solid rgba(255,255,255,0.12)",
-            backdropFilter: "blur(8px)",
-          }}
-          onClick={onClose}
-          aria-label="Close preview"
-        >
-          ✕
-        </button>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-/* ─── Main Export ─────────────────────────────────────────────────────────────── */
+/* ─── Main Export: PhotoGallery ───────────────────────────────────────────────── */
 export function PhotoGallery({
   images,
   heading = "Featured Creators ✦",
   ctaLabel = "Browse All Creators ✦",
   ctaHref = "/creators",
+  animationDelay = 0.5,
 }: PhotoGalleryProps) {
-  const isMobile = useMobile(768);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const isMobile = useIsMobile(768);
 
-  const activeImage = images.find((img) => img.id === activeId) ?? null;
+  useEffect(() => {
+    const visibilityTimer = setTimeout(() => {
+      setIsVisible(true);
+    }, animationDelay * 1000);
 
-  /* ── Drag-to-scroll (desktop only) ── */
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
+    const animationTimer = setTimeout(() => {
+      setIsLoaded(true);
+    }, (animationDelay + 0.4) * 1000);
 
-  const onPointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      if (isMobile) return;
-      isDragging.current = true;
-      startX.current = e.pageX - (containerRef.current?.offsetLeft ?? 0);
-      scrollLeft.current = containerRef.current?.scrollLeft ?? 0;
-      containerRef.current?.setPointerCapture(e.pointerId);
+    return () => {
+      clearTimeout(visibilityTimer);
+      clearTimeout(animationTimer);
+    };
+  }, [animationDelay]);
+
+  const containerVariants = {
+    hidden: { opacity: 1 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: isMobile ? 0.08 : 0.15,
+        delayChildren: 0.1,
+      },
     },
-    [isMobile]
-  );
+  };
 
-  const onPointerMove = useCallback(
-    (e: React.PointerEvent) => {
-      if (!isDragging.current || isMobile) return;
-      const x = e.pageX - (containerRef.current?.offsetLeft ?? 0);
-      const walk = (x - startX.current) * 1.2;
-      if (containerRef.current) {
-        containerRef.current.scrollLeft = scrollLeft.current - walk;
-      }
-    },
-    [isMobile]
-  );
+  /* ── Build photo layout from images data ── */
+  const cardSize = isMobile ? 160 : 220;
+  const gap = isMobile ? 120 : 160;
+  const totalWidth = (images.length - 1) * gap;
 
-  const onPointerUp = useCallback(() => {
-    isDragging.current = false;
-  }, []);
+  const photos = images.map((img, i) => {
+    const xOffset = -totalWidth / 2 + i * gap;
+    const yWave = Math.sin((i / (images.length - 1)) * Math.PI) * 20 + 10;
+    return {
+      ...img,
+      order: i,
+      x: `${xOffset}px`,
+      y: `${yWave}px`,
+      zIndex: images.length - i,
+      direction: (i % 2 === 0 ? "left" : "right") as Direction,
+    };
+  });
+
+  const photoVariants = {
+    hidden: () => ({
+      x: 0,
+      y: 0,
+      rotate: 0,
+      scale: 1,
+    }),
+    visible: (custom: { x: string; y: string; order: number }) => ({
+      x: custom.x,
+      y: custom.y,
+      rotate: 0,
+      scale: 1,
+      transition: {
+        type: "spring",
+        stiffness: isMobile ? 40 : 70,
+        damping: isMobile ? 16 : 12,
+        mass: isMobile ? 0.6 : 1,
+        delay: custom.order * (isMobile ? 0.08 : 0.15),
+      },
+    }),
+  };
 
   return (
-    <section className="relative overflow-hidden" aria-labelledby="gallery-heading">
+    <section
+      className="relative overflow-hidden"
+      aria-labelledby="gallery-heading"
+    >
       {/* ── Ambient glows ── */}
       <div
         aria-hidden
@@ -382,100 +288,110 @@ export function PhotoGallery({
       />
 
       {/* ── Section header ── */}
-      <div className="relative z-10 px-4 text-center sm:px-6 lg:px-10 mb-10 sm:mb-14">
+      <div className="relative z-10 px-4 text-center sm:px-6 lg:px-10">
         <p className="section-heading mb-2 flex items-center justify-center gap-2">
           ✦ Exclusive Profiles
         </p>
         <h2
           id="gallery-heading"
-          className="font-[var(--font-heading)] text-2xl font-bold sm:text-3xl lg:text-4xl"
+          className="z-20 mx-auto max-w-2xl justify-center py-3 text-center font-[var(--font-heading)] text-3xl font-bold sm:text-4xl md:text-5xl lg:text-6xl"
         >
-          {heading.includes("✦") ? (
-            <>
-              {heading.replace(" ✦", "")}{" "}
-              <span
-                style={{
-                  background: "linear-gradient(135deg, #f0c97a, #d4a853, #ff2d78)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}
-              >
-                ✦
-              </span>
-            </>
-          ) : (
-            heading
-          )}
+          <span className="text-white">
+            {heading.replace(" ✦", "")}
+          </span>{" "}
+          <span
+            style={{
+              background:
+                "linear-gradient(135deg, #f0c97a 0%, #d4a853 40%, #ff2d78 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            ✦
+          </span>
         </h2>
-        <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/50">
+        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-white/50">
           Handpicked profiles from our most sought-after creators. Premium
           connections, total discretion.
         </p>
       </div>
 
-      {/* ── Card strip ── */}
-      <div
-        ref={containerRef}
-        className="relative z-10 flex items-end justify-start sm:justify-center gap-4 sm:gap-5 px-6 sm:px-10 pb-8 overflow-x-auto scrollbar-none"
-        style={{
-          cursor: isMobile ? "default" : isDragging.current ? "grabbing" : "grab",
-          perspectiveOrigin: "50% 100%",
-          perspective: 1200,
-          /* hide scrollbar cross-browser */
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-      >
-        {images.map((img, i) => (
-          <GalleryCard
-            key={img.id}
-            image={img}
-            index={i}
-            total={images.length}
-            onClick={setActiveId}
-            isMobile={isMobile}
-          />
-        ))}
+      {/* ── Fan-out card stack ── */}
+      <div className="relative mb-8 h-[350px] w-full items-center justify-center lg:flex">
+        <motion.div
+          className="relative mx-auto flex w-full max-w-7xl justify-center"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isVisible ? 1 : 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        >
+          <motion.div
+            className="relative flex w-full justify-center"
+            variants={containerVariants}
+            initial="hidden"
+            animate={isLoaded ? "visible" : "hidden"}
+          >
+            <div
+              className="relative"
+              style={{ height: cardSize, width: cardSize }}
+            >
+              {[...photos].reverse().map((photo) => (
+                <motion.div
+                  key={photo.id}
+                  className="absolute left-0 top-0"
+                  style={{ zIndex: photo.zIndex }}
+                  variants={photoVariants}
+                  custom={{
+                    x: photo.x,
+                    y: photo.y,
+                    order: photo.order,
+                  }}
+                >
+                  <Photo
+                    width={cardSize}
+                    height={cardSize}
+                    src={photo.src}
+                    alt={photo.alt}
+                    direction={photo.direction}
+                    creator={photo.creator}
+                    badge={photo.badge}
+                    accentColor={photo.accentColor}
+                    isMobile={isMobile}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
       </div>
 
-      {/* ── CTA ── */}
-      <div className="relative z-10 mt-8 flex justify-center px-4">
+      {/* ── CTA Button ── */}
+      <div className="relative z-10 flex w-full justify-center">
         <Link
           href={ctaHref}
           id="gallery-cta"
-          className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-semibold text-white transition-all duration-250 focus-outline"
+          className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-semibold text-white transition-all duration-300 focus-outline"
           style={{
             background: "linear-gradient(135deg, #d4a853 0%, #ff2d78 100%)",
-            boxShadow: "0 0 28px rgba(212,168,83,0.4), 0 4px 16px rgba(0,0,0,0.4)",
+            boxShadow:
+              "0 0 28px rgba(212,168,83,0.4), 0 4px 16px rgba(0,0,0,0.4)",
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+            const el = e.currentTarget;
+            el.style.boxShadow =
               "0 0 44px rgba(212,168,83,0.65), 0 8px 24px rgba(0,0,0,0.5)";
-            (e.currentTarget as HTMLAnchorElement).style.transform =
-              "scale(1.03) translateY(-1px)";
+            el.style.transform = "scale(1.03) translateY(-1px)";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.boxShadow =
+            const el = e.currentTarget;
+            el.style.boxShadow =
               "0 0 28px rgba(212,168,83,0.4), 0 4px 16px rgba(0,0,0,0.4)";
-            (e.currentTarget as HTMLAnchorElement).style.transform =
-              "scale(1) translateY(0)";
+            el.style.transform = "scale(1) translateY(0)";
           }}
         >
           {ctaLabel}
         </Link>
       </div>
-
-      {/* ── Lightbox ── */}
-      <AnimatePresence>
-        {activeImage && (
-          <Lightbox image={activeImage} onClose={() => setActiveId(null)} />
-        )}
-      </AnimatePresence>
     </section>
   );
 }
