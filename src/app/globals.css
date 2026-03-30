@@ -128,7 +128,8 @@
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: smooth;
+  scroll-behavior: smooth !important;
+  color-scheme: dark;
 }
 
 body {

@@ -51,7 +51,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `document.documentElement.classList.add('dark');`,
+          }}
+        />
+      </head>
       <body
         className={`${headingFont.variable} ${bodyFont.variable} antialiased bg-background text-foreground overflow-x-hidden`}
       >
