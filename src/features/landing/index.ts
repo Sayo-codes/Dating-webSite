@@ -7,3 +7,4 @@ export { TestimonialsSection } from "./components/TestimonialsSection";
 export { PricingSection } from "./components/PricingSection";
 export { WhyVelvetSection } from "./components/WhyVelvetSection";
 export { LandingFooter } from "./components/LandingFooter";
+export { GallerySection } from "./components/GallerySection";

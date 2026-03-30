@@ -6,6 +6,7 @@ import {
   StatsSection,
   WhyVelvetSection,
   TestimonialsSection,
+  GallerySection,
   LandingFooter,
 } from "@/features/landing";
 import { PrimaryButton } from "@/shared/ui";
@@ -47,10 +48,13 @@ export default async function Home() {
           {/* 2. Platform stats */}
           <StatsSection />
 
-          {/* 3. Why Velvet Signal — 4 feature cards */}
+          {/* 3. Featured Creators photo gallery */}
+          <GallerySection />
+
+          {/* 4. Why Velvet Signal — 4 feature cards */}
           <WhyVelvetSection />
 
-          {/* 4. Testimonials */}
+          {/* 5. Testimonials */}
           <TestimonialsSection />
 
           {/* 5. Final CTA block — IMAGE 4: Couple embrace for emotional connection */}
