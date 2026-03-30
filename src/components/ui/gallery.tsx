@@ -2,7 +2,7 @@
 
 import { Ref, forwardRef, useState, useEffect } from "react";
 import Image, { ImageProps } from "next/image";
-import { motion, useMotionValue } from "motion/react";
+import { motion, useMotionValue, Variants } from "motion/react";
 import Link from "next/link";
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
@@ -219,7 +219,7 @@ export function PhotoGallery({
     };
   }, [animationDelay]);
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 1 },
     visible: {
       opacity: 1,
@@ -248,13 +248,13 @@ export function PhotoGallery({
     };
   });
 
-  const photoVariants = {
-    hidden: () => ({
+  const photoVariants: Variants = {
+    hidden: {
       x: 0,
       y: 0,
       rotate: 0,
       scale: 1,
-    }),
+    },
     visible: (custom: { x: string; y: string; order: number }) => ({
       x: custom.x,
       y: custom.y,
