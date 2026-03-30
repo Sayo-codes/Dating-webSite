@@ -136,7 +136,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
   const accent = testimonial.accentColor ?? "#d4a853";
   return (
     <div
-      className="mb-4 rounded-2xl p-5 transition-all duration-300 hover:scale-[1.02]"
+      className="rounded-2xl p-5 transition-all duration-300 hover:scale-[1.02]"
       style={{
         background:
           "linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%)",
@@ -213,7 +213,7 @@ function TestimonialColumn({
   const doubled = [...testimonials, ...testimonials];
 
   return (
-    <div className={`overflow-hidden ${className}`} aria-hidden={reverse}>
+    <div className={`overflow-hidden w-full ${className}`} aria-hidden={reverse}>
       <motion.div
         animate={{ y: reverse ? ["-50%", "0%"] : ["0%", "-50%"] }}
         transition={{
@@ -222,6 +222,7 @@ function TestimonialColumn({
           ease: "linear",
           repeatType: "loop",
         }}
+        className="flex flex-col gap-4 pb-4"
       >
         {doubled.map((t, i) => (
           <TestimonialCard key={`${t.name}-${i}`} testimonial={t} />
@@ -233,44 +234,61 @@ function TestimonialColumn({
 
 /* ─── Main Export ────────────────────────────────────────────────────────────── */
 export function TestimonialsColumns() {
-  // Split into three columns
-  const col1 = TESTIMONIALS.slice(0, 3);
-  const col2 = TESTIMONIALS.slice(3, 6);
-  const col3 = TESTIMONIALS.slice(6, 9);
-
   return (
-    <div className="relative w-full overflow-hidden" style={{ height: "560px" }}>
+    <div className="relative w-full overflow-hidden" style={{ height: "600px" }}>
       {/* Top fade */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20"
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 h-24"
         style={{
           background: "linear-gradient(180deg, #07070b 0%, transparent 100%)",
         }}
       />
       {/* Bottom fade */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-20"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-24"
         style={{
           background: "linear-gradient(0deg, #07070b 0%, transparent 100%)",
         }}
       />
 
-      {/* Columns grid — 1 on mobile, 2 on sm, 3 on lg */}
-      <div className="h-full grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 px-1">
-        <TestimonialColumn testimonials={col1} duration={28} />
-        {/* 2nd column: hidden on mobile, visible on sm+ */}
-        <TestimonialColumn
-          testimonials={col2}
-          duration={34}
-          reverse
-          className="hidden sm:block"
-        />
-        {/* 3rd column: hidden on mobile+sm, visible on lg+ */}
-        <TestimonialColumn
-          testimonials={col3}
-          duration={30}
-          className="hidden lg:block"
-        />
+      {/* Columns wrapper */}
+      <div className="flex h-full w-full gap-4 px-2 sm:px-4">
+        
+        {/* Mobile: 1 Column with ALL testimonials */}
+        <div className="flex w-full sm:hidden">
+          <TestimonialColumn testimonials={TESTIMONIALS} duration={40} />
+        </div>
+
+        {/* Tablet: 2 Columns */}
+        <div className="hidden sm:flex lg:hidden w-full gap-4">
+          <TestimonialColumn 
+            testimonials={TESTIMONIALS.filter((_, i) => i % 2 === 0)} 
+            duration={35} 
+          />
+          <TestimonialColumn 
+            testimonials={TESTIMONIALS.filter((_, i) => i % 2 === 1)} 
+            duration={45} 
+            reverse 
+          />
+        </div>
+
+        {/* Desktop: 3 Columns */}
+        <div className="hidden lg:flex w-full gap-4">
+          <TestimonialColumn 
+            testimonials={TESTIMONIALS.filter((_, i) => i % 3 === 0)} 
+            duration={42} 
+          />
+          <TestimonialColumn 
+            testimonials={TESTIMONIALS.filter((_, i) => i % 3 === 1)} 
+            duration={50} 
+            reverse 
+          />
+          <TestimonialColumn 
+            testimonials={TESTIMONIALS.filter((_, i) => i % 3 === 2)} 
+            duration={45} 
+          />
+        </div>
+
       </div>
     </div>
   );
