@@ -34,44 +34,54 @@ export default async function Home() {
     );
   }
 
-  // ── Public: Tinder-style luxury landing page ─────────────────────────────
+  // ── Public: Luxury landing page ─────────────────────────────
   return (
-    <div className="min-h-screen text-white overflow-x-hidden">
+    <div className="min-h-screen text-white overflow-x-hidden selection:bg-[#ff2d78]/30">
       <main className="flex flex-col">
 
         {/* 1. Full-viewport hero */}
         <HeroSection />
 
-        <div className="flex flex-col gap-24 py-24 sm:gap-32 sm:py-32">
+        {/* Optimized mobile spacing: tighter gaps on small screens to prevent scroll-fatigue */}
+        <div className="flex flex-col gap-16 py-16 sm:gap-24 sm:py-24 lg:gap-32 lg:py-32 contain-paint">
 
           {/* 2. Featured Creators photo gallery */}
           <GallerySection />
 
-          {/* 4. Why Rsdate — 4 feature cards */}
+          {/* 3. Why Rsdate — 4 feature cards */}
           <WhyRsdateSection />
 
-          {/* 5. Testimonials */}
+          {/* 4. Testimonials */}
           <TestimonialsSection />
 
-          {/* 5. Final CTA block — IMAGE 4: Couple embrace for emotional connection */}
+          {/* 5. Final CTA block */}
           <div className="px-4 sm:px-6 lg:px-10">
             <div
-              className="relative overflow-hidden rounded-[20px] p-6 text-center sm:rounded-[28px] sm:p-16"
+              className="relative overflow-hidden rounded-[20px] p-6 text-center sm:rounded-[28px] sm:p-12 lg:p-16"
               style={{
                 border: "1px solid rgba(212,168,83,0.35)",
                 boxShadow:
-                  "0 24px 60px rgba(0,0,0,0.5), 0 0 40px rgba(212,168,83,0.08), inset 0 1px 0 rgba(255,255,255,0.08)",
+                  "0 12px 40px rgba(0,0,0,0.5), 0 0 30px rgba(212,168,83,0.06), inset 0 1px 0 rgba(255,255,255,0.05)",
+                // Hardware acceleration for the container
+                transform: "translateZ(0)",
+                willChange: "transform",
               }}
             >
               {/* ── IMAGE 4: Couple embracing — emotional CTA background ── */}
               <Image
                 src="/images/landing/couple-embrace.jpg"
-                alt=""
+                alt="Romantic couple embrace background"
                 fill
                 className="object-cover object-center"
-                sizes="(max-width: 768px) 100vw, 80vw"
-                quality={80}
-                style={{ filter: "brightness(0.2) saturate(1.15)" }}
+                // Optimized sizes prop for the CTA container width
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                // WebP optimization + lower quality for background image to save bandwidth
+                quality={70}
+                // Lazy load since this is at the very bottom of the page
+                loading="lazy"
+                style={{ 
+                  filter: "brightness(0.2) saturate(1.15)",
+                }}
               />
 
               {/* Solid gradient overlay — ensures premium, opaque feel */}
@@ -97,21 +107,21 @@ export default async function Home() {
               {/* Glow accents */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute -top-20 left-1/4 h-56 w-56 rounded-full opacity-40 blur-3xl"
+                className="pointer-events-none absolute -top-20 left-1/4 h-48 w-48 rounded-full opacity-40 blur-3xl sm:h-56 sm:w-56"
                 style={{ background: "#d4a853" }}
               />
               <div
                 aria-hidden
-                className="pointer-events-none absolute -bottom-20 right-1/4 h-56 w-56 rounded-full opacity-30 blur-3xl"
+                className="pointer-events-none absolute -bottom-20 right-1/4 h-48 w-48 rounded-full opacity-30 blur-3xl sm:h-56 sm:w-56"
                 style={{ background: "#ff2d78" }}
               />
 
               <div className="relative z-10">
-                <p className="section-heading mb-3 flex items-center justify-center gap-2">
+                <p className="section-heading mb-3 flex items-center justify-center gap-2 text-[0.65rem] sm:text-xs">
                   ✦ Limited Spots Available
                 </p>
                 <h2
-                  className="font-[var(--font-heading)] text-3xl font-bold sm:text-4xl lg:text-5xl"
+                  className="font-[var(--font-heading)] text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl"
                   style={{
                     color: "#ffffff",
                     textShadow: "0 2px 20px rgba(0,0,0,0.4)",
@@ -120,24 +130,27 @@ export default async function Home() {
                   Begin Your Exclusive Journey
                 </h2>
                 <p
-                  className="mx-auto mt-4 max-w-md text-sm text-white/80 sm:text-base"
+                  className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/80 sm:mt-5 sm:text-base"
                   style={{ textShadow: "0 1px 10px rgba(0,0,0,0.3)" }}
                 >
                   Join thousands of members already experiencing the most private, luxurious
                   creator platform available.
                 </p>
-                <div className="mt-6 flex flex-col items-center gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">
-                  <Link href="/register">
-                    <PrimaryButton size="lg" className="px-10 text-base font-semibold">
+                
+                {/* ── Buttons stacked on mobile, inline on sm+ screens ── */}
+                <div className="mt-8 flex flex-col items-center gap-3.5 sm:mt-10 sm:flex-row sm:justify-center sm:gap-4">
+                  <Link href="/register" className="w-full sm:w-auto">
+                    <PrimaryButton size="lg" className="w-full px-10 text-[0.95rem] font-semibold sm:w-auto">
                       Join Now — It&apos;s Free ✦
                     </PrimaryButton>
                   </Link>
                   <Link
                     href="/creators"
-                    className="focus-outline inline-flex min-h-[52px] items-center justify-center rounded-full border px-8 text-base font-medium text-white/90 transition-all duration-250 hover:border-[rgba(255,255,255,0.5)] hover:text-white hover:bg-white/10"
+                    className="focus-outline inline-flex min-h-[52px] w-full items-center justify-center rounded-full border px-8 text-[0.95rem] font-medium text-white/90 transition-all duration-250 hover:bg-white/10 hover:border-[rgba(255,255,255,0.5)] hover:text-white sm:w-auto"
                     style={{
                       borderColor: "rgba(255,255,255,0.3)",
                       backdropFilter: "blur(8px)",
+                      WebkitBackdropFilter: "blur(8px)", // Safari support
                       textShadow: "0 1px 8px rgba(0,0,0,0.3)",
                     }}
                   >
@@ -149,7 +162,7 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* 7. Footer */}
+        {/* 6. Footer */}
         <LandingFooter />
       </main>
     </div>
