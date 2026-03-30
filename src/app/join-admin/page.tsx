@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/shared/lib/auth";
 import { JoinAdminClient } from "@/features/auth/components/JoinAdminClient";
 
 export const metadata = {
-  title: "Join as admin ✦ Velvet Signal",
+  title: "Join as admin ✦ Rsdate",
   description: "Use your agency invite code to unlock admin access.",
 };
 

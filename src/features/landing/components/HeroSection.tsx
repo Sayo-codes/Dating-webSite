@@ -170,7 +170,7 @@ export function HeroSection() {
             >
               🚀
             </span>
-            Non-stop fun 24h — Connect with models anytime on Velvet Signal
+            Non-stop fun 24h — Connect with models anytime on Rsdate
           </motion.p>
 
           {/* CTA Button */}

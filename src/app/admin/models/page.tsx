@@ -2,7 +2,7 @@ import { prisma } from "@/shared/lib/prisma";
 import { AdminModelsPageClient } from "@/features/admin/components/AdminModelsPageClient";
 
 export const metadata = {
-  title: "Admin – Models ✦ Velvet Signal",
+  title: "Admin – Models ✦ Rsdate",
   description: "Create and manage creator profiles",
 };
 

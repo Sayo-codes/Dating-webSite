@@ -1,4 +1,4 @@
-# Velvet Signal – Design System (extracted from landing page)
+# Rsdate – Design System (extracted from landing page)
 
 This document is the single source of truth for the rest of the platform. **Do not redesign the landing page.** All new screens must use these tokens and components so the app feels like one product.
 

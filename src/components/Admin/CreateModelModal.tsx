@@ -170,7 +170,7 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
         </button>
 
         <div className="border-b border-white/[0.06] px-6 pb-4 pt-6">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-[#f0c97a]/80">Velvet Signal</p>
+          <p className="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-[#f0c97a]/80">Rsdate</p>
           <h2 id="create-model-title" className="mt-1 flex items-center gap-2 font-[var(--font-heading)] text-xl font-bold text-white sm:text-2xl">
             <UserPlus className="h-6 w-6 text-[#d4a853]" aria-hidden />
             Create New Model ✦

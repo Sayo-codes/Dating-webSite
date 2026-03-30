@@ -40,7 +40,7 @@ export function LandingFooter() {
             <Link
               href="/"
               className="flex items-center gap-2.5 focus-outline w-fit"
-              aria-label="Velvet Signal home"
+              aria-label="Rsdate home"
             >
               <span
                 className="flex h-9 w-9 items-center justify-center rounded-xl"
@@ -64,7 +64,7 @@ export function LandingFooter() {
                   backgroundClip: "text",
                 }}
               >
-                Velvet Signal
+                Rsdate
               </span>
             </Link>
 
@@ -126,7 +126,7 @@ export function LandingFooter() {
           style={{ borderColor: "rgba(255,255,255,0.07)" }}
         >
           <p className="text-[0.7rem] text-white/28">
-            © {new Date().getFullYear()} Velvet Signal. All rights reserved.
+            © {new Date().getFullYear()} Rsdate. All rights reserved.
           </p>
           <p className="text-[0.7rem] text-white/28">
             Private. Exclusive. ✦ Verified Connections.

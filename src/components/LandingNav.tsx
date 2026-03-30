@@ -19,7 +19,7 @@ export function LandingNav() {
           className="focus-outline font-[var(--font-heading)] text-lg font-bold tracking-tight text-white sm:text-xl"
           style={{ textShadow: "0 1px 6px rgba(0,0,0,0.5)" }}
         >
-          Velvet Signal
+          Rsdate
         </Link>
 
         <div className="flex items-center gap-2.5 sm:gap-3">

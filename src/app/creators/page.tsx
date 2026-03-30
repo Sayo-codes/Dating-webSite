@@ -5,8 +5,8 @@ import { PageContainer } from "@/shared/ui/PageContainer";
 import { GlassCard } from "@/shared/ui/GlassCard";
 
 export const metadata = {
-  title: "Explore Creators ✦ Velvet Signal",
-  description: "Browse verified creators on Velvet Signal",
+  title: "Explore Creators ✦ Rsdate",
+  description: "Browse verified creators on Rsdate",
 };
 
 export default async function CreatorsPage() {

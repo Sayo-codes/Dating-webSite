@@ -3,8 +3,7 @@ import Image from "next/image";
 import { getCurrentUser } from "@/shared/lib/auth";
 import {
   HeroSection,
-  StatsSection,
-  WhyVelvetSection,
+  WhyRsdateSection,
   TestimonialsSection,
   GallerySection,
   LandingFooter,
@@ -45,14 +44,11 @@ export default async function Home() {
 
         <div className="flex flex-col gap-24 py-24 sm:gap-32 sm:py-32">
 
-          {/* 2. Platform stats */}
-          <StatsSection />
-
-          {/* 3. Featured Creators photo gallery */}
+          {/* 2. Featured Creators photo gallery */}
           <GallerySection />
 
-          {/* 4. Why Velvet Signal — 4 feature cards */}
-          <WhyVelvetSection />
+          {/* 4. Why Rsdate — 4 feature cards */}
+          <WhyRsdateSection />
 
           {/* 5. Testimonials */}
           <TestimonialsSection />

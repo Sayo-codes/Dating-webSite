@@ -55,7 +55,7 @@ export function AdminModelsPageClient({ initialModels, defaultOpenCreate = false
           <p className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[#f0c97a]/70">Admin ✦</p>
           <h1 className="mt-1 font-[var(--font-heading)] text-2xl font-bold text-white sm:text-3xl">Models & Creators</h1>
           <p className="mt-2 max-w-xl text-sm text-white/50">
-            Manage Velvet Signal talent — create profiles, set verification, and curate imagery. Deletes are permanent.
+            Manage Rsdate talent — create profiles, set verification, and curate imagery. Deletes are permanent.
           </p>
         </div>
         <button

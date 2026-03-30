@@ -75,7 +75,7 @@ export function AppHeader() {
         <Link
           href="/"
           className="flex items-center gap-2 focus-outline min-h-[44px] shrink-0"
-          aria-label="Velvet Signal home"
+          aria-label="Rsdate home"
         >
           {/* Gem icon */}
           <span className="relative flex h-8 w-8 items-center justify-center rounded-xl"
@@ -94,7 +94,7 @@ export function AppHeader() {
               backgroundClip: "text",
             }}
           >
-            Velvet Signal
+            Rsdate
           </span>
         </Link>
 

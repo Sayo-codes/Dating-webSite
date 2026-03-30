@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props) {
   const creator = await getCreatorByUsername(username);
   if (!creator) return { title: "Creator not found" };
   return {
-    title: `${creator.displayName} ✦ Velvet Signal`,
+    title: `${creator.displayName} ✦ Rsdate`,
     description: creator.bio ?? `Profile for ${creator.displayName}`,
   };
 }

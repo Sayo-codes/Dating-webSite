@@ -40,7 +40,7 @@ export function TestimonialsSection() {
           </span>
         </h2>
         <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/50">
-          Thousands of members trust Velvet Signal for authentic, private
+          Thousands of members trust Rsdate for authentic, private
           connections. Here&apos;s what they love.
         </p>
       </div>

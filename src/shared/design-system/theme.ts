@@ -1,5 +1,5 @@
 /**
- * Velvet Signal design system – extracted from landing page.
+ * Rsdate design system – extracted from landing page.
  * Use with globals.css CSS variables. Do not redesign; keep new UI consistent.
  */
 

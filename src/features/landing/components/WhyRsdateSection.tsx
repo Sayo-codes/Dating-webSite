@@ -33,10 +33,10 @@ const FEATURES = [
   },
 ] as const;
 
-export function WhyVelvetSection() {
+export function WhyRsdateSection() {
   return (
     <section
-      id="why-velvet"
+      id="why-rsdate"
       className="section-shell relative overflow-hidden"
       aria-labelledby="why-velvet-heading"
     >
@@ -50,10 +50,10 @@ export function WhyVelvetSection() {
       {/* Section header */}
       <div className="px-4 text-center sm:px-6 lg:px-10">
         <p className="section-heading mb-3 flex items-center justify-center gap-2">
-          ✦ Why Velvet Signal
+          ✦ Why Rsdate
         </p>
         <h2
-          id="why-velvet-heading"
+          id="why-rsdate-heading"
           className="font-[var(--font-heading)] text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl"
         >
           Designed for the{" "}
@@ -70,7 +70,7 @@ export function WhyVelvetSection() {
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-white/50 sm:text-base">
           We believe real connections deserve a real luxury platform. Here&apos;s why thousands
-          choose Velvet Signal.
+          choose Rsdate.
         </p>
       </div>
 

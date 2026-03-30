@@ -43,7 +43,7 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Alex T.",
     location: "London, UK",
     quote:
-      "The creators are so responsive and real. I've tried other platforms and nothing comes close to Velvet Signal's quality and exclusivity.",
+      "The creators are so responsive and real. I've tried other platforms and nothing comes close to Rsdate's quality and exclusivity.",
     rating: 5,
     avatar:
       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
