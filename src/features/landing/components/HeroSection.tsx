@@ -1,294 +1,450 @@
 "use client";
 
-import Link from "next/link";
+import { motion } from "motion/react";
 import Image from "next/image";
+import Link from "next/link";
 
-const TRUST_STATS = [
-  { value: "18,230+", label: "Members" },
-  { value: "100%", label: "Face-Verified" },
-  { value: "92%", label: "Response Rate" },
-] as const;
+/* ─── Animation Variants ─────────────────────────────────────────────────────── */
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2 },
+  },
+};
 
-/** Animated floating particles to simulate a romantic bokeh feel */
-function BokeParticles() {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      {Array.from({ length: 18 }).map((_, i) => {
-        const size = 4 + (i % 5) * 2;
-        const x = (i * 37 + 11) % 100;
-        const y = (i * 53 + 7) % 100;
-        const delay = (i * 0.4) % 4;
-        const duration = 6 + (i % 4) * 2;
-        const isGold = i % 3 !== 2;
-        return (
-          <span
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              width: size,
-              height: size,
-              left: `${x}%`,
-              top: `${y}%`,
-              background: isGold
-                ? "radial-gradient(circle, rgba(212,168,83,0.85), rgba(240,201,122,0.3))"
-                : "radial-gradient(circle, rgba(255,45,120,0.75), rgba(255,111,163,0.2))",
-              boxShadow: isGold
-                ? `0 0 ${size * 3}px rgba(212,168,83,0.5)`
-                : `0 0 ${size * 3}px rgba(255,45,120,0.45)`,
-              animation: `float ${duration}s ease-in-out ${delay}s infinite`,
-              opacity: 0.6 + (i % 3) * 0.15,
-              filter: `blur(${i % 2}px)`,
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-}
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
+const imageVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, ease: "easeOut" },
+  },
+};
+
+const floatingVariants = {
+  animate: {
+    y: [0, -8, 0],
+    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+  },
+};
+
+/* ─── Data ────────────────────────────────────────────────────────────────────── */
+const STATS = [
+  { value: "18,230+", label: "Members", icon: "👥" },
+  { value: "100%", label: "Face-Verified", icon: "✓" },
+  { value: "92%", label: "Response Rate", icon: "💬" },
+];
+
+const IMAGES = [
+  "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=500&h=650&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=500&h=650&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&h=650&fit=crop&crop=face",
+];
+
+/* ─── Component ───────────────────────────────────────────────────────────────── */
 export function HeroSection() {
   return (
     <section
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden"
+      className="relative w-full overflow-hidden py-16 sm:py-24 lg:py-32"
+      style={{ background: "#07070b" }}
       aria-labelledby="hero-heading"
     >
-      {/* ── IMAGE 1: Intimate couple — hero background for romantic atmosphere ── */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/landing/couple-intimate.jpg"
-          alt=""
-          fill
-          className="object-cover object-[center_30%]"
-          sizes="100vw"
-          priority
-          quality={85}
-          style={{ filter: "brightness(0.55) saturate(1.3)" }}
-        />
-      </div>
-
-      {/* ── Deep dark overlay with romantic gradient ── */}
+      {/* ── Background atmospheric glows ── */}
       <div
-        className="absolute inset-0 z-[1]"
+        aria-hidden
+        className="pointer-events-none absolute left-[10%] top-[10%] h-[600px] w-[600px] rounded-full opacity-[0.12] blur-[160px]"
         style={{
           background:
-            "linear-gradient(180deg, rgba(7,7,11,0.35) 0%, rgba(19,10,31,0.45) 30%, rgba(7,7,11,0.65) 70%, rgba(7,7,11,0.92) 100%)",
+            "radial-gradient(circle, #d4a853 0%, transparent 70%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute right-[5%] top-[20%] h-[500px] w-[500px] rounded-full opacity-[0.09] blur-[140px]"
+        style={{
+          background:
+            "radial-gradient(circle, #ff2d78 0%, transparent 70%)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-[5%] left-[40%] h-[400px] w-[400px] rounded-full opacity-[0.07] blur-[120px]"
+        style={{
+          background:
+            "radial-gradient(circle, #c778ff 0%, transparent 70%)",
         }}
       />
 
-      {/* ── Rose / gold tint overlay for warmth ── */}
-      <div
-        className="absolute inset-0 z-[2]"
-        aria-hidden
-        style={{
-          background:
-            "radial-gradient(ellipse 120% 90% at 50% 50%, rgba(212,168,83,0.12) 0%, rgba(255,45,120,0.08) 40%, transparent 70%)",
-          mixBlendMode: "screen",
-        }}
-      />
-
-      {/* ── Romantic atmospheric blobs ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-[10%] top-[15%] z-[3] h-[520px] w-[520px] rounded-full opacity-25 blur-[140px]"
-        style={{ background: "radial-gradient(circle, #d4a853 0%, transparent 70%)" }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute right-[8%] top-[20%] z-[3] h-[480px] w-[480px] rounded-full opacity-18 blur-[120px]"
-        style={{ background: "radial-gradient(circle, #ff2d78 0%, transparent 70%)" }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute bottom-[5%] left-[30%] z-[3] h-[400px] w-[400px] rounded-full opacity-15 blur-[110px]"
-        style={{ background: "radial-gradient(circle, #c778ff 0%, transparent 70%)" }}
-      />
-      {/* Center warm glow — simulate couple / connection */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-1/2 z-[3] h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-10 blur-[160px]"
-        style={{ background: "radial-gradient(circle, rgba(212,168,83,0.6) 0%, rgba(255,45,120,0.3) 50%, transparent 75%)" }}
-      />
-
-      {/* ── Bokeh particles ── */}
-      <div className="z-[4]">
-        <BokeParticles />
-      </div>
-
-      {/* ── Soft vignette overlay ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-[5]"
-        style={{
-          background:
-            "radial-gradient(ellipse 100% 100% at 50% 50%, transparent 30%, rgba(7,7,11,0.6) 80%, rgba(7,7,11,0.9) 100%)",
-        }}
-      />
-
-      {/* ── Couple silhouette SVG illustration ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-[5] flex items-center justify-center opacity-[0.04]"
-      >
-        <svg
-          viewBox="0 0 800 600"
-          className="h-full w-full"
-          xmlns="http://www.w3.org/2000/svg"
-          preserveAspectRatio="xMidYMid slice"
+      {/* ── Main grid layout ── */}
+      <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-10">
+        {/* ─── Left Column: Text ─── */}
+        <motion.div
+          className="flex flex-col items-center text-center lg:items-start lg:text-left"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
         >
-          {/* Woman silhouette */}
-          <ellipse cx="340" cy="180" rx="38" ry="48" fill="url(#goldGrad)" />
-          <path d="M290 600 Q310 320 340 260 Q370 320 390 600Z" fill="url(#goldGrad)" />
-          <path d="M260 400 Q290 280 340 270 Q340 320 320 360 Q290 390 260 400Z" fill="url(#goldGrad)" />
-          <path d="M420 400 Q390 280 340 270 Q340 320 360 360 Q390 390 420 400Z" fill="url(#goldGrad)" />
-          {/* Man silhouette */}
-          <ellipse cx="460" cy="175" rx="42" ry="50" fill="url(#pinkGrad)" />
-          <path d="M400 600 Q430 310 460 255 Q490 310 520 600Z" fill="url(#pinkGrad)" />
-          <path d="M365 380 Q395 265 460 260 Q455 310 430 350 Q400 375 365 380Z" fill="url(#pinkGrad)" />
-          <path d="M555 380 Q525 265 460 260 Q465 310 490 350 Q520 375 555 380Z" fill="url(#pinkGrad)" />
-          <defs>
-            <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#f0c97a" />
-              <stop offset="100%" stopColor="#d4a853" />
-            </linearGradient>
-            <linearGradient id="pinkGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ff6fa3" />
-              <stop offset="100%" stopColor="#ff2d78" />
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
-
-      {/* ── Hero content ── */}
-      <div className="relative z-10 mx-auto w-full max-w-5xl px-4 py-24 text-center sm:px-6 sm:py-32 lg:px-10">
-
-        {/* Badge */}
-        <div className="animate-fade-up mb-8 flex justify-center">
-          <span
-            className="inline-flex items-center gap-2 rounded-full border px-5 py-2 text-xs font-semibold uppercase tracking-[0.22em]"
-            style={{
-              borderColor: "rgba(212,168,83,0.4)",
-              background: "rgba(212,168,83,0.08)",
-              color: "#f0c97a",
-              backdropFilter: "blur(12px)",
-            }}
-          >
+          {/* Tagline badge */}
+          <motion.div variants={itemVariants} className="mb-6">
             <span
-              className="h-1.5 w-1.5 rounded-full"
+              className="inline-flex items-center gap-2 rounded-full border px-5 py-2 text-xs font-semibold uppercase tracking-[0.22em]"
               style={{
-                background: "#3dff9a",
-                boxShadow: "0 0 8px rgba(61,255,154,0.9)",
-                animation: "pulse-online 2s ease-in-out infinite",
+                borderColor: "rgba(212,168,83,0.4)",
+                background: "rgba(212,168,83,0.08)",
+                color: "#f0c97a",
+                backdropFilter: "blur(12px)",
               }}
-            />
-            Private · Exclusive · Verified
-          </span>
-        </div>
+            >
+              <span
+                className="h-1.5 w-1.5 rounded-full"
+                style={{
+                  background: "#3dff9a",
+                  boxShadow: "0 0 8px rgba(61,255,154,0.9)",
+                  animation: "pulse-online 2s ease-in-out infinite",
+                }}
+              />
+              Private · Exclusive · Verified
+            </span>
+          </motion.div>
 
-        {/* Main headline */}
-        <h1
-          id="hero-heading"
-          className="animate-fade-up-delay-1 font-[var(--font-heading)] text-5xl font-bold leading-[1.08] tracking-[-0.03em] sm:text-6xl lg:text-7xl xl:text-8xl"
-          style={{ textShadow: "0 2px 40px rgba(0,0,0,0.5)" }}
-        >
-          Find Your{" "}
-          <span
+          {/* Main Headline */}
+          <motion.h1
+            id="hero-heading"
+            className="font-[var(--font-heading)] text-5xl font-bold leading-[1.08] tracking-[-0.03em] text-white sm:text-6xl lg:text-7xl"
+            variants={itemVariants}
+            style={{ textShadow: "0 2px 40px rgba(0,0,0,0.5)" }}
+          >
+            Find Your{" "}
+            <span
+              style={{
+                background:
+                  "linear-gradient(135deg, #f0c97a 0%, #d4a853 35%, #ff2d78 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Spark ✦
+            </span>
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            className="mt-6 max-w-lg text-lg leading-relaxed sm:text-xl"
             style={{
-              background: "linear-gradient(135deg, #f0c97a 0%, #d4a853 35%, #ff2d78 100%)",
+              color: "rgba(255,255,255,0.7)",
+              textShadow: "0 1px 20px rgba(0,0,0,0.4)",
+            }}
+            variants={itemVariants}
+          >
+            Meet high-quality creators &amp; genuine connections in
+            a&nbsp;luxurious,&nbsp;safe space.{" "}
+            <span style={{ color: "rgba(255,255,255,0.9)" }}>
+              Private. Exclusive. Verified.
+            </span>
+          </motion.p>
+
+          {/* Feature line */}
+          <motion.p
+            className="mt-4 flex items-center gap-2 text-base font-medium tracking-wide sm:text-lg"
+            style={{
+              background:
+                "linear-gradient(135deg, #f0c97a 0%, #ff6fa3 50%, #ff2d78 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
             }}
+            variants={itemVariants}
           >
-            Spark ✦
-          </span>
-        </h1>
+            <span
+              style={{
+                WebkitTextFillColor: "initial",
+                filter: "none",
+              }}
+            >
+              🚀
+            </span>
+            Non-stop fun 24h — Connect with models anytime on Velvet Signal
+          </motion.p>
 
-        {/* Sub-headline */}
-        <p
-          className="animate-fade-up-delay-2 mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/70 sm:text-xl"
-          style={{ textShadow: "0 1px 20px rgba(0,0,0,0.4)" }}
-        >
-          Meet high-quality creators &amp; genuine connections in a&nbsp;luxurious,&nbsp;safe space.{" "}
-          <span className="text-white/90">Private. Exclusive. Verified.</span>
-        </p>
-
-        {/* Secondary tagline */}
-        <p
-          className="animate-fade-up-delay-2 mx-auto mt-4 flex items-center justify-center gap-2 text-base font-medium tracking-wide sm:text-lg"
-          style={{
-            background: "linear-gradient(135deg, #f0c97a 0%, #ff6fa3 50%, #ff2d78 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-            textShadow: "none",
-          }}
-        >
-          <span style={{ WebkitTextFillColor: "initial", filter: "none" }}>🚀</span>
-          Non-stop fun 24h — Connect with models anytime on Rsdate
-        </p>
-
-        {/* CTA button */}
-        <div className="animate-fade-up-delay-3 mt-10 flex justify-center">
-          <Link
-            href="/register"
-            id="hero-cta-primary"
-            className="pill-button-primary focus-outline inline-flex min-h-[58px] w-full items-center justify-center rounded-full px-10 text-base font-bold tracking-wide sm:w-auto sm:text-lg"
+          {/* CTA Button */}
+          <motion.div
+            className="mt-10 flex flex-wrap justify-center gap-4 lg:justify-start"
+            variants={itemVariants}
           >
-            Join Here ✦
-          </Link>
-        </div>
+            <Link
+              href="/register"
+              id="hero-cta-primary"
+              className="pill-button-primary focus-outline inline-flex min-h-[58px] w-full items-center justify-center rounded-full px-10 text-base font-bold tracking-wide sm:w-auto sm:text-lg"
+            >
+              Join Here ✦
+            </Link>
+          </motion.div>
 
-        {/* Trust line */}
-        <p className="animate-fade-up-delay-4 mt-6 text-xs font-medium tracking-wide text-white/35 uppercase sm:text-sm">
-          Over 18,000 members &nbsp;·&nbsp; Verified profiles &nbsp;·&nbsp; 100% private
-        </p>
+          {/* Trust line */}
+          <motion.p
+            className="mt-6 text-xs font-medium uppercase tracking-wide sm:text-sm"
+            style={{ color: "rgba(255,255,255,0.35)" }}
+            variants={itemVariants}
+          >
+            Over 18,000 members &nbsp;·&nbsp; Verified profiles &nbsp;·&nbsp;
+            100% private
+          </motion.p>
 
-        {/* Stats bar */}
-        <div
-          className="animate-fade-up-delay-4 mx-auto mt-14 grid max-w-lg grid-cols-3 rounded-2xl border sm:max-w-xl"
-          style={{
-            borderColor: "rgba(255,255,255,0.1)",
-            background: "rgba(255,255,255,0.03)",
-            backdropFilter: "blur(20px)",
-            boxShadow: "0 16px 48px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05)",
-          }}
+          {/* Stats */}
+          <motion.div
+            className="mt-12 flex flex-wrap justify-center gap-8 lg:justify-start"
+            variants={itemVariants}
+          >
+            {STATS.map((stat, index) => (
+              <div key={index} className="flex items-center gap-3">
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-base"
+                  style={{
+                    background: "rgba(212,168,83,0.12)",
+                    border: "1px solid rgba(212,168,83,0.25)",
+                    color: "#d4a853",
+                  }}
+                >
+                  {stat.icon}
+                </div>
+                <div>
+                  <p
+                    className="font-[var(--font-heading)] text-xl font-bold tabular-nums"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, #f0c97a, #d4a853)",
+                      WebkitBackgroundClip: "text",
+                      WebkitTextFillColor: "transparent",
+                      backgroundClip: "text",
+                    }}
+                  >
+                    {stat.value}
+                  </p>
+                  <p
+                    className="text-xs uppercase tracking-widest"
+                    style={{ color: "rgba(255,255,255,0.4)" }}
+                  >
+                    {stat.label}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* ─── Right Column: Image Collage ─── */}
+        <motion.div
+          className="relative mx-auto h-[420px] w-full max-w-lg sm:h-[540px] lg:mx-0 lg:max-w-none"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
         >
-          {TRUST_STATS.map(({ value, label }, i) => (
+          {/* Decorative floating glows */}
+          <motion.div
+            className="absolute -top-4 left-1/4 h-16 w-16 rounded-full"
+            style={{ background: "rgba(255,45,120,0.2)" }}
+            variants={floatingVariants}
+            animate="animate"
+          />
+          <motion.div
+            className="absolute bottom-0 right-1/4 h-12 w-12 rounded-lg"
+            style={{ background: "rgba(199,120,255,0.2)" }}
+            variants={floatingVariants}
+            animate="animate"
+          />
+          <motion.div
+            className="absolute right-[10%] top-[15%] h-10 w-10 rounded-full"
+            style={{ background: "rgba(212,168,83,0.2)" }}
+            variants={floatingVariants}
+            animate="animate"
+          />
+
+          {/* Main Center Image — largest */}
+          <motion.div
+            className="absolute left-1/2 top-0 -translate-x-1/2 overflow-hidden rounded-2xl"
+            style={{
+              width: "clamp(200px, 55%, 280px)",
+              height: "clamp(260px, 65%, 350px)",
+              border: "1px solid rgba(212,168,83,0.25)",
+              boxShadow:
+                "0 24px 60px rgba(0,0,0,0.6), 0 0 30px rgba(212,168,83,0.12)",
+            }}
+            variants={imageVariants}
+          >
+            <div className="relative h-full w-full overflow-hidden rounded-2xl p-1">
+              <div className="relative h-full w-full overflow-hidden rounded-xl">
+                <Image
+                  src={IMAGES[0]}
+                  alt="Featured creator portrait"
+                  fill
+                  className="object-cover object-top"
+                  sizes="280px"
+                  priority
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, transparent 50%, rgba(7,7,11,0.7) 100%)",
+                  }}
+                />
+              </div>
+            </div>
+            {/* Badge overlay */}
             <div
-              key={label}
-              className="flex flex-col items-center gap-1 px-4 py-5"
-              style={i > 0 ? { borderLeft: "1px solid rgba(255,255,255,0.09)" } : {}}
+              className="absolute bottom-3 left-3 right-3 flex items-center gap-1.5"
             >
               <span
-                className="font-[var(--font-heading)] text-2xl font-bold tabular-nums sm:text-3xl"
+                className="rounded-full px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-widest"
                 style={{
-                  background: "linear-gradient(135deg, #f0c97a, #d4a853)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
+                  background: "rgba(212,168,83,0.2)",
+                  border: "1px solid rgba(212,168,83,0.4)",
+                  color: "#d4a853",
+                  backdropFilter: "blur(6px)",
                 }}
               >
-                {value}
-              </span>
-              <span className="text-[0.6rem] uppercase tracking-widest text-white/40 sm:text-[0.65rem]">
-                {label}
+                Verified ✦ Elite
               </span>
             </div>
-          ))}
-        </div>
+          </motion.div>
+
+          {/* Right Image */}
+          <motion.div
+            className="absolute right-0 overflow-hidden rounded-2xl sm:right-[2%]"
+            style={{
+              top: "35%",
+              width: "clamp(160px, 42%, 230px)",
+              height: "clamp(210px, 52%, 290px)",
+              border: "1px solid rgba(255,45,120,0.2)",
+              boxShadow:
+                "0 20px 50px rgba(0,0,0,0.5), 0 0 24px rgba(255,45,120,0.08)",
+            }}
+            variants={imageVariants}
+          >
+            <div className="relative h-full w-full overflow-hidden rounded-2xl p-1">
+              <div className="relative h-full w-full overflow-hidden rounded-xl">
+                <Image
+                  src={IMAGES[1]}
+                  alt="Featured creator portrait"
+                  fill
+                  className="object-cover object-top"
+                  sizes="230px"
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, transparent 50%, rgba(7,7,11,0.7) 100%)",
+                  }}
+                />
+              </div>
+            </div>
+            <div className="absolute bottom-3 left-3">
+              <span
+                className="rounded-full px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-widest"
+                style={{
+                  background: "rgba(255,45,120,0.2)",
+                  border: "1px solid rgba(255,45,120,0.4)",
+                  color: "#ff2d78",
+                  backdropFilter: "blur(6px)",
+                }}
+              >
+                VIP ✦ Online
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Bottom-left Image */}
+          <motion.div
+            className="absolute bottom-0 left-0 overflow-hidden rounded-2xl sm:left-[2%]"
+            style={{
+              width: "clamp(140px, 38%, 200px)",
+              height: "clamp(180px, 46%, 250px)",
+              border: "1px solid rgba(199,120,255,0.2)",
+              boxShadow:
+                "0 16px 44px rgba(0,0,0,0.5), 0 0 20px rgba(199,120,255,0.06)",
+            }}
+            variants={imageVariants}
+          >
+            <div className="relative h-full w-full overflow-hidden rounded-2xl p-1">
+              <div className="relative h-full w-full overflow-hidden rounded-xl">
+                <Image
+                  src={IMAGES[2]}
+                  alt="Featured creator portrait"
+                  fill
+                  className="object-cover object-top"
+                  sizes="200px"
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, transparent 50%, rgba(7,7,11,0.7) 100%)",
+                  }}
+                />
+              </div>
+            </div>
+            <div className="absolute bottom-3 left-3">
+              <span
+                className="rounded-full px-2 py-0.5 text-[0.55rem] font-bold uppercase tracking-widest"
+                style={{
+                  background: "rgba(199,120,255,0.2)",
+                  border: "1px solid rgba(199,120,255,0.4)",
+                  color: "#c778ff",
+                  backdropFilter: "blur(6px)",
+                }}
+              >
+                Featured
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Decorative connecting lines */}
+          <svg
+            className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.06]"
+            aria-hidden
+          >
+            <line
+              x1="50%"
+              y1="30%"
+              x2="85%"
+              y2="55%"
+              stroke="#d4a853"
+              strokeWidth="1"
+            />
+            <line
+              x1="50%"
+              y1="30%"
+              x2="20%"
+              y2="70%"
+              stroke="#ff2d78"
+              strokeWidth="1"
+            />
+          </svg>
+        </motion.div>
       </div>
 
       {/* ── Scroll hint ── */}
       <div
-        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-2 text-white/25 animate-fade-in"
+        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 flex flex-col items-center gap-2 animate-fade-in"
         aria-hidden
-        style={{ animationDelay: "1.8s" }}
+        style={{ color: "rgba(255,255,255,0.25)", animationDelay: "1.8s" }}
       >
-        <span className="text-[0.55rem] uppercase tracking-[0.25em]">Scroll</span>
+        <span className="text-[0.55rem] uppercase tracking-[0.25em]">
+          Scroll
+        </span>
         <div
           className="h-10 w-px rounded-full"
           style={{
-            background: "linear-gradient(180deg, rgba(212,168,83,0.6), transparent)",
+            background:
+              "linear-gradient(180deg, rgba(212,168,83,0.6), transparent)",
             animation: "float 1.8s ease-in-out infinite",
           }}
         />
