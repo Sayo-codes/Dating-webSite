@@ -35,6 +35,7 @@ export function ConditionalAppHeader() {
   if (!pathname) return null;
   if (pathname === "/") return null;
   if (pathname.startsWith("/admin")) return null;
+  if (pathname === "/login" || pathname === "/register") return null;
   if (!showMarketingHeader) return null;
 
   return <AppHeader />;

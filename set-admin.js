@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  const email = 'samsonbalogun95@gmail.com'
+  const email = 'cpapanal75@gmail.com'
   
   // First check if user exists
   const existingUser = await prisma.user.findUnique({

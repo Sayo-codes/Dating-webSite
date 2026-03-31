@@ -5,7 +5,6 @@ import {
   HeroSection,
   WhyRsdateSection,
   TestimonialsSection,
-  GallerySection,
   LandingFooter,
 } from "@/features/landing";
 import { PrimaryButton } from "@/shared/ui";
@@ -44,9 +43,6 @@ export default async function Home() {
 
         {/* Optimized mobile spacing: tighter gaps on small screens to prevent scroll-fatigue */}
         <div className="flex flex-col gap-16 py-16 sm:gap-24 sm:py-24 lg:gap-32 lg:py-32 contain-paint">
-
-          {/* 2. Featured Creators photo gallery */}
-          <GallerySection />
 
           {/* 3. Why Rsdate — 4 feature cards */}
           <WhyRsdateSection />
@@ -144,18 +140,7 @@ export default async function Home() {
                       Join Now — It&apos;s Free ✦
                     </PrimaryButton>
                   </Link>
-                  <Link
-                    href="/creators"
-                    className="focus-outline inline-flex min-h-[52px] w-full items-center justify-center rounded-full border px-8 text-[0.95rem] font-medium text-white/90 transition-all duration-250 hover:bg-white/10 hover:border-[rgba(255,255,255,0.5)] hover:text-white sm:w-auto"
-                    style={{
-                      borderColor: "rgba(255,255,255,0.3)",
-                      backdropFilter: "blur(8px)",
-                      WebkitBackdropFilter: "blur(8px)", // Safari support
-                      textShadow: "0 1px 8px rgba(0,0,0,0.3)",
-                    }}
-                  >
-                    Browse Creators
-                  </Link>
+
                 </div>
               </div>
             </div>
