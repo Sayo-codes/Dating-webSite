@@ -452,6 +452,22 @@ body {
   to   { opacity: 1; transform: scale(1); }
 }
 
+/* ── Testimonial column scroll — GPU compositor thread (no JS) ── */
+@keyframes testimonial-scroll-down {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+@keyframes testimonial-scroll-up {
+  0%   { transform: translateY(-50%); }
+  100% { transform: translateY(0); }
+}
+
+/* ── Hero floating glows — CSS-driven, GPU compositor ── */
+@keyframes hero-float-anim {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
 /* =========================================
    ANIMATION UTILITIES
    ========================================= */
@@ -1585,3 +1601,106 @@ textarea:focus-visible,
   }
 }
 
+/* =========================================
+   HERO GLOW & FLOAT UTILITY CLASSES
+   (shared desktop+mobile, size controlled by media query)
+   ========================================= */
+.hero-glow {
+  /* Desktop sizes */
+  width: 600px;
+  height: 600px;
+  filter: blur(160px);
+}
+.hero-glow:nth-child(2) { width: 500px; height: 500px; filter: blur(140px); }
+.hero-glow:nth-child(3) { width: 400px; height: 400px; filter: blur(120px); }
+
+/* Shrink glows on mobile to cut paint area ~75% */
+@media (max-width: 768px) {
+  .hero-glow         { width: 200px !important; height: 200px !important; filter: blur(60px) !important; }
+  .hero-glow:nth-child(2) { width: 180px !important; height: 180px !important; filter: blur(50px) !important; }
+  .hero-glow:nth-child(3) { width: 140px !important; height: 140px !important; filter: blur(40px) !important; }
+}
+
+.hero-float {
+  animation: hero-float-anim 3s ease-in-out infinite;
+  /* Promote to own layer so it doesn't affect layout of siblings */
+  will-change: transform;
+}
+
+/* =========================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   ========================================= */
+@media (max-width: 768px) {
+
+  /* Smooth scroll causes jank on short mobile pages — use auto */
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Disable the shimmer-slide animation on creator cards:
+     6 simultaneous CSS animations triggering layer promotion = jank */
+  .shimmer-overlay::after {
+    display: none;
+  }
+
+  /* Simplify glass cards on mobile: remove expensive blur + heavy shadow */
+  .glass-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Remove hover transform on mobile (no hover state on touch, but prevents
+     accidental triggering on tap which causes a visible layout shift) */
+  .glass-card--interactive:hover {
+    transform: none;
+  }
+
+  /* Disable animate-fade-up stagger delays on mobile:
+     staggering 4 cards simultaneously causes layout recalc on each */
+  .animate-fade-up {
+    animation-duration: 0.4s;
+  }
+
+  /* CTA block: remove willChange from static elements to free GPU memory */
+  [style*="willChange: transform"] {
+    will-change: auto;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION (accessibility + perf)
+   Respects OS-level "Reduce Motion" setting.
+   Also benefits battery-constrained mobile devices.
+   ========================================= */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Stop the testimonial scroll columns */
+  [style*="testimonial-scroll"] {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Stop hero floating glows */
+  .hero-float {
+    animation: none !important;
+  }
+
+  /* Stop the online pulse dot */
+  .status-dot--online {
+    animation: none;
+  }
+
+  /* Stop glow-pulse on lock overlay icon */
+  .locked-overlay__icon {
+    animation: none;
+  }
+}

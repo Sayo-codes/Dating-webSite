@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "motion/react";
 import Image from "next/image";
 import React from "react";
 
@@ -136,13 +135,13 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
   const accent = testimonial.accentColor ?? "#d4a853";
   return (
     <div
-      className="rounded-2xl p-5 transition-all duration-300 hover:scale-[1.02]"
+      className="rounded-2xl p-5"
       style={{
         background:
-          "linear-gradient(145deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%)",
+          "linear-gradient(145deg, rgba(25,18,38,0.92) 0%, rgba(14,10,22,0.96) 100%)",
         border: `1px solid rgba(255,255,255,0.08)`,
-        boxShadow: `0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)`,
-        backdropFilter: "blur(12px)",
+        boxShadow: `0 4px 16px rgba(0,0,0,0.4)`,
+        /* No backdropFilter — too expensive on mobile (forces GPU texture per card) */
       }}
     >
       {/* Stars */}
@@ -198,6 +197,10 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 }
 
 /* ─── Animated Column ────────────────────────────────────────────────────────── */
+/*
+  CSS-driven scroll: runs on the GPU compositor thread — zero JS per frame.
+  Much lighter than Framer Motion's JS-driven animation on mobile.
+*/
 function TestimonialColumn({
   testimonials,
   duration = 30,
@@ -211,23 +214,21 @@ function TestimonialColumn({
 }) {
   // Duplicate for seamless loop
   const doubled = [...testimonials, ...testimonials];
+  const animationName = reverse ? "testimonial-scroll-up" : "testimonial-scroll-down";
 
   return (
     <div className={`overflow-hidden w-full ${className}`} aria-hidden={reverse}>
-      <motion.div
-        animate={{ y: reverse ? ["-50%", "0%"] : ["0%", "-50%"] }}
-        transition={{
-          duration,
-          repeat: Infinity,
-          ease: "linear",
-          repeatType: "loop",
-        }}
+      <div
         className="flex flex-col gap-4 pb-4"
+        style={{
+          animation: `${animationName} ${duration}s linear infinite`,
+          willChange: "transform",
+        }}
       >
         {doubled.map((t, i) => (
           <TestimonialCard key={`${t.name}-${i}`} testimonial={t} />
         ))}
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -235,7 +236,14 @@ function TestimonialColumn({
 /* ─── Main Export ────────────────────────────────────────────────────────────── */
 export function TestimonialsColumns() {
   return (
-    <div className="relative w-full overflow-hidden" style={{ height: "600px" }}>
+    <div
+      className="relative w-full overflow-hidden"
+      style={{
+        height: "600px",
+        /* Isolate this section from rest of page layout */
+        contain: "strict",
+      }}
+    >
       {/* Top fade */}
       <div
         className="pointer-events-none absolute inset-x-0 top-0 z-10 h-24"
@@ -253,39 +261,39 @@ export function TestimonialsColumns() {
 
       {/* Columns wrapper */}
       <div className="flex h-full w-full gap-4 px-2 sm:px-4">
-        
-        {/* Mobile: 1 Column with ALL testimonials */}
+
+        {/* Mobile: 1 Column — fewer cards to reduce paint area */}
         <div className="flex w-full sm:hidden">
-          <TestimonialColumn testimonials={TESTIMONIALS} duration={40} />
+          <TestimonialColumn testimonials={TESTIMONIALS.slice(0, 6)} duration={50} />
         </div>
 
         {/* Tablet: 2 Columns */}
         <div className="hidden sm:flex lg:hidden w-full gap-4">
-          <TestimonialColumn 
-            testimonials={TESTIMONIALS.filter((_, i) => i % 2 === 0)} 
-            duration={35} 
+          <TestimonialColumn
+            testimonials={TESTIMONIALS.filter((_, i) => i % 2 === 0)}
+            duration={35}
           />
-          <TestimonialColumn 
-            testimonials={TESTIMONIALS.filter((_, i) => i % 2 === 1)} 
-            duration={45} 
-            reverse 
+          <TestimonialColumn
+            testimonials={TESTIMONIALS.filter((_, i) => i % 2 === 1)}
+            duration={45}
+            reverse
           />
         </div>
 
         {/* Desktop: 3 Columns */}
         <div className="hidden lg:flex w-full gap-4">
-          <TestimonialColumn 
-            testimonials={TESTIMONIALS.filter((_, i) => i % 3 === 0)} 
-            duration={42} 
+          <TestimonialColumn
+            testimonials={TESTIMONIALS.filter((_, i) => i % 3 === 0)}
+            duration={42}
           />
-          <TestimonialColumn 
-            testimonials={TESTIMONIALS.filter((_, i) => i % 3 === 1)} 
-            duration={50} 
-            reverse 
+          <TestimonialColumn
+            testimonials={TESTIMONIALS.filter((_, i) => i % 3 === 1)}
+            duration={50}
+            reverse
           />
-          <TestimonialColumn 
-            testimonials={TESTIMONIALS.filter((_, i) => i % 3 === 2)} 
-            duration={45} 
+          <TestimonialColumn
+            testimonials={TESTIMONIALS.filter((_, i) => i % 3 === 2)}
+            duration={45}
           />
         </div>
 

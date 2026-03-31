@@ -33,6 +33,8 @@ const floatingVariants: Variants = {
     transition: { duration: 3, repeat: Infinity, ease: "easeInOut" },
   },
 };
+/* Note: on desktop the Framer Motion float is fine.
+   On mobile we swap to pure CSS via the class `hero-float` defined in globals.css */
 
 /* ─── Data ────────────────────────────────────────────────────────────────────── */
 const STATS = [
@@ -55,29 +57,28 @@ export function HeroSection() {
       style={{ background: "#07070b" }}
       aria-labelledby="hero-heading"
     >
-      {/* ── Background atmospheric glows ── */}
+      {/* ── Background atmospheric glows ──
+           On mobile: reduced blur sizes via hero-glow class (see globals.css)
+      */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-[10%] top-[10%] h-[600px] w-[600px] rounded-full opacity-[0.12] blur-[160px]"
+        className="hero-glow pointer-events-none absolute left-[10%] top-[10%] rounded-full opacity-[0.12]"
         style={{
-          background:
-            "radial-gradient(circle, #d4a853 0%, transparent 70%)",
+          background: "radial-gradient(circle, #d4a853 0%, transparent 70%)",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute right-[5%] top-[20%] h-[500px] w-[500px] rounded-full opacity-[0.09] blur-[140px]"
+        className="hero-glow pointer-events-none absolute right-[5%] top-[20%] rounded-full opacity-[0.09]"
         style={{
-          background:
-            "radial-gradient(circle, #ff2d78 0%, transparent 70%)",
+          background: "radial-gradient(circle, #ff2d78 0%, transparent 70%)",
         }}
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute bottom-[5%] left-[40%] h-[400px] w-[400px] rounded-full opacity-[0.07] blur-[120px]"
+        className="hero-glow pointer-events-none absolute bottom-[5%] left-[40%] rounded-full opacity-[0.07]"
         style={{
-          background:
-            "radial-gradient(circle, #c778ff 0%, transparent 70%)",
+          background: "radial-gradient(circle, #c778ff 0%, transparent 70%)",
         }}
       />
 
@@ -246,24 +247,18 @@ export function HeroSection() {
           initial="hidden"
           animate="visible"
         >
-          {/* Decorative floating glows */}
-          <motion.div
-            className="absolute -top-4 left-1/4 h-16 w-16 rounded-full"
+          {/* Decorative floating glows — CSS animated (compositor thread) */}
+          <div
+            className="hero-float absolute -top-4 left-1/4 h-16 w-16 rounded-full"
             style={{ background: "rgba(255,45,120,0.2)" }}
-            variants={floatingVariants}
-            animate="animate"
           />
-          <motion.div
-            className="absolute bottom-0 right-1/4 h-12 w-12 rounded-lg"
-            style={{ background: "rgba(199,120,255,0.2)" }}
-            variants={floatingVariants}
-            animate="animate"
+          <div
+            className="hero-float absolute bottom-0 right-1/4 h-12 w-12 rounded-lg"
+            style={{ background: "rgba(199,120,255,0.2)", animationDelay: "0.8s" }}
           />
-          <motion.div
-            className="absolute right-[10%] top-[15%] h-10 w-10 rounded-full"
-            style={{ background: "rgba(212,168,83,0.2)" }}
-            variants={floatingVariants}
-            animate="animate"
+          <div
+            className="hero-float absolute right-[10%] top-[15%] h-10 w-10 rounded-full"
+            style={{ background: "rgba(212,168,83,0.2)", animationDelay: "1.6s" }}
           />
 
           {/* Main Center Image — largest */}
