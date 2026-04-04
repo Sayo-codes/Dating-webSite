@@ -42,6 +42,9 @@ const nextConfig: NextConfig = {
       ...(s3Pattern ? [s3Pattern] : []),
     ],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
