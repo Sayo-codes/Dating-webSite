@@ -280,7 +280,7 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
               >
                 <button
                   type="button"
-                  className="focus-outline mt-1.5 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#d4a853]/35 bg-[#07070b]/60 px-3 py-3 text-sm text-[#f0c97a]/90 transition-colors hover:border-[#d4a853]/55 hover:bg-[#d4a853]/5 pointer-events-none"
+                  className="focus-outline mt-1.5 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#d4a853]/35 bg-[#07070b]/60 px-3 py-3 text-sm text-[#f0c97a]/90 transition-colors hover:border-[#d4a853]/55 hover:bg-[#d4a853]/5"
                 >
                   <ImagePlus className="h-4 w-4" aria-hidden />
                   {avatarFile ? "Cropped Photo Added ✦" : "Choose portrait…"}

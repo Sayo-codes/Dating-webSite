@@ -255,7 +255,7 @@ export function AdminCreatorsClient() {
                       <button
                         type="button"
                         disabled={uploadingId === c.id}
-                        className="text-white/70 hover:text-white disabled:opacity-50 pointer-events-none"
+                        className="text-white/70 hover:text-white disabled:opacity-50"
                       >
                         {uploadingId === c.id ? "…" : "Upload avatar"}
                       </button>

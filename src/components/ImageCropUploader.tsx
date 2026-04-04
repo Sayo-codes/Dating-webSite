@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, MouseEvent as ReactMouseEvent, TouchEvent as ReactTouchEvent } from "react";
+import React, { useState, useRef, useEffect, useCallback, MouseEvent as ReactMouseEvent } from "react";
 
 interface ImageCropUploaderProps {
   outputSize?: number;
@@ -16,38 +16,60 @@ export function ImageCropUploader({
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [croppedBlob, setCroppedBlob] = useState<Blob | null>(null);
   const [croppedUrl, setCroppedUrl] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Editor states
   const [imageObj, setImageObj] = useState<HTMLImageElement | null>(null);
   const [zoom, setZoom] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [startDrag, setStartDrag] = useState({ x: 0, y: 0 });
+
+  /* ---- refs for drag state (avoids stale closures in native listeners) ---- */
+  const isDraggingRef = useRef(false);
+  const startDragRef = useRef({ x: 0, y: 0 });
+  const offsetRef = useRef({ x: 0, y: 0 });
+  const zoomRef = useRef(1);
 
   const circleDiameter = 280;
 
-  // Handle file selection
+  // Keep refs in sync with state
+  useEffect(() => { offsetRef.current = offset; }, [offset]);
+  useEffect(() => { zoomRef.current = zoom; }, [zoom]);
+
+  /* ---- file selection ---- */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setLoadError(null);
+
+    if (!file.type.startsWith("image/")) {
+      setLoadError("Please select an image file.");
+      return;
+    }
+
     const url = URL.createObjectURL(file);
     setImageSrc(url);
+
     const img = new window.Image();
     img.src = url;
     img.onload = () => {
       setImageObj(img);
       setZoom(1);
+      zoomRef.current = 1;
       setOffset({ x: 0, y: 0 });
+      offsetRef.current = { x: 0, y: 0 };
     };
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      setImageSrc(null);
+      setLoadError("Could not load this image. Try a JPEG or PNG file.");
+    };
+
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // Draw on canvas when values change
+  /* ---- canvas draw ---- */
   useEffect(() => {
     if (!imageObj || !canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -60,29 +82,22 @@ export function ImageCropUploader({
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
 
-    // Save context to clip
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.clip();
-
-    // Dark background for transparency clarity
     ctx.fillStyle = "#07070b";
     ctx.fill();
 
-    // Calculate dimensions
-    // Fit shortest side to diameter
     const scale = Math.max(circleDiameter / imageObj.width, circleDiameter / imageObj.height) * zoom;
     const w = imageObj.width * scale;
     const h = imageObj.height * scale;
-
     const dx = cx - w / 2 + offset.x;
     const dy = cy - h / 2 + offset.y;
-
     ctx.drawImage(imageObj, dx, dy, w, h);
     ctx.restore();
 
-    // Draw opaque dimming layer outside the circle
+    // dim outside circle
     ctx.save();
     ctx.beginPath();
     ctx.rect(0, 0, canvas.width, canvas.height);
@@ -91,7 +106,7 @@ export function ImageCropUploader({
     ctx.fill();
     ctx.restore();
 
-    // Draw a border ring
+    // ring
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
@@ -101,34 +116,85 @@ export function ImageCropUploader({
     ctx.restore();
   }, [imageObj, zoom, offset]);
 
-  // Drag handling
-  const handleDragStart = (e: ReactMouseEvent | ReactTouchEvent) => {
-    setIsDragging(true);
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    setStartDrag({ x: clientX - offset.x, y: clientY - offset.y });
-  };
+  /* ---- native touch + wheel listeners (passive:false so preventDefault works) ---- */
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !imageSrc) return;
 
-  const handleDragMove = (e: ReactMouseEvent | ReactTouchEvent) => {
-    if (!isDragging) return;
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    setOffset({ x: clientX - startDrag.x, y: clientY - startDrag.y });
-  };
+    const onTouchStart = (e: TouchEvent) => {
+      e.preventDefault();
+      isDraggingRef.current = true;
+      const t = e.touches[0];
+      startDragRef.current = {
+        x: t.clientX - offsetRef.current.x,
+        y: t.clientY - offsetRef.current.y,
+      };
+    };
 
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
+    const onTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+      if (!isDraggingRef.current) return;
+      const t = e.touches[0];
+      const next = {
+        x: t.clientX - startDragRef.current.x,
+        y: t.clientY - startDragRef.current.y,
+      };
+      offsetRef.current = next;
+      setOffset(next);
+    };
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    setZoom((z) => Math.min(Math.max(0.1, z - e.deltaY * 0.001), 5));
-  };
+    const onTouchEnd = (e: TouchEvent) => {
+      e.preventDefault();
+      isDraggingRef.current = false;
+    };
 
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const next = Math.min(Math.max(0.5, zoomRef.current - e.deltaY * 0.001), 5);
+      zoomRef.current = next;
+      setZoom(next);
+    };
+
+    canvas.addEventListener("touchstart", onTouchStart, { passive: false });
+    canvas.addEventListener("touchmove",  onTouchMove,  { passive: false });
+    canvas.addEventListener("touchend",   onTouchEnd,   { passive: false });
+    canvas.addEventListener("wheel",      onWheel,      { passive: false });
+
+    return () => {
+      canvas.removeEventListener("touchstart", onTouchStart);
+      canvas.removeEventListener("touchmove",  onTouchMove);
+      canvas.removeEventListener("touchend",   onTouchEnd);
+      canvas.removeEventListener("wheel",      onWheel);
+    };
+  }, [imageSrc]);
+
+  /* ---- mouse drag (React synthetic events are fine for mouse) ---- */
+  const handleMouseDown = useCallback((e: ReactMouseEvent) => {
+    isDraggingRef.current = true;
+    startDragRef.current = {
+      x: e.clientX - offsetRef.current.x,
+      y: e.clientY - offsetRef.current.y,
+    };
+  }, []);
+
+  const handleMouseMove = useCallback((e: ReactMouseEvent) => {
+    if (!isDraggingRef.current) return;
+    const next = {
+      x: e.clientX - startDragRef.current.x,
+      y: e.clientY - startDragRef.current.y,
+    };
+    offsetRef.current = next;
+    setOffset(next);
+  }, []);
+
+  const handleMouseUp = useCallback(() => {
+    isDraggingRef.current = false;
+  }, []);
+
+  /* ---- crop ---- */
   const applyCrop = () => {
     if (!imageObj) return;
 
-    // Create a hidden canvas tailored to the outputSize
     const outCanvas = document.createElement("canvas");
     outCanvas.width = outputSize;
     outCanvas.height = outputSize;
@@ -147,7 +213,6 @@ export function ImageCropUploader({
     const scale = Math.max(circleDiameter / imageObj.width, circleDiameter / imageObj.height) * zoom;
     const w = imageObj.width * scale * scaleRatio;
     const h = imageObj.height * scale * scaleRatio;
-
     const dx = cx - w / 2 + offset.x * scaleRatio;
     const dy = cy - h / 2 + offset.y * scaleRatio;
 
@@ -169,6 +234,7 @@ export function ImageCropUploader({
     setImageObj(null);
     setCroppedBlob(null);
     setCroppedUrl(null);
+    setLoadError(null);
   };
 
   const confirmAndUpload = () => {
@@ -180,7 +246,14 @@ export function ImageCropUploader({
 
   return (
     <>
-      <div onClick={() => fileInputRef.current?.click()} className="inline-block relative">
+      {/* Wrapper — tapping anywhere in this div opens the file picker */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => fileInputRef.current?.click()}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") fileInputRef.current?.click(); }}
+        className="inline-block relative cursor-pointer"
+      >
         {children}
         <input
           ref={fileInputRef}
@@ -191,12 +264,27 @@ export function ImageCropUploader({
         />
       </div>
 
+      {/* Error toast (shown below the trigger when image fails to load) */}
+      {loadError && !imageSrc && (
+        <div className="mt-2 rounded-lg border border-red-400/40 bg-red-500/20 px-3 py-2 text-xs text-red-200">
+          {loadError}
+        </div>
+      )}
+
+      {/* Crop modal */}
       {imageSrc && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="flex flex-col items-center gap-6 rounded-2xl bg-[#0a0a0f] p-6 border border-white/10 shadow-2xl w-full max-w-sm">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="flex flex-col items-center gap-5 rounded-2xl bg-[#0a0a0f] p-5 border border-white/10 shadow-2xl w-full max-w-sm">
             {!croppedBlob ? (
               <>
-                <h3 className="text-lg font-medium text-white text-center">Reposition & Crop</h3>
+                <h3 className="text-lg font-medium text-white text-center">Reposition &amp; Crop</h3>
+
+                {loadError && (
+                  <div className="w-full rounded-lg border border-red-400/40 bg-red-500/20 px-3 py-2 text-xs text-red-200 text-center">
+                    {loadError}
+                  </div>
+                )}
+
                 <div
                   className="relative overflow-hidden rounded-xl border border-white/10 bg-[#000]"
                   style={{ width: circleDiameter, height: circleDiameter, touchAction: "none" }}
@@ -205,17 +293,15 @@ export function ImageCropUploader({
                     ref={canvasRef}
                     width={circleDiameter}
                     height={circleDiameter}
-                    onMouseDown={handleDragStart}
-                    onMouseMove={handleDragMove}
-                    onMouseUp={handleDragEnd}
-                    onMouseLeave={handleDragEnd}
-                    onTouchStart={handleDragStart}
-                    onTouchMove={handleDragMove}
-                    onTouchEnd={handleDragEnd}
-                    onWheel={handleWheel}
-                    className="cursor-move"
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseUp}
+                    className="cursor-move select-none"
+                    style={{ touchAction: "none" }}
                   />
                 </div>
+
                 <div className="w-full px-4 flex items-center gap-3">
                   <span className="text-xs text-white/50">−</span>
                   <input
@@ -224,23 +310,29 @@ export function ImageCropUploader({
                     max="3"
                     step="0.01"
                     value={zoom}
-                    onChange={(e) => setZoom(parseFloat(e.target.value))}
+                    onChange={(e) => {
+                      const v = parseFloat(e.target.value);
+                      zoomRef.current = v;
+                      setZoom(v);
+                    }}
                     className="flex-1 accent-[var(--accent-primary)]"
                   />
                   <span className="text-xs text-white/50">+</span>
                 </div>
-                <div className="flex w-full gap-3 mt-2">
+
+                <div className="flex w-full gap-3 mt-1">
                   <button
                     type="button"
                     onClick={reset}
-                    className="flex-1 rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-white hover:bg-white/5 transition-colors"
+                    className="flex-1 rounded-full border border-white/20 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/5 transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="button"
                     onClick={applyCrop}
-                    className="flex-1 rounded-full bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-[#05060a] hover:opacity-90 transition-opacity"
+                    disabled={!imageObj}
+                    className="flex-1 rounded-full bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-[#05060a] hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
                     Apply Crop
                   </button>
@@ -253,7 +345,7 @@ export function ImageCropUploader({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={croppedUrl!} alt="Cropped Preview" className="h-full w-full object-cover" />
                 </div>
-                <div className="flex w-full gap-3 mt-4">
+                <div className="flex w-full gap-3 mt-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -261,16 +353,16 @@ export function ImageCropUploader({
                       if (croppedUrl) URL.revokeObjectURL(croppedUrl);
                       setCroppedUrl(null);
                     }}
-                    className="flex-1 rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-white hover:bg-white/5 transition-colors"
+                    className="flex-1 rounded-full border border-white/20 px-4 py-2.5 text-sm font-medium text-white hover:bg-white/5 transition-colors"
                   >
                     Recrop
                   </button>
                   <button
                     type="button"
                     onClick={confirmAndUpload}
-                    className="flex-1 rounded-full bg-[var(--accent-primary)] px-4 py-2 text-sm font-medium text-[#05060a] hover:opacity-90 transition-opacity"
+                    className="flex-1 rounded-full bg-[var(--accent-primary)] px-4 py-2.5 text-sm font-medium text-[#05060a] hover:opacity-90 transition-opacity"
                   >
-                    Confirm & Upload
+                    Confirm &amp; Upload
                   </button>
                 </div>
               </>
