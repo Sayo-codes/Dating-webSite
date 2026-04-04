@@ -3,6 +3,7 @@
 import { useState, useTransition, useRef } from "react";
 import { X, UserPlus, ImagePlus } from "lucide-react";
 import { createModel } from "@/actions/createModel";
+import { ImageCropUploader } from "@/components/ImageCropUploader";
 
 async function uploadCreatorImage(
   file: File,
@@ -270,15 +271,21 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">Avatar image</label>
-              <input ref={avatarRef} type="file" accept="image/*" className="hidden" onChange={(e) => setAvatarFile(e.target.files?.[0] ?? null)} />
-              <button
-                type="button"
-                onClick={() => avatarRef.current?.click()}
-                className="focus-outline mt-1.5 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#d4a853]/35 bg-[#07070b]/60 px-3 py-3 text-sm text-[#f0c97a]/90 transition-colors hover:border-[#d4a853]/55 hover:bg-[#d4a853]/5"
+              <ImageCropUploader
+                outputSize={400}
+                onUploadComplete={(blob) => {
+                  const file = new File([blob], "avatar.png", { type: "image/png" });
+                  setAvatarFile(file);
+                }}
               >
-                <ImagePlus className="h-4 w-4" aria-hidden />
-                {avatarFile ? avatarFile.name.slice(0, 28) : "Choose portrait…"}
-              </button>
+                <button
+                  type="button"
+                  className="focus-outline mt-1.5 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#d4a853]/35 bg-[#07070b]/60 px-3 py-3 text-sm text-[#f0c97a]/90 transition-colors hover:border-[#d4a853]/55 hover:bg-[#d4a853]/5 pointer-events-none"
+                >
+                  <ImagePlus className="h-4 w-4" aria-hidden />
+                  {avatarFile ? "Cropped Photo Added ✦" : "Choose portrait…"}
+                </button>
+              </ImageCropUploader>
             </div>
             <div>
               <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">Banner (optional)</label>

@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ImageCropUploader } from "@/components/ImageCropUploader";
 
 type Creator = {
   id: string;
@@ -52,9 +53,7 @@ export function AdminCreatorsClient() {
   const [editing, setEditing] = useState<Creator | null>(null);
   const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [avatarTargetId, setAvatarTargetId] = useState<string | null>(null);
   const [galleryTargetId, setGalleryTargetId] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const fetchCreators = async () => {
@@ -132,7 +131,6 @@ export function AdminCreatorsClient() {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploadingId(null);
-      fileInputRef.current && (fileInputRef.current.value = "");
     }
   };
 
@@ -169,17 +167,6 @@ export function AdminCreatorsClient() {
       )}
 
       <div className="flex justify-between">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f && avatarTargetId) handleAvatarUpload(avatarTargetId, f);
-            setAvatarTargetId(null);
-          }}
-        />
         <input
           ref={galleryInputRef}
           type="file"
@@ -258,14 +245,21 @@ export function AdminCreatorsClient() {
                     >
                       Edit
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => { setAvatarTargetId(c.id); fileInputRef.current?.click(); }}
-                      disabled={uploadingId === c.id}
-                      className="text-white/70 hover:text-white disabled:opacity-50"
+                    <ImageCropUploader
+                      outputSize={400}
+                      onUploadComplete={(blob) => {
+                        const file = new File([blob], "avatar.png", { type: "image/png" });
+                        handleAvatarUpload(c.id, file);
+                      }}
                     >
-                      {uploadingId === c.id ? "…" : "Upload avatar"}
-                    </button>
+                      <button
+                        type="button"
+                        disabled={uploadingId === c.id}
+                        className="text-white/70 hover:text-white disabled:opacity-50 pointer-events-none"
+                      >
+                        {uploadingId === c.id ? "…" : "Upload avatar"}
+                      </button>
+                    </ImageCropUploader>
                     <button
                       type="button"
                       onClick={() => { setGalleryTargetId(c.id); galleryInputRef.current?.click(); }}
