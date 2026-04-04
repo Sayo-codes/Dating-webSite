@@ -144,17 +144,7 @@ export function CreatorCard({
               </div>
             )}
 
-            {matchPercent != null && (
-              <span
-                className={`absolute left-1.5 top-1.5 z-20 rounded-full px-1.5 py-0.5 text-[9px] font-bold tabular-nums text-white shadow-md sm:left-2 sm:top-2 sm:px-2 sm:py-0.5 sm:text-[10px] md:text-[11px] ${
-                  matchPercent >= 85
-                    ? "bg-gradient-to-r from-[#d4a853] to-[#f0c97a] text-[#1a1208]"
-                    : "bg-[#ff2d78]"
-                }`}
-              >
-                {matchPercent}%
-              </span>
-            )}
+
 
             {isVIP && (
               <span
