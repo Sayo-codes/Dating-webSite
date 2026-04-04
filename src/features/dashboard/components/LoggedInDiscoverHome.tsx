@@ -49,8 +49,6 @@ export function LoggedInDiscoverHome({ user, unreadCount, creators }: Props) {
                     matchPercent: c.matchPercent,
                     distanceLabel: c.distanceLabel,
                     displayAge: c.displayAge,
-                    showLockedOverlay: c.showLockedOverlay,
-                    isSubscribed: c.isSubscribed,
                   }}
                 />
               </li>
