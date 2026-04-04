@@ -18,7 +18,7 @@ function getClient(): S3Client | null {
         accessKeyId: process.env.S3_ACCESS_KEY_ID,
         secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
       },
-      forcePathStyle: !!process.env.S3_FORCE_PATH_STYLE,
+      forcePathStyle: true, // Required for Supabase — virtual-hosted style breaks the endpoint
     });
   }
   return client;
