@@ -4,12 +4,14 @@ import React, { useState, useRef, useEffect, useCallback, MouseEvent as ReactMou
 
 interface ImageCropUploaderProps {
   outputSize?: number;
+  mode?: "avatar" | "card";
   onUploadComplete?: (blob: Blob) => void;
   children: React.ReactNode;
 }
 
 export function ImageCropUploader({
   outputSize = 400,
+  mode = "avatar",
   onUploadComplete,
   children,
 }: ImageCropUploaderProps) {
@@ -31,7 +33,11 @@ export function ImageCropUploader({
   const offsetRef = useRef({ x: 0, y: 0 });
   const zoomRef = useRef(1);
 
-  const circleDiameter = 280;
+  const frameW = 280;
+  const frameH = mode === "card" ? 392 : 280;
+  
+  const outW = mode === "card" ? 560 : outputSize;
+  const outH = mode === "card" ? 784 : outputSize;
 
   // Keep refs in sync with state
   useEffect(() => { offsetRef.current = offset; }, [offset]);
@@ -78,18 +84,22 @@ export function ImageCropUploader({
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const radius = circleDiameter / 2;
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
 
     ctx.save();
     ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    if (mode === "card") {
+      ctx.roundRect(cx - frameW / 2, cy - frameH / 2, frameW, frameH, 16);
+    } else {
+      ctx.arc(cx, cy, frameW / 2, 0, Math.PI * 2);
+    }
     ctx.clip();
+    
     ctx.fillStyle = "#07070b";
     ctx.fill();
 
-    const scale = Math.max(circleDiameter / imageObj.width, circleDiameter / imageObj.height) * zoom;
+    const scale = Math.max(frameW / imageObj.width, frameH / imageObj.height) * zoom;
     const w = imageObj.width * scale;
     const h = imageObj.height * scale;
     const dx = cx - w / 2 + offset.x;
@@ -97,24 +107,32 @@ export function ImageCropUploader({
     ctx.drawImage(imageObj, dx, dy, w, h);
     ctx.restore();
 
-    // dim outside circle
+    // dim outside frame
     ctx.save();
     ctx.beginPath();
     ctx.rect(0, 0, canvas.width, canvas.height);
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2, true);
+    if (mode === "card") {
+      ctx.roundRect(cx - frameW / 2, cy - frameH / 2, frameW, frameH, 16);
+    } else {
+      ctx.arc(cx, cy, frameW / 2, 0, Math.PI * 2);
+    }
     ctx.fillStyle = "rgba(0,0,0,0.6)";
-    ctx.fill();
+    ctx.fill("evenodd");
     ctx.restore();
 
-    // ring
+    // ring/border
     ctx.save();
     ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    if (mode === "card") {
+      ctx.roundRect(cx - frameW / 2, cy - frameH / 2, frameW, frameH, 16);
+    } else {
+      ctx.arc(cx, cy, frameW / 2, 0, Math.PI * 2);
+    }
     ctx.strokeStyle = "rgba(255,255,255,0.3)";
     ctx.lineWidth = 2;
     ctx.stroke();
     ctx.restore();
-  }, [imageObj, zoom, offset]);
+  }, [imageObj, zoom, offset, mode, frameW, frameH]);
 
   /* ---- native touch + wheel listeners (passive:false so preventDefault works) ---- */
   useEffect(() => {
@@ -196,21 +214,28 @@ export function ImageCropUploader({
     if (!imageObj) return;
 
     const outCanvas = document.createElement("canvas");
-    outCanvas.width = outputSize;
-    outCanvas.height = outputSize;
+    outCanvas.width = outW;
+    outCanvas.height = outH;
     const ctx = outCanvas.getContext("2d");
     if (!ctx) return;
 
-    const radius = outputSize / 2;
-    const cx = outputSize / 2;
-    const cy = outputSize / 2;
+    const cx = outW / 2;
+    const cy = outH / 2;
 
     ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    if (mode === "card") {
+      ctx.roundRect(0, 0, outW, outH, 32); 
+    } else {
+      ctx.arc(cx, cy, outW / 2, 0, Math.PI * 2);
+    }
     ctx.clip();
 
-    const scaleRatio = outputSize / circleDiameter;
-    const scale = Math.max(circleDiameter / imageObj.width, circleDiameter / imageObj.height) * zoom;
+    const scaleRatioX = outW / frameW;
+    const scaleRatioY = outH / frameH;
+    // They are identical by definition, but we just pick one
+    const scaleRatio = scaleRatioX;
+
+    const scale = Math.max(frameW / imageObj.width, frameH / imageObj.height) * zoom;
     const w = imageObj.width * scale * scaleRatio;
     const h = imageObj.height * scale * scaleRatio;
     const dx = cx - w / 2 + offset.x * scaleRatio;
@@ -287,12 +312,12 @@ export function ImageCropUploader({
 
                 <div
                   className="relative overflow-hidden rounded-xl border border-white/10 bg-[#000]"
-                  style={{ width: circleDiameter, height: circleDiameter, touchAction: "none" }}
+                  style={{ width: frameW, height: frameH, touchAction: "none" }}
                 >
                   <canvas
                     ref={canvasRef}
-                    width={circleDiameter}
-                    height={circleDiameter}
+                    width={frameW}
+                    height={frameH}
                     onMouseDown={handleMouseDown}
                     onMouseMove={handleMouseMove}
                     onMouseUp={handleMouseUp}
@@ -341,7 +366,11 @@ export function ImageCropUploader({
             ) : (
               <>
                 <h3 className="text-lg font-medium text-white text-center">Review Image</h3>
-                <div className="flex h-32 w-32 items-center justify-center rounded-full overflow-hidden border-2 border-[var(--accent-primary)] bg-black/50">
+                <div 
+                  className={`flex items-center justify-center overflow-hidden border-2 border-[var(--accent-primary)] bg-black/50 ${
+                    mode === "card" ? "h-40 w-28 rounded-xl" : "h-32 w-32 rounded-full"
+                  }`}
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={croppedUrl!} alt="Cropped Preview" className="h-full w-full object-cover" />
                 </div>
