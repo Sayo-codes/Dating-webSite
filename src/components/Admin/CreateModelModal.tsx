@@ -54,6 +54,7 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
   const [verified, setVerified] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [cardFile, setCardFile] = useState<File | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const avatarRef = useRef<HTMLInputElement>(null);
   const bannerRef = useRef<HTMLInputElement>(null);
@@ -73,6 +74,7 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
     setVerified(false);
     setAvatarFile(null);
     setBannerFile(null);
+    setCardFile(null);
     setFormError(null);
     if (avatarRef.current) avatarRef.current.value = "";
     if (bannerRef.current) bannerRef.current.value = "";
@@ -133,6 +135,16 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
             body: JSON.stringify({ bannerUrl: url }),
           });
           if (!patch.ok) throw new Error("Saved profile but banner URL failed to attach.");
+        }
+        if (cardFile) {
+          if (!cardFile.type.startsWith("image/")) throw new Error("Card must be an image.");
+          const url = await uploadCreatorImage(cardFile, id, "banner"); // Using banner context for S3 path
+          const patch = await fetch(`/api/admin/creators/${id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cardImage: url }),
+          });
+          if (!patch.ok) throw new Error("Saved profile but card URL failed to attach.");
         }
       } catch (err) {
         onToast(err instanceof Error ? err.message : "Upload issue after create", "error");
@@ -298,6 +310,24 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
                 <ImagePlus className="h-4 w-4" aria-hidden />
                 {bannerFile ? bannerFile.name.slice(0, 28) : "Choose banner…"}
               </button>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">Card Image (10:14 Ratio)</label>
+              <ImageCropUploader
+                mode="card"
+                onUploadComplete={(blob) => {
+                  const file = new File([blob], "card.png", { type: "image/png" });
+                  setCardFile(file);
+                }}
+              >
+                <button
+                  type="button"
+                  className="focus-outline mt-1.5 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#ff2d78]/35 bg-[#07070b]/60 px-3 py-3 text-sm text-[#ff2d78]/90 transition-colors hover:border-[#ff2d78]/55 hover:bg-[#ff2d78]/5"
+                >
+                  <ImagePlus className="h-4 w-4" aria-hidden />
+                  {cardFile ? "Card Photo Added ✦" : "Choose card image…"}
+                </button>
+              </ImageCropUploader>
             </div>
           </div>
 

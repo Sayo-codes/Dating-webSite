@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getCreatorByUsername } from "@/features/creators/data";
 import { getCurrentUser } from "@/shared/lib/auth";
-import { prisma } from "@/shared/lib/prisma";
+
 import { PremiumCreatorProfile } from "@/features/creators/components/PremiumCreatorProfile";
 
 type Props = { params: Promise<{ username: string }> };
@@ -26,25 +26,11 @@ export default async function CreatorProfilePage({ params }: Props) {
     currentUser.role === "creator" &&
     currentUser.username.toLowerCase() === creator.username.toLowerCase();
 
-  // Check subscription status
-  let isSubscribed = false;
-  if (currentUser && !isOwnProfile) {
-    const subscription = await prisma.subscription.findUnique({
-      where: {
-        userId_creatorId: { userId: currentUser.id, creatorId: creator.id },
-      },
-    });
-    isSubscribed =
-      subscription?.status === "ACTIVE" &&
-      subscription.currentPeriodEnd > new Date();
-  }
-
   return (
     <PremiumCreatorProfile
       creator={creator}
       isLoggedIn={!!currentUser}
       isOwnProfile={isOwnProfile}
-      isSubscribed={isSubscribed || isOwnProfile}
     />
   );
 }

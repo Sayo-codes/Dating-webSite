@@ -11,8 +11,6 @@ export type DiscoverCardData = {
   matchPercent: number;
   distanceLabel: string;
   displayAge: number;
-  showLockedOverlay: boolean;
-  isSubscribed: boolean;
 };
 
 type Props = {
@@ -30,8 +28,6 @@ export function CreatorDiscoverCard({ creator }: Props) {
       imageUrl={creator.imageUrl}
       isVIP={creator.matchPercent >= 88}
       matchPercent={creator.matchPercent}
-      showLockedOverlay={creator.showLockedOverlay}
-      isSubscribed={creator.isSubscribed}
     />
   );
 }

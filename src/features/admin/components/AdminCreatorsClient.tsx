@@ -10,6 +10,7 @@ type Creator = {
   username: string;
   displayName: string;
   avatarUrl: string | null;
+  cardImage: string | null;
   bio: string | null;
   location: string | null;
   profession: string | null;
@@ -96,7 +97,7 @@ export function AdminCreatorsClient() {
       const el = form.elements.namedItem(name) as HTMLInputElement | null;
       if (el) payload[name] = asBool ? el.checked : el.value;
     };
-    add("username"); add("displayName"); add("avatarUrl"); add("bio"); add("location"); add("profession"); add("height"); add("weight");
+    add("username"); add("displayName"); add("avatarUrl"); add("cardImage"); add("bio"); add("location"); add("profession"); add("height"); add("weight");
     const verifiedEl = form.elements.namedItem("verified") as HTMLInputElement | null;
     if (verifiedEl) payload.verified = verifiedEl.checked;
     setError(null);
@@ -255,9 +256,38 @@ export function AdminCreatorsClient() {
                       <button
                         type="button"
                         disabled={uploadingId === c.id}
-                        className="text-white/70 hover:text-white disabled:opacity-50"
+                        className="text-white/70 hover:text-white disabled:opacity-50 inline-block focus:outline-none"
                       >
                         {uploadingId === c.id ? "…" : "Upload avatar"}
+                      </button>
+                    </ImageCropUploader>
+                    <ImageCropUploader
+                      mode="card"
+                      onUploadComplete={async (blob) => {
+                        const file = new File([blob], "card.png", { type: "image/png" });
+                        setUploadingId(c.id);
+                        setError(null);
+                        try {
+                          const publicUrl = await uploadForCreator(file, c.id, "gallery");
+                          await fetch(`/api/admin/creators/${c.id}`, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ cardImage: publicUrl }),
+                          });
+                          await fetchCreators();
+                        } catch (err) {
+                           setError(err instanceof Error ? err.message : "Upload failed");
+                        } finally {
+                           setUploadingId(null);
+                        }
+                      }}
+                    >
+                      <button
+                        type="button"
+                        disabled={uploadingId === c.id}
+                        className="text-white/70 hover:text-white disabled:opacity-50 inline-block focus:outline-none"
+                      >
+                        {uploadingId === c.id ? "…" : "Upload card"}
                       </button>
                     </ImageCropUploader>
                     <button

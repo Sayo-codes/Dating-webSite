@@ -65,10 +65,12 @@ export async function getCreatorByUsername(username: string) {
       id: p.id,
       caption: p.caption,
       previewUrl: p.previewUrl,
+      mediaUrl: p.mediaUrl,
       mediaType: p.mediaType,
-      isLocked: p.isLocked,
+      isLocked: false,
       unlockPriceCents: p.unlockPriceCents,
       likeCount: p.likeCount,
+      commentCount: 0,
       createdAt: p.createdAt.toISOString(),
     })),
   };

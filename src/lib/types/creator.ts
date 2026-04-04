@@ -13,10 +13,12 @@ export type CreatorPostItem = {
   id: string;
   caption: string | null;
   previewUrl: string;
+  mediaUrl?: string | null;
   mediaType: string;
   isLocked: boolean;
   unlockPriceCents: number;
   likeCount: number;
+  commentCount?: number;
   createdAt: string;
 };
 

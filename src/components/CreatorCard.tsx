@@ -2,8 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Gift, Lock, MapPin, MessageCircle } from "lucide-react";
+import { Gift, MapPin, MessageCircle } from "lucide-react";
 import type { CreatorListItem } from "@/lib/types/creator";
 
 const IMG_FALLBACK =
@@ -19,9 +18,7 @@ export type CreatorCardProps = {
   username?: string;
   className?: string;
   matchPercent?: number;
-  showLockedOverlay?: boolean;
-  isSubscribed?: boolean;
-  onFollow?: () => void;
+
 };
 
 function slugFromName(name: string): string {
@@ -48,7 +45,7 @@ export function creatorListItemToCardProps(creator: CreatorListItem): CreatorCar
     name: creator.displayName,
     age,
     location: creator.location?.trim() || "Near you",
-    imageUrl: creator.galleryThumbnail ?? creator.avatarUrl,
+    imageUrl: (creator as any).cardImage ?? creator.galleryThumbnail ?? creator.avatarUrl,
     isVIP: creator.verified,
   };
 }
@@ -63,11 +60,9 @@ export function CreatorCard({
   username: usernameProp,
   className = "",
   matchPercent,
-  showLockedOverlay,
-  isSubscribed,
-  onFollow,
+
 }: CreatorCardProps) {
-  const router = useRouter();
+
   const username = usernameProp ?? slugFromName(name);
   const profileHref = `/creators/${username}`;
   const hasCreatorTarget = Boolean(creatorId);
@@ -82,13 +77,7 @@ export function CreatorCard({
   const unoptimized = src.startsWith("data:") || !src.startsWith("/");
   const locationLine = location?.trim() || "Near you";
 
-  const handleFollow = () => {
-    if (onFollow) {
-      onFollow();
-      return;
-    }
-    router.push(profileHref);
-  };
+
 
   return (
     <article
@@ -110,9 +99,7 @@ export function CreatorCard({
               src={src}
               alt=""
               fill
-              className={`object-cover object-[center_16%] transition-transform duration-500 ease-out group-hover/cc:scale-[1.03] max-md:object-[center_12%] ${
-                showLockedOverlay ? "scale-105 blur-[14px]" : ""
-              }`}
+              className={`object-cover object-[center_16%] transition-transform duration-500 ease-out group-hover/cc:scale-[1.03] max-md:object-[center_12%]`}
               sizes="(max-width: 640px) 45vw, (max-width: 1024px) 33vw, 320px"
               unoptimized={unoptimized}
               priority={false}
@@ -135,14 +122,6 @@ export function CreatorCard({
               className="pointer-events-none absolute -right-[12%] top-[12%] z-[2] h-[36%] w-[50%] rounded-full bg-[#ff2d78]/12 blur-[32px]"
             />
 
-            {showLockedOverlay && (
-              <div className="absolute inset-0 z-[15] flex flex-col items-center justify-center gap-1.5 bg-[#07070b]/45 backdrop-blur-[2px]">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d4a853]/45 bg-black/55 text-[#f0c97a]">
-                  <Lock className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden />
-                </div>
-                <span className="text-[9px] font-medium uppercase tracking-widest text-white/90">Subscribe ✦</span>
-              </div>
-            )}
 
 
 
@@ -196,15 +175,7 @@ export function CreatorCard({
             </div>
           </div>
 
-          <div className="relative z-20 shrink-0 border-t border-white/[0.06] bg-[#121015] px-2 py-1 sm:px-2.5 sm:py-1.5 md:px-3.5 md:py-2">
-            <button
-              type="button"
-              onClick={handleFollow}
-              className="focus-outline w-full rounded-full bg-gradient-to-r from-[#ff2d78] to-[#d4a853] py-1.5 text-center text-[10px] font-semibold tracking-wide text-white shadow-[0_3px_12px_rgba(255,45,120,0.28)] transition-[filter,transform] duration-200 hover:brightness-[1.08] active:scale-[0.99] sm:py-2 sm:text-[11px] md:py-2.5 md:text-sm"
-            >
-              {isSubscribed ? "Following ✦" : "Follow +"}
-            </button>
-          </div>
+
         </div>
       </div>
     </article>

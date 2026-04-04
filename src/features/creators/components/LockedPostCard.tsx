@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import type { CreatorPostItem } from "@/lib/types/creator";
 
 type Props = {
@@ -9,53 +12,56 @@ type Props = {
 };
 
 export function LockedPostCard({ post, creatorName, creatorId }: Props) {
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(post.likeCount);
+  const [isLiking, setIsLiking] = useState(false);
   const priceLabel = (post.unlockPriceCents / 100).toFixed(2);
   const subscribeHref = `/premium?creator=${encodeURIComponent(creatorId)}`;
 
-  return (
-    <div className="locked-post glass-card" id={`post-${post.id}`}>
-      {/* Blurred preview */}
-      <div className="locked-post__preview">
-        <Image
-          src={post.previewUrl}
-          alt={post.caption ?? `Exclusive post by ${creatorName}`}
-          fill
-          className="locked-post__image"
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          unoptimized
-          style={post.isLocked ? { filter: "blur(24px)" } : undefined}
-        />
-        {post.isLocked && <div className="locked-post__blur-overlay" />}
-      </div>
+  const toggleLike = async () => {
+    if (isLiking) return;
+    setIsLiking(true);
+    try {
+      const action = isLiked ? "unlike" : "like";
+      // Optimistic update
+      setIsLiked(!isLiked);
+      setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
+      
+      await fetch(`/api/posts/${post.id}/like`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+    } catch (e) {
+      // Revert on error
+      setIsLiked(!isLiked);
+      setLikeCount(post.likeCount);
+    } finally {
+      setIsLiking(false);
+    }
+  };
 
-      {/* Lock overlay */}
-      {post.isLocked && (
-        <div className="locked-overlay">
-          <div className="locked-overlay__icon">
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-            </svg>
-          </div>
-          <p className="locked-overlay__text">✦ Exclusive Content</p>
-          <Link
-            href={subscribeHref}
-            className="locked-overlay__unlock pill-button-primary inline-flex min-h-[48px] items-center justify-center text-center"
-            style={{ background: "linear-gradient(135deg, #ff2d78 0%, #d4a853 100%)" }}
-          >
-            Subscribe to Unlock – ${priceLabel}/mo
-          </Link>
-        </div>
-      )}
+  return (
+    <div className="locked-post glass-card w-full mb-4" id={`post-${post.id}`}>
+      {/* Post media preview */}
+      <div className="locked-post__preview">
+        {post.mediaType === "VIDEO" && post.mediaUrl ? (
+          <video
+            src={post.mediaUrl}
+            controls
+            className="locked-post__image object-cover w-full h-full"
+          />
+        ) : (
+          <Image
+            src={post.mediaUrl || post.previewUrl}
+            alt={post.caption ?? `Post by ${creatorName}`}
+            fill
+            className="locked-post__image"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            unoptimized
+          />
+        )}
+      </div>
 
       {/* Post footer */}
       <div className="locked-post__footer">
@@ -63,10 +69,23 @@ export function LockedPostCard({ post, creatorName, creatorId }: Props) {
           {post.caption && (
             <p className="locked-post__caption">{post.caption}</p>
           )}
-          <div className="locked-post__stats">
-            <span className="locked-post__likes">
-              ❤️ {post.likeCount}
-            </span>
+          <div className="locked-post__stats flex items-center gap-4">
+            <button 
+              onClick={toggleLike}
+              disabled={isLiking}
+              className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                isLiked ? "text-red-500" : "text-[var(--text-muted)] hover:text-white"
+              }`}
+            >
+              <svg 
+                width="20" height="20" viewBox="0 0 24 24" 
+                fill={isLiked ? "currentColor" : "none"} 
+                stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+              >
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+              <span>{likeCount}</span>
+            </button>
             {post.mediaType === "VIDEO" && (
               <span className="locked-post__type-badge">🎬 Video</span>
             )}

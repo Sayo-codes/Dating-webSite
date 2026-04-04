@@ -81,6 +81,7 @@ model Model {
   weight       String?
   profession   String?
   education    String?
+  cardImage    String?
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
@@ -167,6 +168,7 @@ model Creator {
   profession      String?
   height          String?
   weight          String?
+  cardImage       String?
   verified        Boolean  @default(false)
   followerCount   Int      @default(0)
   earnedCents     Int      @default(0)
