@@ -2,6 +2,9 @@
   "name": "website",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "npmrc": "legacy-peer-deps=true",
   "scripts": {
     "dev": "next dev",
