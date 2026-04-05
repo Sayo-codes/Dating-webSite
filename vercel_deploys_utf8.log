@@ -1,0 +1,196 @@
+﻿node.exe : Vercel CLI 
+50.1.6
+At line:1 char:1
++ & "C:\nvm4w\nodejs/node.
+exe" "C:\nvm4w\nodejs/node
+_modules/npm/bin/np ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (V  
+  ercel CLI 50.1.6:Stri   
+ ng) [], RemoteExcepti    
+on
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+Retrieving projectΓÇª
+Fetching deployments in 
+samson-s-projects-c4c746ed
+> Deployments for samson-s
+-projects-c4c746ed/dating-
+web-site-p5re [431ms]
+
+  Age     Deployment      
+                          
+                          
+             Status      
+Environment     Duration  
+   Username               
+  
+  8m      https://dating-w
+eb-site-p5re-1sur4zhge-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Error    
+ Production      6s       
+    samsonbalogun95-9179  
+   
+https://dating-web-site-p5re-1sur4zhge-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-6wv3k69e0-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-bvrc5rm43-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-fd4fhtm21-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-gplq6eczr-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-jg5e2jqeb-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-15bigeb8i-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-88qbamlz7-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-1ytotabjf-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-eaww7yhcs-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-8qd6m2pjt-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-3gj5oi8po-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-7radto3n6-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-hv5cjhgyo-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-dd5mq9x26-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-kp6x0i67c-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-14yf1irih-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-q0kpyj4g5-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-6388y6k73-samson-s-projects-c4c746ed.vercel.app
+https://dating-web-site-p5re-eugg96w9e-samson-s-projects-c4c746ed.vercel.app
+  17m     https://dating-w
+eb-site-p5re-6wv3k69e0-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Error    
+ Production      5s       
+    samsonbalogun95-9179  
+   
+  14h     https://dating-w
+eb-site-p5re-bvrc5rm43-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Error    
+ Production      32s      
+    samsonbalogun95-9179  
+   
+  15h     https://dating-w
+eb-site-p5re-fd4fhtm21-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Error    
+ Production      42s      
+    samsonbalogun95-9179  
+   
+  15h     https://dating-w
+eb-site-p5re-gplq6eczr-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Error    
+ Production      44s      
+    samsonbalogun95-9179  
+   
+  15h     https://dating-w
+eb-site-p5re-jg5e2jqeb-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Error    
+ Production      39s      
+    samsonbalogun95-9179  
+   
+  19h     https://dating-w
+eb-site-p5re-15bigeb8i-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      59s      
+    samsonbalogun95-9179  
+   
+  20h     https://dating-w
+eb-site-p5re-88qbamlz7-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      57s      
+    samsonbalogun95-9179  
+   
+  20h     https://dating-w
+eb-site-p5re-1ytotabjf-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      58s      
+    samsonbalogun95-9179  
+   
+  21h     https://dating-w
+eb-site-p5re-eaww7yhcs-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      1m       
+    samsonbalogun95-9179  
+   
+  21h     https://dating-w
+eb-site-p5re-8qd6m2pjt-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      58s      
+    samsonbalogun95-9179  
+   
+  22h     https://dating-w
+eb-site-p5re-3gj5oi8po-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      58s      
+    samsonbalogun95-9179  
+   
+  24h     https://dating-w
+eb-site-p5re-7radto3n6-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      59s      
+    samsonbalogun95-9179  
+   
+  1d      https://dating-w
+eb-site-p5re-hv5cjhgyo-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      59s      
+    samsonbalogun95-9179  
+   
+  2d      https://dating-w
+eb-site-p5re-dd5mq9x26-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      54s      
+    samsonbalogun95-9179  
+   
+  2d      https://dating-w
+eb-site-p5re-kp6x0i67c-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      1m       
+    samsonbalogun95-9179  
+   
+  4d      https://dating-w
+eb-site-p5re-14yf1irih-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      60s      
+    samsonbalogun95-9179  
+   
+  4d      https://dating-w
+eb-site-p5re-q0kpyj4g5-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      1m       
+    samsonbalogun95-9179  
+   
+  4d      https://dating-w
+eb-site-p5re-6388y6k73-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      57s      
+    samsonbalogun95-9179  
+   
+  6d      https://dating-w
+eb-site-p5re-eugg96w9e-sam
+son-s-projects-c4c746ed.ve
+rcel.app     ΓùÅ Ready    
+ Production      56s      
+    samsonbalogun95-9179  
+   
+
+> To display the next 
+page, run `vercel ls 
+--next 1774902802464`

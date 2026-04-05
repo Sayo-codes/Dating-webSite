@@ -1,0 +1,158 @@
+﻿node.exe : Vercel CLI 
+50.1.6
+At line:1 char:1
++ & "C:\nvm4w\nodejs/node.
+exe" "C:\nvm4w\nodejs/node
+_modules/npm/bin/np ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (V  
+  ercel CLI 50.1.6:Stri   
+ ng) [], RemoteExcepti    
+on
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+Fetching deployment "datin
+g-web-site-p5re-1sur4zhge-
+samson-s-projects-c4c746ed
+.vercel.app" in 
+samson-s-projects-c4c746ed
+2026-04-05T09:21:42.197Z  
+Running build in 
+Washington, D.C., USA 
+(East) ΓÇô iad1
+2026-04-05T09:21:42.198Z  
+Build machine 
+configuration: 2 cores, 8 
+GB
+2026-04-05T09:21:42.316Z  
+Cloning github.com/Sayo-co
+des/Dating-webSite 
+(Branch: main, Commit: 
+cf8d145)
+2026-04-05T09:21:42.703Z  
+Cloning completed: 
+386.000ms
+2026-04-05T09:21:43.703Z  
+Restored build cache from 
+previous deployment (9XzjE
+rYioRwe7RUKw6SmhHS9L47u)
+2026-04-05T09:21:44.370Z  
+Running "vercel build"
+2026-04-05T09:21:45.024Z  
+Vercel CLI 50.38.2
+2026-04-05T09:21:45.300Z  
+Installing dependencies...
+2026-04-05T09:21:47.082Z  
+npm error code ERESOLVE
+2026-04-05T09:21:47.083Z  
+npm error ERESOLVE could 
+not resolve
+2026-04-05T09:21:47.083Z  
+npm error
+2026-04-05T09:21:47.084Z  
+npm error While 
+resolving: 
+framer-motion@11.11.11
+2026-04-05T09:21:47.085Z  
+npm error Found: 
+react@19.2.3
+2026-04-05T09:21:47.085Z  
+npm error 
+node_modules/react
+2026-04-05T09:21:47.085Z  
+npm error   
+react@"19.2.3" from the 
+root project
+2026-04-05T09:21:47.086Z  
+npm error   peer 
+react@"^16.8.0 || ^17 || 
+^18 || ^19" from @paypal/r
+eact-paypal-js@9.0.1
+2026-04-05T09:21:47.086Z  
+npm error   node_modules/@
+paypal/react-paypal-js
+2026-04-05T09:21:47.086Z  
+npm error     @paypal/reac
+t-paypal-js@"^9.0.1" from 
+the root project
+2026-04-05T09:21:47.087Z  
+npm error   4 more 
+(lucide-react, next, 
+react-dom, styled-jsx)
+2026-04-05T09:21:47.087Z  
+npm error
+2026-04-05T09:21:47.087Z  
+npm error Could not 
+resolve dependency:
+2026-04-05T09:21:47.088Z  
+npm error peerOptional 
+react@"^18.0.0" from 
+framer-motion@11.11.11
+2026-04-05T09:21:47.088Z  
+npm error 
+node_modules/framer-motion
+2026-04-05T09:21:47.088Z  
+npm error   
+framer-motion@"^11.11.11" 
+from the root project
+2026-04-05T09:21:47.088Z  
+npm error
+2026-04-05T09:21:47.088Z  
+npm error Conflicting 
+peer dependency: 
+react@18.3.1
+2026-04-05T09:21:47.089Z  
+npm error 
+node_modules/react
+2026-04-05T09:21:47.089Z  
+npm error   peerOptional 
+react@"^18.0.0" from 
+framer-motion@11.11.11
+2026-04-05T09:21:47.089Z  
+npm error   
+node_modules/framer-motion
+2026-04-05T09:21:47.089Z  
+npm error     
+framer-motion@"^11.11.11" 
+from the root project
+2026-04-05T09:21:47.089Z  
+npm error
+2026-04-05T09:21:47.089Z  
+npm error Fix the 
+upstream dependency 
+conflict, or retry
+2026-04-05T09:21:47.089Z  
+npm error this command 
+with --force or 
+--legacy-peer-deps
+2026-04-05T09:21:47.089Z  
+npm error to accept an 
+incorrect (and 
+potentially broken) 
+dependency resolution.
+2026-04-05T09:21:47.090Z  
+npm error
+2026-04-05T09:21:47.090Z  
+npm error
+2026-04-05T09:21:47.090Z  
+npm error For a full 
+report see:
+2026-04-05T09:21:47.090Z  
+npm error /vercel/.npm/_lo
+gs/2026-04-05T09_21_45_509
+Z-eresolve-report.txt
+2026-04-05T09:21:47.090Z  
+npm error A complete log 
+of this run can be found 
+in: /vercel/.npm/_logs/202
+6-04-05T09_21_45_509Z-debu
+g-0.log
+2026-04-05T09:21:47.124Z  
+Error: Command "npm 
+install" exited with 1
+status	ΓùÅ Error

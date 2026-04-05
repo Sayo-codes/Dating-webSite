@@ -1,0 +1,137 @@
+﻿
+> website@0.1.0 build
+> npx prisma migrate deploy && npx prisma generate && next build
+
+node.exe : Loaded 
+Prisma config from 
+prisma.config.ts.
+At line:1 char:1
++ & "C:\nvm4w\nodejs/no
+de.exe" "C:\nvm4w\nodej
+s/node_modules/npm/bin/
+np ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : 
+NotSpecified: (L    
+oaded Prisma c...isma  
+  .config.ts.:String) 
+[    ], RemoteException
+    + 
+FullyQualifiedError    
+Id : NativeCommandErr  
+  or
+ 
+
+Prisma config 
+detected, skipping 
+environment variable 
+loading.
+Prisma schema loaded from prisma\schema.prisma
+Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-winter-feather-ag3q41gy.c-2.eu-central-1.aws.neon.tech"
+
+5 migrations found in prisma/migrations
+
+
+No pending migrations to apply.
+Loaded Prisma config 
+from prisma.config.ts.
+
+Prisma config 
+detected, skipping 
+environment variable 
+loading.
+Prisma schema loaded from prisma\schema.prisma
+
+Γ£ö Generated Prisma Client (v6.19.2) to .\node_modules\@prisma\client in 342ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to turn off tips and other hints? https://pris.ly/tip-4-nohints
+
+Γû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local, .env
+
+  Creating an optimized production build ...
+Γ£ô Compiled successfully in 18.2s
+  Running TypeScript ...
+  Collecting page data using 3 workers ...
+  Generating static pages using 3 workers (0/49) ...
+  Generating static pages using 3 workers (12/49) 
+  Generating static pages using 3 workers (24/49) 
+  Generating static pages using 3 workers (36/49) 
+Γ£ô Generating static pages using 3 workers (49/49) in 4.9s
+  Finalizing page optimization ...
+
+Route (app)
+Γöî ╞Æ /
+Γö£ Γùï /_not-found
+Γö£ ╞Æ /admin
+Γö£ Γùï /admin-preview
+Γö£ ╞Æ /admin/analytics
+Γö£ ╞Æ /admin/creators
+Γö£ ╞Æ /admin/media-vault
+Γö£ ╞Æ /admin/messages
+Γö£ ╞Æ /admin/models
+Γö£ ╞Æ /api/admin/analytics
+Γö£ ╞Æ /api/admin/conversations
+Γö£ ╞Æ /api/admin/conversations/[id]/messages
+Γö£ ╞Æ /api/admin/conversations/[id]/read
+Γö£ ╞Æ /api/admin/conversations/[id]/subscriber
+Γö£ ╞Æ /api/admin/creators
+Γö£ ╞Æ /api/admin/creators/[id]
+Γö£ ╞Æ /api/admin/creators/[id]/gallery
+Γö£ ╞Æ /api/admin/messages/[id]/hide
+Γö£ ╞Æ /api/auth/claim-admin-invite
+Γö£ ╞Æ /api/auth/forgot-password
+Γö£ ╞Æ /api/auth/login
+Γö£ ╞Æ /api/auth/logout
+Γö£ ╞Æ /api/auth/me
+Γö£ ╞Æ /api/auth/register
+Γö£ ╞Æ /api/auth/resend-otp
+Γö£ ╞Æ /api/auth/socket-token
+Γö£ ╞Æ /api/auth/verify-email
+Γö£ ╞Æ /api/conversations
+Γö£ ╞Æ /api/conversations/[id]
+Γö£ ╞Æ /api/conversations/[id]/messages
+Γö£ ╞Æ /api/conversations/unread-count
+Γö£ ╞Æ /api/creator/conversations
+Γö£ ╞Æ /api/creator/conversations/[id]
+Γö£ ╞Æ /api/creator/conversations/[id]/messages
+Γö£ ╞Æ /api/creator/gallery
+Γö£ ╞Æ /api/creator/gallery/[id]
+Γö£ ╞Æ /api/creators
+Γö£ ╞Æ /api/creators/[username]
+Γö£ ╞Æ /api/creators/[username]/posts
+Γö£ ╞Æ /api/health
+Γö£ ╞Æ /api/models/[slug]
+Γö£ ╞Æ /api/payments
+Γö£ ╞Æ /api/payments/capture
+Γö£ ╞Æ /api/payments/check-unlock
+Γö£ ╞Æ /api/payments/create-order
+Γö£ ╞Æ /api/payments/transactions
+Γö£ ╞Æ /api/payments/webhook
+Γö£ ╞Æ /api/paypal/subscribe
+Γö£ ╞Æ /api/paypal/webhook
+Γö£ ╞Æ /api/posts/[id]/like
+Γö£ ╞Æ /api/run-admin
+Γö£ ╞Æ /api/subscriptions/check
+Γö£ ╞Æ /api/transactions
+Γö£ ╞Æ /api/upload/presign
+Γö£ ╞Æ /creator/dashboard
+Γö£ Γùï /creators
+Γö£ ╞Æ /creators/[username]
+Γö£ ╞Æ /join-admin
+Γö£ ╞Æ /login
+Γö£ ╞Æ /messages
+Γö£ ╞Æ /premium
+Γö£ ╞Æ /register
+Γöö ╞Æ /verify-email
+
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+

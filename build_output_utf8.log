@@ -2,29 +2,34 @@
 > website@0.1.0 build
 > npx prisma migrate deploy && npx prisma generate && next build
 
-node.exe : Loaded Prisma 
-config from 
+node.exe : Loaded 
+Prisma config from 
 prisma.config.ts.
 At line:1 char:1
-+ & "C:\nvm4w\nodejs/node.
-exe" "C:\nvm4w\nodejs/node
-_modules/npm/bin/np ...
-+ ~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo        
-      : NotSpecified: (L  
-  oaded Prisma c...isma   
- .config.ts.:String) [    
-], RemoteException
-    + FullyQualifiedError 
-   Id : NativeCommandErr  
++ & "C:\nvm4w\nodejs/no
+de.exe" "C:\nvm4w\nodej
+s/node_modules/npm/bin/
+np ...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : 
+NotSpecified: (L    
+oaded Prisma c...isma  
+  .config.ts.:String) 
+[    ], RemoteException
+    + 
+FullyQualifiedError    
+Id : NativeCommandErr  
   or
  
 
-Prisma config detected, 
-skipping environment 
-variable loading.
+Prisma config 
+detected, skipping 
+environment variable 
+loading.
 Prisma schema loaded from prisma\schema.prisma
 Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-winter-feather-ag3q41gy.c-2.eu-central-1.aws.neon.tech"
 
@@ -32,104 +37,25 @@ Datasource "db": PostgreSQL database "neondb", schema "public" at "ep-winter-fea
 
 
 No pending migrations to apply.
-Loaded Prisma config from 
-prisma.config.ts.
+Loaded Prisma config 
+from prisma.config.ts.
 
-Prisma config detected, 
-skipping environment 
-variable loading.
+Prisma config 
+detected, skipping 
+environment variable 
+loading.
 Prisma schema loaded from prisma\schema.prisma
+Error: 
+EPERM: operation not 
+permitted, rename 'C:\U
+sers\user\Desktop\websi
+te\node_modules\.prisma
+\client\query_engine-wi
+ndows.dll.node.tmp12996
+' -> 'C:\Users\user\Des
+ktop\website\node_modul
+es\.prisma\client\query
+_engine-windows.dll.nod
+e'
 
-Γ£ö Generated Prisma Client (v6.19.2) to .\node_modules\@prisma\client in 346ms
 
-Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
-
-Tip: Need your database queries to be 1000x faster? Accelerate offers you that and more: https://pris.ly/tip-2-accelerate
-
-Γû▓ Next.js 16.1.6 (Turbopack)
-- Environments: .env.local, .env
-
-  Creating an optimized production build ...
-Γ£ô Compiled successfully in 14.1s
-  Running TypeScript ...
-Failed to compile.
-
-./src/components/ui/galler
-y.tsx:134:7
-Type error: Type '{ 
-children: Element; 
-whileTap: { scale: 
-number; zIndex?: 
-undefined; } | { scale: 
-number; zIndex: number; 
-}; whileHover: { scale?: 
-undefined; rotateZ?: 
-undefined; zIndex?: 
-undefined; } | { ...; }; 
-... 9 more ...; 
-dragConstraints?: 
-undefined; } | { ...; }' 
-is not assignable to type 
-'IntrinsicAttributes & HTM
-LAttributesWithoutMotionPr
-ops<unknown, unknown> & 
-MotionProps & 
-RefAttributes<unknown>'.
-  Type '{ children: 
-Element; whileTap: { 
-scale: number; zIndex?: 
-undefined; } | { scale: 
-number; zIndex: number; 
-}; whileHover: { scale?: 
-undefined; rotateZ?: 
-undefined; zIndex?: 
-undefined; } | { scale: 
-number; rotateZ: number; 
-zIndex: number; }; ... 9 
-more ...; 
-dragConstraints?: 
-undefined; }' is not 
-assignable to type 
-'IntrinsicAttributes & HTM
-LAttributesWithoutMotionPr
-ops<unknown, unknown> & 
-MotionProps & 
-RefAttributes<unknown>'.
-    Property 'className' 
-does not exist on type 
-'IntrinsicAttributes & HTM
-LAttributesWithoutMotionPr
-ops<unknown, unknown> & 
-MotionProps & 
-RefAttributes<unknown>'.
-
-[0m [90m 132 |[39m     
-  animate[33m=[39m{{ 
-rotate[33m:[39m 
-rotation }}
- [90m 133 |[39m       
-style[33m=[39m{{ 
-width[33m,[39m 
-height[33m,[39m 
-perspective[33m:[39m 
-[35m400[39m }}
-[31m[1m>[22m[39m[90m 
-134 |[39m       className
-[33m=[39m{[32m`${classN
-ame ?? ""} relative 
-mx-auto shrink-0 ${[39m
- [90m     |[39m       
-[31m[1m^[22m[39m
- [90m 135 |[39m [32m   
-     isMobile ? 
-"cursor-pointer" : 
-"cursor-grab active:cursor
--grabbing"[39m
- [90m 136 |[39m [32m   
-   }`[39m}
- [90m 137 |[39m       on
-MouseMove[33m=[39m{handl
-eMouse}[0m
-Next.js build worker 
-exited with code: 1 and 
-signal: null
