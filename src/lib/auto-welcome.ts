@@ -49,7 +49,7 @@ export async function sendAutoWelcome(
       senderType: message.senderType,
       body: message.body,
       mediaUrl: null,
-      mediaType: null,
+      mediaType: null, 
       createdAt: message.createdAt,
     });
   } catch (error) {
