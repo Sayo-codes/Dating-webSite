@@ -14,7 +14,7 @@ export async function GET() {
   });
 
   return NextResponse.json({
-    transactions: transactions.map((t) => ({
+    transactions: transactions.map((t: any) => ({
       id: t.id,
       amountCents: t.amountCents,
       currency: t.currency,

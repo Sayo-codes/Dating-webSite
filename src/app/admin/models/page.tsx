@@ -21,7 +21,7 @@ export default async function AdminModelsPage({ searchParams }: PageProps) {
     },
   });
 
-  const initialModels = creators.map((c) => ({
+  const initialModels = creators.map((c: any) => ({
     id: c.id,
     username: c.username,
     displayName: c.displayName,

@@ -11,7 +11,7 @@ export async function getCreatorsList() {
       },
     },
   });
-  return creators.map((c) => ({
+  return creators.map((c: any) => ({
     id: c.id,
     username: c.username,
     displayName: c.displayName,
@@ -37,8 +37,8 @@ export async function getCreatorByUsername(username: string) {
   });
   if (!creator) return null;
 
-  const photoCount = creator.media.filter((m) => m.type === "IMAGE").length;
-  const videoCount = creator.media.filter((m) => m.type === "VIDEO").length;
+  const photoCount = creator.media.filter((m: any) => m.type === "IMAGE").length;
+  const videoCount = creator.media.filter((m: any) => m.type === "VIDEO").length;
 
   return {
     id: creator.id,
@@ -60,8 +60,8 @@ export async function getCreatorByUsername(username: string) {
     totalLikes: creator.totalLikes,
     photoCount,
     videoCount,
-    gallery: creator.media.map((m) => ({ id: m.id, url: m.url, type: m.type })),
-    posts: creator.posts.map((p) => ({
+    gallery: creator.media.map((m: any) => ({ id: m.id, url: m.url, type: m.type })),
+    posts: creator.posts.map((p: any) => ({
       id: p.id,
       caption: p.caption,
       previewUrl: p.previewUrl,

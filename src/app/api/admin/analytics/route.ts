@@ -51,13 +51,13 @@ export async function GET() {
       messages: messageCount,
     },
     recentUsers,
-    recentConversations: recentConversations.map((c) => ({
+    recentConversations: recentConversations.map((c: any) => ({
       id: c.id,
       user: c.user.username,
       creator: c.creator.displayName ?? c.creator.username,
       updatedAt: c.updatedAt,
     })),
-    messagesByDay: messagesByDay.map((r) => ({
+    messagesByDay: messagesByDay.map((r: any) => ({
       date: (r.date as any) instanceof Date ? (r.date as any).toISOString().slice(0, 10) : String(r.date),
       count: Number(r.count),
     })),

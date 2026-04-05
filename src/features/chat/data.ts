@@ -18,7 +18,7 @@ export async function getConversationsForUser(userId: string) {
       },
     },
   });
-  return list.map((c) => ({
+  return list.map((c: any) => ({
     id: c.id,
     creator: c.creator,
     lastMessage: c.messages[0]
@@ -136,7 +136,7 @@ export async function getConversationsForCreator(creatorId: string) {
       },
     },
   });
-  return list.map((c) => ({
+  return list.map((c: any) => ({
     id: c.id,
     user: c.user,
     creator: c.creator,

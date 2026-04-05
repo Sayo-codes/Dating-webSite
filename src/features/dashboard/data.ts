@@ -52,9 +52,9 @@ export async function getDiscoverFeedForUser(userId: string): Promise<DiscoverCr
     }),
   ]);
 
-  const subscribed = new Set(activeSubs.map((s) => s.creatorId));
+  const subscribed = new Set(activeSubs.map((s: any) => s.creatorId));
 
-  return creators.map((c, index) => {
+  return creators.map((c: any, index: any) => {
     const { matchPercent, distanceLabel, displayAge } = enrichForViewer(userId, c.id, c.location);
     const age = c.age != null && Number.isFinite(c.age) ? c.age : displayAge;
     const thumb = c.media[0]?.url ?? c.avatarUrl;

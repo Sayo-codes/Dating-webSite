@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { AnimatePresence, motion } from "motion/react";
+// @ts-ignore
+import { AnimatePresence, motion } from "framer-motion";
 
 interface ImageSliderProps extends React.HTMLAttributes<HTMLDivElement> {
   images: string[];
@@ -24,10 +25,12 @@ export const ImageSlider = React.forwardRef<HTMLDivElement, ImageSliderProps>(
     const baseClass = "relative w-full h-full overflow-hidden";
     const finalClass = className ? `${baseClass} ${className}` : baseClass;
 
+    const MotionImg = motion.img as React.ComponentType<any>;
+
     return (
       <div ref={ref} className={finalClass} {...props}>
         <AnimatePresence initial={false}>
-          <motion.img
+          <MotionImg
             key={currentIndex}
             src={images[currentIndex]}
             alt={`Slide ${currentIndex + 1}`}

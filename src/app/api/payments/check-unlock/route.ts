@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/shared/lib/auth";
 import { prisma } from "@/shared/lib/prisma";
-import { TransactionStatus } from "@prisma/client";
+
 
 export async function GET(request: NextRequest) {
   const user = await getCurrentUser();
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   const count = await prisma.transaction.count({
     where: {
       userId: user.id,
-      status: TransactionStatus.COMPLETED,
+      status: "COMPLETED",
       ...(itemType ? { itemType } : {}),
       ...(itemId ? { itemId } : {}),
     },

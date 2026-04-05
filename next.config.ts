@@ -42,12 +42,6 @@ const nextConfig: NextConfig = {
       ...(s3Pattern ? [s3Pattern] : []),
     ],
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
 };
 
 export default nextConfig;

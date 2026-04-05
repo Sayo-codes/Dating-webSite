@@ -1,8 +1,14 @@
 "use client";
 
-import { motion, Variants } from "motion/react";
+// @ts-ignore
+import React from 'react';
+import { motion, Variants } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+
+const MotionDiv = motion.div as React.ComponentType<any>;
+const MotionH1 = motion.h1 as React.ComponentType<any>;
+const MotionP = motion.p as React.ComponentType<any>;
 
 /* ─── Animation Variants ─────────────────────────────────────────────────────── */
 const containerVariants: Variants = {
@@ -85,14 +91,14 @@ export function HeroSection() {
       {/* ── Main grid layout ── */}
       <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-10">
         {/* ─── Left Column: Text ─── */}
-        <motion.div
+        <MotionDiv
           className="flex flex-col items-center text-center lg:items-start lg:text-left"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           {/* Tagline badge */}
-          <motion.div variants={itemVariants} className="mb-6">
+          <MotionDiv variants={itemVariants} className="mb-6">
             <span
               className="inline-flex items-center gap-2 rounded-full border px-5 py-2 text-xs font-semibold uppercase tracking-[0.22em]"
               style={{
@@ -112,10 +118,10 @@ export function HeroSection() {
               />
               Private · Exclusive · Verified
             </span>
-          </motion.div>
+          </MotionDiv>
 
           {/* Main Headline */}
-          <motion.h1
+          <MotionH1
             id="hero-heading"
             className="font-[var(--font-heading)] text-5xl font-bold leading-[1.08] tracking-[-0.03em] text-white sm:text-6xl lg:text-7xl"
             variants={itemVariants}
@@ -133,10 +139,10 @@ export function HeroSection() {
             >
               Spark ✦
             </span>
-          </motion.h1>
+          </MotionH1>
 
           {/* Subtitle */}
-          <motion.p
+          <MotionP
             className="mt-6 max-w-lg text-lg leading-relaxed sm:text-xl"
             style={{
               color: "rgba(255,255,255,0.7)",
@@ -149,10 +155,10 @@ export function HeroSection() {
             <span style={{ color: "rgba(255,255,255,0.9)" }}>
               Private. Exclusive. Verified.
             </span>
-          </motion.p>
+          </MotionP>
 
           {/* Feature line */}
-          <motion.p
+          <MotionP
             className="mt-4 flex items-center gap-2 text-base font-medium tracking-wide sm:text-lg"
             style={{
               background:
@@ -172,10 +178,10 @@ export function HeroSection() {
               🚀
             </span>
             Non-stop fun 24h — Connect with models anytime on Rsdate
-          </motion.p>
+          </MotionP>
 
           {/* CTA Button */}
-          <motion.div
+          <MotionDiv
             className="mt-10 flex flex-wrap justify-center gap-4 lg:justify-start"
             variants={itemVariants}
           >
@@ -186,20 +192,20 @@ export function HeroSection() {
             >
               Join Here ✦
             </Link>
-          </motion.div>
+          </MotionDiv>
 
           {/* Trust line */}
-          <motion.p
+          <MotionP
             className="mt-6 text-xs font-medium uppercase tracking-wide sm:text-sm"
             style={{ color: "rgba(255,255,255,0.35)" }}
             variants={itemVariants}
           >
             Over 18,000 members &nbsp;·&nbsp; Verified profiles &nbsp;·&nbsp;
             100% private
-          </motion.p>
+          </MotionP>
 
           {/* Stats */}
-          <motion.div
+          <MotionDiv
             className="mt-12 flex flex-wrap justify-center gap-8 lg:justify-start"
             variants={itemVariants}
           >
@@ -237,11 +243,11 @@ export function HeroSection() {
                 </div>
               </div>
             ))}
-          </motion.div>
-        </motion.div>
+          </MotionDiv>
+        </MotionDiv>
 
         {/* ─── Right Column: Image Collage ─── */}
-        <motion.div
+        <MotionDiv
           className="relative mx-auto h-[420px] w-full max-w-lg sm:h-[540px] lg:mx-0 lg:max-w-none"
           variants={containerVariants}
           initial="hidden"
@@ -262,7 +268,7 @@ export function HeroSection() {
           />
 
           {/* Main Center Image — largest */}
-          <motion.div
+          <MotionDiv
             className="absolute left-1/2 top-0 -translate-x-1/2 overflow-hidden rounded-2xl"
             style={{
               width: "clamp(200px, 55%, 280px)",
@@ -308,10 +314,10 @@ export function HeroSection() {
                 Verified ✦ Elite
               </span>
             </div>
-          </motion.div>
+          </MotionDiv>
 
           {/* Right Image */}
-          <motion.div
+          <MotionDiv
             className="absolute right-0 overflow-hidden rounded-2xl sm:right-[2%]"
             style={{
               top: "35%",
@@ -354,10 +360,10 @@ export function HeroSection() {
                 VIP ✦ Online
               </span>
             </div>
-          </motion.div>
+          </MotionDiv>
 
           {/* Bottom-left Image */}
-          <motion.div
+          <MotionDiv
             className="absolute bottom-0 left-0 overflow-hidden rounded-2xl sm:left-[2%]"
             style={{
               width: "clamp(140px, 38%, 200px)",
@@ -399,7 +405,7 @@ export function HeroSection() {
                 Featured
               </span>
             </div>
-          </motion.div>
+          </MotionDiv>
 
           {/* Decorative connecting lines */}
           <svg
@@ -423,7 +429,7 @@ export function HeroSection() {
               strokeWidth="1"
             />
           </svg>
-        </motion.div>
+        </MotionDiv>
       </div>
 
       {/* ── Scroll hint ── */}

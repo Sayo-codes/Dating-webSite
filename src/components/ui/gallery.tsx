@@ -1,8 +1,9 @@
 "use client";
 
-import { Ref, forwardRef, useState, useEffect } from "react";
+import React, { Ref, forwardRef, useState, useEffect } from "react";
 import Image, { ImageProps } from "next/image";
-import { motion, useMotionValue, Variants } from "motion/react";
+// @ts-ignore
+import { motion, useMotionValue, Variants } from "framer-motion";
 import Link from "next/link";
 
 /* ─── Types ──────────────────────────────────────────────────────────────────── */
@@ -50,6 +51,8 @@ const MotionImage = motion.create(
     return <Image ref={ref} {...props} />;
   })
 );
+
+const MotionDiv = motion.div as React.ComponentType<any>;
 
 /* ─── Photo Card ─────────────────────────────────────────────────────────────── */
 type Direction = "left" | "right";
@@ -122,7 +125,7 @@ function Photo({
   const dragAnimation = isMobile ? {} : { scale: 1.1, zIndex: 9999 };
 
   return (
-    <motion.div
+    <MotionDiv
       {...dragProps}
       whileTap={tapAnimation}
       whileHover={hoverAnimation}
@@ -188,7 +191,7 @@ function Photo({
           </div>
         )}
       </div>
-    </motion.div>
+    </MotionDiv>
   );
 }
 
@@ -319,13 +322,13 @@ export function PhotoGallery({
 
       {/* ── Fan-out card stack ── */}
       <div className="relative mb-8 h-[350px] w-full items-center justify-center lg:flex">
-        <motion.div
+        <MotionDiv
           className="relative mx-auto flex w-full max-w-7xl justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: isVisible ? 1 : 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
-          <motion.div
+          <MotionDiv
             className="relative flex w-full justify-center"
             variants={containerVariants}
             initial="hidden"
@@ -336,7 +339,7 @@ export function PhotoGallery({
               style={{ height: cardSize, width: cardSize }}
             >
               {[...photos].reverse().map((photo) => (
-                <motion.div
+                <MotionDiv
                   key={photo.id}
                   className="absolute left-0 top-0"
                   style={{ zIndex: photo.zIndex }}
@@ -358,11 +361,11 @@ export function PhotoGallery({
                     accentColor={photo.accentColor}
                     isMobile={isMobile}
                   />
-                </motion.div>
+                </MotionDiv>
               ))}
             </div>
-          </motion.div>
-        </motion.div>
+          </MotionDiv>
+        </MotionDiv>
       </div>
 
       {/* ── CTA Button ── */}

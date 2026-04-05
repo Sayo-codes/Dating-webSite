@@ -36,7 +36,7 @@ export async function GET(
     }
 
     // Map posts based on subscription status
-    const mappedPosts = posts.map(post => ({
+    const mappedPosts = posts.map((post: any) => ({
       id: post.id,
       caption: post.caption,
       previewUrl: post.previewUrl,

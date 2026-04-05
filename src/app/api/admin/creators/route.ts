@@ -13,7 +13,7 @@ export async function GET() {
     },
   });
   return NextResponse.json({
-    creators: creators.map((c) => ({
+    creators: creators.map((c: any) => ({
       id: c.id,
       username: c.username,
       displayName: c.displayName,
@@ -28,7 +28,7 @@ export async function GET() {
       verified: c.verified,
       createdAt: c.createdAt,
       conversationCount: c._count.conversations,
-      gallery: c.media.map((m) => ({ id: m.id, url: m.url, type: m.type })),
+      gallery: c.media.map((m: any) => ({ id: m.id, url: m.url, type: m.type })),
     })),
   });
 }

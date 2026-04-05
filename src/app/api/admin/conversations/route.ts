@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   });
 
   return NextResponse.json({
-    conversations: conversations.map((c) => ({
+    conversations: conversations.map((c: any) => ({
       id: c.id,
       userId: c.userId,
       creatorId: c.creatorId,

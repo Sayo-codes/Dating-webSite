@@ -50,8 +50,8 @@ export async function GET(_req: Request, context: { params: Promise<{ id: string
   });
 
   const totalSpent = [
-    ...transactions.map((t) => t.amountCents),
-    ...payments.map((p) => p.amountCents),
+    ...transactions.map((t: any) => t.amountCents),
+    ...payments.map((p: any) => p.amountCents),
   ].reduce((sum, a) => sum + a, 0);
 
   return NextResponse.json({
