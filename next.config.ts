@@ -15,6 +15,9 @@ function s3RemotePattern(): { protocol: "https"; hostname: string; pathname: str
 const s3Pattern = s3RemotePattern();
 
 const nextConfig: NextConfig = {
+  experimental: {
+    cssChunking: false,
+  },
   images: {
     remotePatterns: [
       {
