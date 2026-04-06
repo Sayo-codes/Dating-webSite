@@ -1,9 +1,13 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
-import { X, UserPlus, ImagePlus } from "lucide-react";
+import { useState, useTransition, useRef, useEffect } from "react";
+import { X, UserPlus, ImagePlus, ChevronDown, MapPin, Search } from "lucide-react";
 import { createModel } from "@/actions/createModel";
 import { ImageCropUploader } from "@/components/ImageCropUploader";
+
+const US_CITIES = [
+  "New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX", "Phoenix, AZ", "Philadelphia, PA", "San Antonio, TX", "San Diego, CA", "Dallas, TX", "San Jose, CA", "Austin, TX", "Jacksonville, FL", "Fort Worth, TX", "Columbus, OH", "Charlotte, NC", "San Francisco, CA", "Indianapolis, IN", "Seattle, WA", "Denver, CO", "Washington, DC", "Boston, MA", "El Paso, TX", "Nashville, TN", "Detroit, MI", "Oklahoma City, OK", "Portland, OR", "Las Vegas, NV", "Memphis, TN", "Louisville, KY", "Baltimore, MD", "Milwaukee, WI", "Albuquerque, NM", "Tucson, AZ", "Fresno, CA", "Sacramento, CA", "Kansas City, MO", "Mesa, AZ", "Atlanta, GA", "Omaha, NE", "Colorado Springs, CO", "Raleigh, NC", "Long Beach, CA", "Virginia Beach, VA", "Miami, FL", "Oakland, CA", "Minneapolis, MN", "Tulsa, OK", "Arlington, TX", "New Orleans, LA", "Wichita, KS", "Cleveland, OH", "Tampa, FL", "Bakersfield, CA", "Aurora, CO", "Anaheim, CA", "Honolulu, HI", "Santa Ana, CA", "Riverside, CA", "Corpus Christi, TX", "Lexington, KY", "Stockton, CA", "Henderson, NV", "Saint Paul, MN", "St. Louis, MO", "Cincinnati, OH", "Pittsburgh, PA", "Greensboro, NC", "Anchorage, AK", "Plano, TX", "Lincoln, NE", "Orlando, FL", "Irvine, CA", "Newark, NJ", "Toledo, OH", "Durham, NC", "Chula Vista, CA", "Fort Wayne, IN", "Jersey City, NJ", "St. Petersburg, FL", "Laredo, TX", "Madison, WI", "Chandler, AZ", "Buffalo, NY", "Lubbock, TX", "Scottsdale, AZ", "Reno, NV", "Glendale, AZ", "Gilbert, AZ", "Winston-Salem, NC", "North Las Vegas, NV", "Norfolk, VA", "Chesapeake, VA", "Garland, TX", "Irving, TX", "Hialeah, FL", "Fremont, CA", "Boise, ID", "Richmond, VA", "Baton Rouge, LA", "Spokane, WA", "Des Moines, IA", "Tacoma, WA", "San Bernardino, CA", "Modesto, CA", "Fontana, CA", "Santa Clarita, CA", "Oxnard, CA", "Birmingham, AL", "Fayetteville, NC", "Rochester, NY", "Moreno Valley, CA", "Glendale, CA", "Yonkers, NY", "Salt Lake City, UT", "Amarillo, TX", "Augusta, GA", "Columbus, GA", "Grand Rapids, MI", "Huntington Beach, CA", "Little Rock, AR", "Montgomery, AL", "Akron, OH", "Shreveport, LA", "Mobile, AL", "Huntsville, AL", "Tallahassee, FL", "Grand Prairie, TX", "Overland Park, KS", "Knoxville, TN", "Port St. Lucie, FL", "Worcester, MA", "Brownsville, TX", "Tempe, AZ", "Providence, RI", "Cape Coral, FL", "Chattanooga, TN", "Jackson, MS", "Fort Lauderdale, FL", "Santa Rosa, CA", "Rancho Cucamonga, CA", "Oceanside, CA", "Sioux Falls, SD", "Garden Grove, CA", "Ontario, CA", "Vancouver, WA", "Elk Grove, CA", "Pembroke Pines, FL", "Salem, OR", "Eugene, OR", "Corona, CA", "Springfield, MO", "Naperville, IL", "Joliet, IL", "Paterson, NJ", "Savannah, GA", "Bridgeport, CT", "Escondido, CA", "Killeen, TX", "Alexandria, VA", "McAllen, TX", "Mesquite, TX", "Hollywood, FL", "Surprise, AZ", "Rockford, IL", "Thornton, CO", "Lancaster, CA", "Palmdale, CA", "Bellevue, WA", "Hayward, CA", "Salinas, CA", "Frisco, TX", "Pomona, CA", "Lakewood, CO", "Sunnyvale, CA", "Macon, GA", "Kansas City, KS", "Clarksville, TN", "Springfield, MA", "Pasadena, TX", "Roseville, CA", "Charleston, SC", "Dayton, OH", "Fullerton, CA", "Visalia, CA", "Waco, TX", "Miramar, FL", "Olathe, KS", "Sterling Heights, MI", "Victorville, CA", "Cedar Rapids, IA", "Warren, MI", "Gainesville, FL", "Topeka, KS", "Stamford, CT", "New Haven, CT", "Kent, WA", "Concord, CA", "Elizabeth, NJ", "Columbia, SC", "Thousand Oaks, CA", "Fargo, ND", "Billings, MT", "Cheyenne, WY", "Burlington, VT", "Dover, DE", "Charleston, WV", "Manchester, NH", "Portland, ME"
+];
 
 async function uploadCreatorImage(
   file: File,
@@ -60,6 +64,25 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
   const bannerRef = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
 
+  // Dropdown state
+  const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
+  const [citySearch, setCitySearch] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsCityDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const filteredCities = US_CITIES.filter((city) =>
+    city.toLowerCase().includes(citySearch.toLowerCase())
+  ).slice(0, 50); // Limit to 50 results for performance
+
   if (!open) return null;
 
   const reset = () => {
@@ -76,6 +99,8 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
     setBannerFile(null);
     setCardFile(null);
     setFormError(null);
+    setCitySearch("");
+    setIsCityDropdownOpen(false);
     if (avatarRef.current) avatarRef.current.value = "";
     if (bannerRef.current) bannerRef.current.value = "";
   };
@@ -234,14 +259,58 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
                 className={fieldClass}
               />
             </div>
-            <div>
+            <div className="relative" ref={dropdownRef}>
               <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">Location</label>
-              <input
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Chicago, IL"
-                className={fieldClass}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  readOnly
+                  value={location}
+                  onClick={() => setIsCityDropdownOpen(!isCityDropdownOpen)}
+                  placeholder="Select City"
+                  className={`${fieldClass} cursor-pointer pr-10`}
+                />
+                <ChevronDown className={`absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30 transition-transform ${isCityDropdownOpen ? "rotate-180" : ""}`} />
+              </div>
+
+              {isCityDropdownOpen && (
+                <div className="absolute left-0 right-0 z-[100] mt-2 max-h-[300px] overflow-hidden rounded-2xl border border-white/10 bg-[#0c0c12] shadow-2xl backdrop-blur-xl">
+                  <div className="border-b border-white/5 p-2">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/40" />
+                      <input
+                        autoFocus
+                        type="text"
+                        placeholder="Search cities..."
+                        value={citySearch}
+                        onChange={(e) => setCitySearch(e.target.value)}
+                        className="w-full bg-white/5 py-2 pl-9 pr-4 text-xs text-white outline-none placeholder:text-white/20 focus:bg-white/10"
+                      />
+                    </div>
+                  </div>
+                  <div className="max-h-[220px] overflow-y-auto px-1 py-1 custom-scrollbar">
+                    {filteredCities.length > 0 ? (
+                      filteredCities.map((city) => (
+                        <button
+                          key={city}
+                          type="button"
+                          onClick={() => {
+                            setLocation(city);
+                            setIsCityDropdownOpen(false);
+                            setCitySearch("");
+                          }}
+                          className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+                        >
+                          <MapPin className="h-3.5 w-3.5 text-[#d4a853]/60" />
+                          {city}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-4 py-8 text-center text-xs text-white/30">No cities found matching "{citySearch}"</div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
             <div className="sm:col-span-2">
               <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">Bio / description</label>
