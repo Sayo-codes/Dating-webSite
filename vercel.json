@@ -1,8 +1,4 @@
 {
   "installCommand": "npm install --legacy-peer-deps",
-  "build": {
-    "env": {
-      "NODE_VERSION": "20"
-    }
-  }
+  "buildCommand": "npx prisma migrate deploy && npx prisma generate && next build"
 }
