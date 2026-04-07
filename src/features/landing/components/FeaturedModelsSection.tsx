@@ -67,7 +67,7 @@ function FeaturedModelsSkeleton() {
       {Array.from({ length: 3 }).map((_, index) => (
         <GlassCard
           key={`skeleton-${index}`}
-          className="h-[420px] min-w-[260px] shrink-0 skeleton"
+          className="aspect-[10/14] min-w-[260px] shrink-0 skeleton"
           aria-hidden="true"
         >
           <span className="sr-only">Loading</span>

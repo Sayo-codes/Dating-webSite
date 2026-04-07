@@ -45,7 +45,7 @@ export function creatorListItemToCardProps(creator: CreatorListItem): CreatorCar
     name: creator.displayName,
     age,
     location: creator.location?.trim() || "Near you",
-    imageUrl: (creator as any).cardImage ?? creator.galleryThumbnail ?? creator.avatarUrl,
+    imageUrl: creator.cardImage ?? creator.avatarUrl,
     isVIP: creator.verified,
   };
 }
@@ -81,14 +81,14 @@ export function CreatorCard({
 
   return (
     <article
-      className={`group/cc relative w-full max-w-full origin-center overflow-visible transition-transform duration-300 ease-out hover:z-10 hover:scale-[1.02] max-md:aspect-[10/14] md:aspect-[3/5] max-md:max-h-[70vw] md:max-h-none ${className}`.trim()}
+      className={`group/cc relative w-full max-w-full origin-center overflow-visible transition-transform duration-300 ease-out hover:z-10 hover:scale-[1.02] aspect-[10/14] max-md:max-h-[70vw] md:max-h-none ${className}`.trim()}
     >
       {/* Frame: thinner on mobile, full glow on md+ */}
       <div
         className="h-full w-full transition-[box-shadow,filter] duration-300 ease-out [background:linear-gradient(135deg,#ffb38a_0%,#ff2d78_38%,#d4a853_72%,#ff5a9a_100%)] p-[2px] shadow-[0_0_0_1px_rgba(255,45,120,0.2),0_6px_20px_rgba(0,0,0,0.45),0_0_28px_-8px_rgba(255,45,120,0.4)] max-md:rounded-[22px] md:p-[3px] md:rounded-[44px] md:shadow-[0_0_0_1px_rgba(255,45,120,0.2),0_8px_32px_rgba(0,0,0,0.5),0_0_40px_-6px_rgba(255,45,120,0.45),0_0_56px_-12px_rgba(212,168,83,0.35)] group-hover/cc:shadow-[0_0_0_2px_rgba(255,45,120,0.35),0_12px_36px_rgba(0,0,0,0.55),0_0_48px_-4px_rgba(255,45,120,0.5),0_0_56px_-8px_rgba(212,168,83,0.4)]"
       >
         <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#07070b] max-md:rounded-[20px] md:rounded-[41px]">
-          <div className="relative min-h-0 flex-1">
+          <div className="relative w-full h-full">
             <Link
               href={profileHref}
               className="absolute inset-x-0 top-0 z-[1] block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a853] focus-visible:ring-offset-2 focus-visible:ring-offset-[#07070b] bottom-[3.35rem] max-md:bottom-[3.2rem] sm:bottom-[3.85rem] md:bottom-[4.5rem] lg:bottom-[4.75rem]"
@@ -99,7 +99,7 @@ export function CreatorCard({
               src={src}
               alt=""
               fill
-              className={`object-cover object-[center_16%] transition-transform duration-500 ease-out group-hover/cc:scale-[1.03] max-md:object-[center_12%]`}
+              className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover/cc:scale-[1.03]"
               sizes="(max-width: 640px) 45vw, (max-width: 1024px) 33vw, 320px"
               unoptimized={unoptimized}
               priority={false}

@@ -10,8 +10,8 @@ export function getFeaturedModels(): ModelSummary[] {
       username: "eva",
       location: "Los Angeles, CA",
       age: 24,
-      imageUrl:
-        "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=500&fit=crop",
+      imageUrl: "", // or remove if not needed, but keep for type safety
+      cardImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=560&fit=crop",
     },
     {
       name: "Jessie",

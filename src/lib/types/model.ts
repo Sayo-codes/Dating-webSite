@@ -9,4 +9,6 @@ export interface ModelSummary {
   location: string;
   age: number;
   imageUrl: string;
+  cardImage?: string | null;
+  avatarUrl?: string | null;
 }

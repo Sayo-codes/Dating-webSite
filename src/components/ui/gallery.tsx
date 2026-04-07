@@ -141,13 +141,13 @@ function Photo({
       draggable={false}
     >
       <div
-        className="relative h-full w-full overflow-hidden rounded-3xl"
+        className="w-full h-full relative overflow-hidden rounded-3xl"
         style={{
           boxShadow: `0 12px 40px rgba(0,0,0,0.6), inset 0 0 0 1px ${accentColor}22`,
         }}
       >
         <MotionImage
-          className="rounded-3xl object-cover"
+          className="w-full h-full object-cover object-center rounded-3xl"
           fill
           src={src}
           alt={alt}
@@ -234,7 +234,8 @@ export function PhotoGallery({
   };
 
   /* ── Build photo layout from images data ── */
-  const cardSize = isMobile ? 160 : 220;
+  const cardWidth = isMobile ? 160 : 220;
+  const cardHeight = (cardWidth * 14) / 10;
   const gap = isMobile ? 120 : 160;
   const totalWidth = (images.length - 1) * gap;
 
@@ -336,7 +337,7 @@ export function PhotoGallery({
           >
             <div
               className="relative"
-              style={{ height: cardSize, width: cardSize }}
+              style={{ height: cardHeight, width: cardWidth }}
             >
               {[...photos].reverse().map((photo) => (
                 <MotionDiv
@@ -351,8 +352,8 @@ export function PhotoGallery({
                   }}
                 >
                   <Photo
-                    width={cardSize}
-                    height={cardSize}
+                    width={cardWidth}
+                    height={cardHeight}
                     src={photo.src}
                     alt={photo.alt}
                     direction={photo.direction}

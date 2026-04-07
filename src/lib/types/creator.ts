@@ -6,6 +6,7 @@ export type CreatorListItem = {
   avatarUrl: string | null;
   verified: boolean;
   location: string | null;
+  cardImage: string | null;
   galleryThumbnail: string | null;
 };
 

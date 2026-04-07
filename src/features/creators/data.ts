@@ -19,6 +19,7 @@ export async function getCreatorsList() {
     avatarUrl: c.avatarUrl,
     verified: c.verified,
     location: c.location,
+    cardImage: c.cardImage,
     galleryThumbnail: c.media[0]?.url ?? null,
   }));
 }

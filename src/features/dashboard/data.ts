@@ -9,6 +9,8 @@ export type DiscoverCreatorRow = {
   matchPercent: number;
   distanceLabel: string;
   displayAge: number;
+  cardImage: string | null;
+  avatarUrl: string | null;
 };
 
 function hashToInt(seed: string): number {
@@ -57,7 +59,7 @@ export async function getDiscoverFeedForUser(userId: string): Promise<DiscoverCr
   return creators.map((c: any, index: any) => {
     const { matchPercent, distanceLabel, displayAge } = enrichForViewer(userId, c.id, c.location);
     const age = c.age != null && Number.isFinite(c.age) ? c.age : displayAge;
-    const thumb = c.media[0]?.url ?? c.avatarUrl;
+    const thumb = c.cardImage ?? c.avatarUrl;
 
     return {
       id: c.id,
@@ -68,6 +70,8 @@ export async function getDiscoverFeedForUser(userId: string): Promise<DiscoverCr
       matchPercent,
       distanceLabel,
       displayAge: age,
+      cardImage: c.cardImage,
+      avatarUrl: c.avatarUrl,
     };
   });
 }
