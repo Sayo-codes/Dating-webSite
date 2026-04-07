@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Inter } from "next/font/google";
-import { ConditionalAppHeader } from "@/shared/ui/ConditionalAppHeader";
 import "./globals.css";
 
 const headingFont = Plus_Jakarta_Sans({
@@ -62,7 +61,6 @@ export default function RootLayout({
       <body
         className={`${headingFont.variable} ${bodyFont.variable} antialiased bg-background text-foreground overflow-x-hidden`}
       >
-        <ConditionalAppHeader />
         {children}
       </body>
     </html>
