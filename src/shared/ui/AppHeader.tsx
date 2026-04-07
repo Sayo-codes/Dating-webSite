@@ -45,6 +45,25 @@ export function AppHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    const onClickOutside = (e: MouseEvent) => {
+      if (menuOpen && !(e.target as Element).closest('header')) {
+        setMenuOpen(false);
+      }
+    };
+    if (menuOpen) {
+      document.addEventListener("keydown", onKeyDown);
+      document.addEventListener("mousedown", onClickOutside);
+    }
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("mousedown", onClickOutside);
+    };
+  }, [menuOpen]);
+
   // Logged-out: no nav links (Login / Join Now buttons handle auth)
   const guestNavLinks: { href: string; label: string }[] = [];
 
@@ -59,15 +78,7 @@ export function AppHeader() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 border-b ${scrolled
-          ? "shadow-[0_4px_24px_rgba(0,0,0,0.5)] border-[rgba(212,168,83,0.12)]"
-          : "border-[rgba(255,255,255,0.06)]"
-        }`}
-      style={{
-        background: scrolled ? "rgba(7,7,11,0.98)" : "rgba(7,7,11,0.95)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-      }}
+      className={`sticky top-0 z-50 transition-all duration-300 border-b border-white/10 bg-[#0a0a0f]/95 backdrop-blur-xl ${scrolled ? "shadow-[0_4px_24px_rgba(0,0,0,0.5)]" : ""}`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10 h-16">
 
@@ -172,36 +183,31 @@ export function AppHeader() {
         <button
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
-          className="focus-outline flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white/90 transition-all duration-200 hover:bg-white/10 active:scale-95 md:hidden"
+          className="focus-outline flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-200 hover:bg-white/10 active:scale-95 md:hidden"
           aria-label={menuOpen ? "Close menu" : "Open menu"}
           aria-expanded={menuOpen}
         >
-          <span className="relative flex h-5 w-5 flex-col justify-center gap-[5px]">
-            <span className={`block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ${menuOpen ? "translate-y-[7px] rotate-45" : ""}`} />
-            <span className={`block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ${menuOpen ? "opacity-0 scale-x-0" : ""}`} />
-            <span className={`block h-0.5 w-5 rounded-full bg-current transition-all duration-300 ${menuOpen ? "-translate-y-[7px] -rotate-45" : ""}`} />
+          <span className="relative flex w-6 flex-col justify-center gap-[6px]">
+            <span className={`block bg-white w-6 h-0.5 transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
+            <span className={`block bg-white w-6 h-0.5 transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`} />
+            <span className={`block bg-white w-6 h-0.5 transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
           </span>
         </button>
       </div>
 
       {/* Mobile menu overlay */}
       <div
-        className={`fixed inset-x-0 bottom-0 z-40 md:hidden transition-all duration-400 ${menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          }`}
-        style={{ top: "64px", background: "rgba(7,7,11,0.97)", backdropFilter: "blur(24px)", WebkitBackdropFilter: "blur(24px)" }}
+        className={`fixed inset-x-0 bottom-0 z-[9999] md:hidden w-full bg-[#0a0a0f] backdrop-blur-xl border-t border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.9)] transition-all duration-300 ease-in-out overflow-hidden ${menuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}`}
+        style={{ top: "64px" }}
         aria-hidden={!menuOpen}
       >
-        {/* Gold top border */}
-        <div className="h-px w-full" style={{ background: "linear-gradient(90deg, transparent, rgba(212,168,83,0.4), transparent)" }} />
-
-        <nav className="flex flex-col gap-1 p-5 pt-6" aria-label="Main mobile">
-          {navLinks.map(({ href, label }, i) => (
+        <nav className="flex flex-col" aria-label="Main mobile">
+          {navLinks.map(({ href, label }) => (
             <Link
               key={href}
               href={href}
-              className={`focus-outline flex min-h-[52px] items-center rounded-2xl px-5 text-base font-medium transition-all duration-200 ${pathname === href ? "bg-[rgba(212,168,83,0.12)] text-[#f0c97a]" : "text-white/80 hover:bg-white/8 hover:text-white"
-                }`}
-              style={{ animationDelay: `${i * 50}ms` }}
+              className="focus-outline min-h-[56px] px-6 py-4 text-base text-white border-b border-white/8 hover:bg-[#d4a853]/10 hover:text-[#d4a853] w-full flex items-center transition-colors duration-200"
+              onClick={() => setMenuOpen(false)}
             >
               {label}
             </Link>
@@ -211,8 +217,8 @@ export function AppHeader() {
           {user && (
             <Link
               href="/messages"
-              className={`focus-outline flex min-h-[52px] items-center justify-between rounded-2xl px-5 text-base font-medium transition-all duration-200 ${pathname === "/messages" ? "bg-[rgba(212,168,83,0.12)] text-[#f0c97a]" : "text-white/80 hover:bg-white/8 hover:text-white"
-                }`}
+              className="focus-outline min-h-[56px] px-6 py-4 text-base text-white border-b border-white/8 hover:bg-[#d4a853]/10 hover:text-[#d4a853] w-full flex items-center justify-between transition-colors duration-200"
+              onClick={() => setMenuOpen(false)}
             >
               <span className="flex items-center gap-2">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -232,14 +238,16 @@ export function AppHeader() {
             <>
               <Link
                 href="/login"
-                className="focus-outline flex min-h-[52px] items-center rounded-2xl px-5 text-base font-medium text-white/80 hover:bg-white/8 hover:text-white transition-all duration-200"
+                className="focus-outline min-h-[56px] px-6 py-4 text-base text-white border-b border-white/8 hover:bg-[#d4a853]/10 hover:text-[#d4a853] w-full flex items-center transition-colors duration-200"
+                onClick={() => setMenuOpen(false)}
               >
                 Login
               </Link>
-              <div className="mt-2 px-2">
+              <div className="px-6 py-4">
                 <Link
                   href="/register"
-                  className="pill-button-primary focus-outline flex w-full min-h-[52px] items-center justify-center rounded-2xl text-base font-bold"
+                  className="w-full bg-[#d4a853] text-black font-bold rounded-full py-4 text-center mt-2 flex items-center justify-center text-base"
+                  onClick={() => setMenuOpen(false)}
                 >
                   Sign Up ✦
                 </Link>
@@ -248,10 +256,10 @@ export function AppHeader() {
           )}
 
           {user && (
-            <form action="/api/auth/logout" method="POST" className="mt-3 border-t border-white/10 pt-4">
+            <form action="/api/auth/logout" method="POST" className="w-full">
               <button
                 type="submit"
-                className="focus-outline flex min-h-[52px] w-full items-center rounded-2xl px-5 text-base font-medium text-white/60 hover:bg-white/8 hover:text-white transition-all duration-200"
+                className="focus-outline min-h-[56px] px-6 py-4 text-base text-white border-b border-white/8 hover:bg-[#d4a853]/10 hover:text-[#d4a853] w-full flex items-center transition-colors duration-200"
               >
                 Log out
               </button>

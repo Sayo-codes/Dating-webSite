@@ -5,13 +5,8 @@ import Link from "next/link";
 export function LandingNav() {
   return (
     <div
-      className="absolute inset-x-0 top-0 z-40"
-      style={{
-        background: "rgba(7,7,11,0.92)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(212,168,83,0.12)",
-      }}
+      className="absolute inset-x-0 top-0 z-40 bg-[#0a0a0f]/95 backdrop-blur-xl border-b"
+      style={{ borderBottomColor: "rgba(212,168,83,0.12)" }}
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:h-[72px] sm:px-6 lg:px-10">
         <Link

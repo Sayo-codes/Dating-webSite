@@ -33,8 +33,7 @@ export function DashboardHeader({ title, unreadCount, user }: Props) {
 
   return (
     <header
-      className="sticky top-0 z-50 border-b border-white/[0.08] bg-[#07070b]/92 backdrop-blur-xl"
-      style={{ WebkitBackdropFilter: "blur(20px)" }}
+      className="sticky top-0 z-50 border-b border-white/10 bg-[#0a0a0f] backdrop-blur-xl"
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6 lg:px-10">
         <h1 className="min-w-0 font-[var(--font-heading)] text-base font-semibold tracking-tight text-white sm:text-lg">
@@ -99,7 +98,7 @@ export function DashboardHeader({ title, unreadCount, user }: Props) {
 
             {open && (
               <div
-                className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-white/10 bg-[rgba(14,12,20,0.98)] py-1 shadow-[0_16px_48px_rgba(0,0,0,0.55)]"
+                className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0f] py-1 shadow-[0_8px_32px_rgba(0,0,0,0.8)]"
                 role="menu"
               >
                 <p className="border-b border-white/10 px-4 py-2 text-xs text-white/45 truncate">{user.email}</p>
