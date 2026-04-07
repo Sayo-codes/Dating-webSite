@@ -28,7 +28,7 @@ function sanitizeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(0, 120);
 }
 
-export type PresignContext = "message" | "avatar" | "banner" | "gallery";
+export type PresignContext = "message" | "avatar" | "banner" | "gallery" | "posts";
 
 export const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",

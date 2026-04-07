@@ -12,7 +12,7 @@ const US_CITIES = [
 async function uploadCreatorImage(
   file: File,
   creatorId: string,
-  context: "avatar" | "banner"
+  context: "avatar" | "gallery"
 ): Promise<string> {
   const res = await fetch("/api/upload/presign", {
     method: "POST",
@@ -57,11 +57,9 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
   const [weight, setWeight] = useState("");
   const [verified, setVerified] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [cardFile, setCardFile] = useState<File | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const avatarRef = useRef<HTMLInputElement>(null);
-  const bannerRef = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
 
   // Dropdown state
@@ -96,13 +94,11 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
     setWeight("");
     setVerified(false);
     setAvatarFile(null);
-    setBannerFile(null);
     setCardFile(null);
     setFormError(null);
     setCitySearch("");
     setIsCityDropdownOpen(false);
     if (avatarRef.current) avatarRef.current.value = "";
-    if (bannerRef.current) bannerRef.current.value = "";
   };
 
   const handleClose = () => {
@@ -151,19 +147,9 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
           });
           if (!patch.ok) throw new Error("Saved profile but avatar URL failed to attach.");
         }
-        if (bannerFile) {
-          if (!bannerFile.type.startsWith("image/")) throw new Error("Banner must be an image.");
-          const url = await uploadCreatorImage(bannerFile, id, "banner");
-          const patch = await fetch(`/api/admin/creators/${id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ bannerUrl: url }),
-          });
-          if (!patch.ok) throw new Error("Saved profile but banner URL failed to attach.");
-        }
         if (cardFile) {
           if (!cardFile.type.startsWith("image/")) throw new Error("Card must be an image.");
-          const url = await uploadCreatorImage(cardFile, id, "banner"); // Using banner context for S3 path
+          const url = await uploadCreatorImage(cardFile, id, "gallery"); // Using gallery context for S3 path
           const patch = await fetch(`/api/admin/creators/${id}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -367,18 +353,6 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
                   {avatarFile ? "Cropped Photo Added ✦" : "Choose portrait…"}
                 </button>
               </ImageCropUploader>
-            </div>
-            <div>
-              <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">Banner (optional)</label>
-              <input ref={bannerRef} type="file" accept="image/*" className="hidden" onChange={(e) => setBannerFile(e.target.files?.[0] ?? null)} />
-              <button
-                type="button"
-                onClick={() => bannerRef.current?.click()}
-                className="focus-outline mt-1.5 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 bg-[#07070b]/60 px-3 py-3 text-sm text-white/60 transition-colors hover:border-[#ff2d78]/35 hover:text-white/80"
-              >
-                <ImagePlus className="h-4 w-4" aria-hidden />
-                {bannerFile ? bannerFile.name.slice(0, 28) : "Choose banner…"}
-              </button>
             </div>
             <div className="sm:col-span-2">
               <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">Card Image (10:14 Ratio)</label>

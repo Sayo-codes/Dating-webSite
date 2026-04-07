@@ -9,7 +9,7 @@ import {
   type PresignContext,
 } from "@/shared/lib/storage";
 
-const CONTEXTS: PresignContext[] = ["message", "avatar", "banner", "gallery"];
+const CONTEXTS: PresignContext[] = ["message", "avatar", "banner", "gallery", "posts"];
 
 export async function POST(request: NextRequest) {
   const auth = await withAuth();

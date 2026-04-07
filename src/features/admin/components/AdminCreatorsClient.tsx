@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ImageCropUploader } from "@/components/ImageCropUploader";
+import { PlusCircle, Send, PlusSquare, FilePlus } from "lucide-react";
+import { NewPostModal } from "./NewPostModal";
 
 type Creator = {
   id: string;
@@ -56,6 +58,14 @@ export function AdminCreatorsClient() {
   const [error, setError] = useState<string | null>(null);
   const [galleryTargetId, setGalleryTargetId] = useState<string | null>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const [postTarget, setPostTarget] = useState<Creator | null>(null);
+  const [toast, setToast] = useState<{ message: string; tone: "success" | "error" } | null>(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   const fetchCreators = async () => {
     const res = await fetch("/api/admin/creators");
@@ -161,6 +171,15 @@ export function AdminCreatorsClient() {
 
   return (
     <div className="space-y-6">
+      {toast && (
+        <div className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-2xl shadow-2xl border backdrop-blur-xl animate-in slide-in-from-bottom flex items-center gap-2 font-medium ${
+          toast.tone === "success" ? "bg-green-500/10 border-green-500/30 text-green-200" : "bg-red-500/10 border-red-500/30 text-red-100"
+        }`}>
+          {toast.tone === "success" ? <PlusCircle className="h-4 w-4" /> : null}
+          {toast.message}
+        </div>
+      )}
+
       {error && (
         <div className="rounded-lg border border-red-400/40 bg-red-500/20 px-4 py-2 text-sm text-red-200">
           {error}
@@ -298,7 +317,15 @@ export function AdminCreatorsClient() {
                     >
                       Add media
                     </button>
-                    <Link href={`/creators/${c.username}`} target="_blank" className="text-white/70 hover:text-white">
+                    <button
+                      type="button"
+                      onClick={() => setPostTarget(c)}
+                      className="inline-flex min-h-[44px] items-center gap-1.5 px-3 py-2 rounded-lg text-white/70 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
+                    >
+                      <PlusSquare className="h-4 w-4" />
+                      <span>New Post</span>
+                    </button>
+                    <Link href={`/creators/${c.username}`} target="_blank" className="inline-flex min-h-[44px] items-center text-white/70 hover:text-white px-2">
                       View
                     </Link>
                   </div>
@@ -331,6 +358,16 @@ export function AdminCreatorsClient() {
             </div>
           </form>
         </div>
+      )}
+      {postTarget && (
+        <NewPostModal
+          isOpen={true}
+          creatorId={postTarget.id}
+          creatorName={postTarget.displayName}
+          onClose={() => setPostTarget(null)}
+          onSuccess={fetchCreators}
+          onToast={(message, tone) => setToast({ message, tone })}
+        />
       )}
     </div>
   );
