@@ -106,6 +106,13 @@ export function ModelList({ models, onChanged, onToast, onPostToFeed }: Props) {
                 </button>
               )}
               <Link
+                href={`/admin/models/${m.id}/edit`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-2 text-xs text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              >
+                <Pencil className="h-3.5 w-3.5" aria-hidden />
+                Edit
+              </Link>
+              <Link
                 href={`/creators/${m.username}`}
                 target="_blank"
                 rel="noreferrer"
@@ -174,14 +181,14 @@ export function ModelList({ models, onChanged, onToast, onPostToFeed }: Props) {
                 <td className="p-4 text-white/55">{m.conversationCount}</td>
                 <td className="p-4">
                   <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      disabled
-                      title="Editor coming soon"
-                      className="rounded-lg p-2 text-white/25"
+                    <Link
+                      href={`/admin/models/${m.id}/edit`}
+                      className="rounded-lg p-2 text-white/60 transition-colors hover:bg-white/5 hover:text-white"
+                      aria-label="Edit model"
+                      title="Edit model"
                     >
                       <Pencil className="h-4 w-4" aria-hidden />
-                    </button>
+                    </Link>
                     {onPostToFeed && (
                       <button
                         type="button"
