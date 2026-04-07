@@ -116,7 +116,7 @@ export function LoginView({ redirectTo }: LoginViewProps) {
                   <label htmlFor="password" className="text-sm font-medium text-[var(--text-secondary)]">
                     Password
                   </label>
-                  <Link href="#" className="text-sm font-medium text-[var(--accent-gold)] hover:text-[#f0c97a] hover:underline">
+                  <Link href="/forgot-password" className="text-sm font-medium text-[var(--accent-gold)] hover:text-[#f0c97a] hover:underline">
                     Forgot password?
                   </Link>
                 </div>

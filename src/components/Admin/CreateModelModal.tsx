@@ -61,6 +61,11 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
   const [formError, setFormError] = useState<string | null>(null);
   const avatarRef = useRef<HTMLInputElement>(null);
   const [pending, startTransition] = useTransition();
+  // Initial stats
+  const [initFollowers, setInitFollowers] = useState("");
+  const [initSubscribers, setInitSubscribers] = useState("");
+  const [initLikes, setInitLikes] = useState("");
+  const [initTips, setInitTips] = useState("");
 
   // Dropdown state
   const [isCityDropdownOpen, setIsCityDropdownOpen] = useState(false);
@@ -98,6 +103,10 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
     setFormError(null);
     setCitySearch("");
     setIsCityDropdownOpen(false);
+    setInitFollowers("");
+    setInitSubscribers("");
+    setInitLikes("");
+    setInitTips("");
     if (avatarRef.current) avatarRef.current.value = "";
   };
 
@@ -127,6 +136,10 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
         height,
         weight,
         verified,
+        initialFollowers: initFollowers ? parseInt(initFollowers, 10) : undefined,
+        initialSubscribers: initSubscribers ? parseInt(initSubscribers, 10) : undefined,
+        initialLikes: initLikes ? parseInt(initLikes, 10) : undefined,
+        initialTipsCents: initTips ? Math.round(parseFloat(initTips) * 100) : undefined,
       });
 
       if (!result.ok || !result.id) {
@@ -319,6 +332,60 @@ export function CreateModelModal({ open, onClose, onSuccess, onToast }: Props) {
             <div>
               <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">Weight</label>
               <input value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="125 lbs" className={fieldClass} />
+            </div>
+          </div>
+
+          {/* ── Initial Stats ── */}
+          <div className="rounded-xl border border-[#d4a853]/15 bg-[#d4a853]/5 px-4 py-4">
+            <p className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-[#f0c97a]/70">
+              Initial Stats (optional)
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">Followers</label>
+                <input
+                  value={initFollowers}
+                  onChange={(e) => setInitFollowers(e.target.value.replace(/\D/g, ""))}
+                  inputMode="numeric"
+                  placeholder="0"
+                  className={fieldClass}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">Subscribers</label>
+                <input
+                  value={initSubscribers}
+                  onChange={(e) => setInitSubscribers(e.target.value.replace(/\D/g, ""))}
+                  inputMode="numeric"
+                  placeholder="0"
+                  className={fieldClass}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">Total Likes</label>
+                <input
+                  value={initLikes}
+                  onChange={(e) => setInitLikes(e.target.value.replace(/\D/g, ""))}
+                  inputMode="numeric"
+                  placeholder="0"
+                  className={fieldClass}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">
+                  Total Tips (USD)
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-white/40">$</span>
+                  <input
+                    value={initTips}
+                    onChange={(e) => setInitTips(e.target.value.replace(/[^0-9.]/g, ""))}
+                    inputMode="decimal"
+                    placeholder="0.00"
+                    className={`${fieldClass} pl-7`}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 

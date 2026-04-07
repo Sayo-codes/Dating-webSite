@@ -14,6 +14,10 @@ export type CreateModelInput = {
   height?: string;
   weight?: string;
   verified?: boolean;
+  initialFollowers?: number;
+  initialSubscribers?: number;
+  initialLikes?: number;
+  initialTipsCents?: number;
 };
 
 export async function createModel(
@@ -40,6 +44,9 @@ export async function createModel(
       ? Math.round(Number(input.age))
       : null;
 
+  const safeInt = (v?: number) =>
+    typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.round(v) : 0;
+
   try {
     const creator = await prisma.creator.create({
       data: {
@@ -52,6 +59,10 @@ export async function createModel(
         height: input.height?.trim() || null,
         weight: input.weight?.trim() || null,
         verified: Boolean(input.verified),
+        followerCount: safeInt(input.initialFollowers),
+        subscriberCount: safeInt(input.initialSubscribers),
+        totalLikes: safeInt(input.initialLikes),
+        totalTipsCents: safeInt(input.initialTipsCents),
       },
     });
 

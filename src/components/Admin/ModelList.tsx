@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { ExternalLink, Pencil, Send, Trash2 } from "lucide-react";
 import { deleteModel } from "@/actions/deleteModel";
 
 export type AdminModelRow = {
@@ -27,9 +27,10 @@ type Props = {
   models: AdminModelRow[];
   onChanged: () => void;
   onToast: (message: string, tone: "success" | "error") => void;
+  onPostToFeed?: (creatorId: string) => void;
 };
 
-export function ModelList({ models, onChanged, onToast }: Props) {
+export function ModelList({ models, onChanged, onToast, onPostToFeed }: Props) {
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -94,6 +95,16 @@ export function ModelList({ models, onChanged, onToast }: Props) {
                 <Pencil className="h-3.5 w-3.5" aria-hidden />
                 Edit
               </button>
+              {onPostToFeed && (
+                <button
+                  type="button"
+                  onClick={() => onPostToFeed(m.id)}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-[#ff2d78]/40 bg-[#ff2d78]/10 px-3 py-2 text-xs font-medium text-[#ff6fa3] transition-colors hover:border-[#ff2d78]/60 hover:bg-[#ff2d78]/20"
+                >
+                  <Send className="h-3.5 w-3.5" aria-hidden />
+                  Post to Feed
+                </button>
+              )}
               <Link
                 href={`/creators/${m.username}`}
                 target="_blank"
@@ -171,6 +182,17 @@ export function ModelList({ models, onChanged, onToast }: Props) {
                     >
                       <Pencil className="h-4 w-4" aria-hidden />
                     </button>
+                    {onPostToFeed && (
+                      <button
+                        type="button"
+                        onClick={() => onPostToFeed(m.id)}
+                        className="rounded-lg p-2 text-[#ff6fa3]/80 transition-colors hover:bg-[#ff2d78]/10 hover:text-[#ff6fa3]"
+                        aria-label="Post to feed"
+                        title="Post to feed"
+                      >
+                        <Send className="h-4 w-4" aria-hidden />
+                      </button>
+                    )}
                     <Link
                       href={`/creators/${m.username}`}
                       target="_blank"

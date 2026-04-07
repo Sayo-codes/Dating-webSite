@@ -81,11 +81,16 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { mediaUrl, mediaType, caption } = body;
+    const { mediaUrl, mediaType, caption, isLocked, unlockPriceCents } = body;
 
     if (!mediaUrl || !mediaType) {
       return NextResponse.json({ error: "mediaUrl and mediaType are required" }, { status: 400 });
     }
+
+    const locked = isLocked === true;
+    const priceCents = typeof unlockPriceCents === "number" && unlockPriceCents > 0
+      ? unlockPriceCents
+      : locked ? 1999 : 0;
 
     const newPost = await prisma.creatorPost.create({
       data: {
@@ -94,8 +99,8 @@ export async function POST(
         mediaType: mediaType === "VIDEO" ? "VIDEO" : "IMAGE",
         previewUrl: mediaUrl,
         caption: caption || null,
-        isLocked: false,
-        unlockPriceCents: 0,
+        isLocked: locked,
+        unlockPriceCents: priceCents,
       },
     });
 
