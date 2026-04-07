@@ -1,28 +1,41 @@
 "use client";
 
-import Link from "next/image";
 import LinkNext from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 /**
- * Minimal, ultra-smooth premium brand header for Rsdate.
- * Strictly features the logo and a "Sign Up / Login" or "Explore" CTA.
- * No mobile hamburger menus, no account dropdowns.
+ * Ultra-minimal Rsdate Brand Bar.
+ * Strictly features ONLY the logo.
+ * Implements "Swipe Up to Hide" logic:
+ * - When scrolling down: header hides (swipes up).
+ * - When scrolling up: header reveals (swipes down).
+ * GPU-accelerated for max performance and butter-smooth transitions.
  */
 export function AppHeader() {
+  const [isVisible, setIsVisible] = useState(true);
   const [scrolled, setScrolled] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
-    fetch("/api/auth/me")
-      .then((r) => setIsLoggedIn(r.ok))
-      .catch(() => setIsLoggedIn(false));
-  }, []);
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+      // 1. Transparency logic (more than 10px scroll)
+      setScrolled(currentScrollY > 10);
+
+      // 2. Visibility logic (Swipe Up to Hide)
+      // Show if scrolling up, hide if scrolling down (and past the header height)
+      if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
@@ -33,13 +46,14 @@ export function AppHeader() {
           : "bg-transparent border-transparent"
       }`}
       style={{
-        transform: "translateZ(0)",
+        // Hardware acceleration for ultra-smooth hide/reveal transition
+        transform: isVisible ? "translate3d(0, 0, 0)" : "translate3d(0, -100%, 0)",
         willChange: "transform, background-color, border-color, backdrop-filter",
       }}
     >
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-center px-4 sm:px-6 lg:px-10">
         
-        {/* Logo - Minimal & Premium */}
+        {/* Logo - Minimal & Centered for absolute brand focus */}
         <LinkNext
           href="/"
           className="flex items-center gap-2.5 transition-transform hover:scale-[1.02] active:scale-[0.98]"
@@ -55,25 +69,6 @@ export function AppHeader() {
             Rsdate
           </span>
         </LinkNext>
-
-        {/* Minimal Action Item */}
-        <div>
-          {isLoggedIn ? (
-            <LinkNext 
-              href="/creators"
-              className="text-xs font-bold uppercase tracking-[0.2em] text-[#f0c97a] transition-all hover:text-white"
-            >
-              ✦ Explore
-            </LinkNext>
-          ) : (
-             <LinkNext 
-              href="/register" 
-              className="rounded-full bg-gradient-to-r from-[#d4a853] to-[#ff2d78] px-5 py-2 text-xs font-bold uppercase tracking-widest text-white shadow-lg transition-transform hover:scale-105"
-            >
-              Join ✦
-            </LinkNext>
-          )}
-        </div>
 
       </div>
     </header>
