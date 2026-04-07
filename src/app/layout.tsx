@@ -44,6 +44,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { GlobalAppHeader } from "@/shared/ui/GlobalAppHeader";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -61,6 +63,7 @@ export default function RootLayout({
       <body
         className={`${headingFont.variable} ${bodyFont.variable} antialiased bg-background text-foreground overflow-x-hidden`}
       >
+        <GlobalAppHeader />
         {children}
       </body>
     </html>

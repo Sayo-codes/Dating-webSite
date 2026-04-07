@@ -19,17 +19,7 @@ type Props = {
 
 export function LoggedInDiscoverHome({ user, unreadCount, creators }: Props) {
   return (
-    <div className="min-h-screen bg-[#07070b] text-white">
-      <DashboardHeader
-        title="Discover Creators ✦"
-        unreadCount={unreadCount}
-        user={{
-          username: user.username,
-          email: user.email,
-          avatarUrl: null,
-          role: user.role,
-        }}
-      />
+    <div className="min-h-screen bg-[#07070b] text-white pt-16">
 
       <main className="mx-auto max-w-7xl px-3 pb-10 pt-5 sm:px-6 sm:pt-7 lg:px-10">
         {creators.length === 0 ? (
