@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/shared/lib/prisma";
 import { hashPassword } from "@/shared/lib/auth";
 import { createOtp } from "@/shared/lib/otp";
-import { sendVerificationEmail } from "@/lib/email";
+import { sendOtpEmail } from "@/lib/email";
 import { registerSchema } from "@/shared/lib/validation/auth";
 import { checkRateLimit } from "@/shared/lib/rate-limit";
 
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     try {
       const code = await createOtp(normalizedEmail);
-      await sendVerificationEmail(normalizedEmail, code);
+      await sendOtpEmail(normalizedEmail, code);
     } catch (otpError) {
       console.error("[register] Email send failed after user create:", otpError);
       return NextResponse.json(

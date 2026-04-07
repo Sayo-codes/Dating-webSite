@@ -65,9 +65,7 @@ const emailStyles = `
   }
 `;
 
-export async function sendVerificationEmail(to: string, token: string) {
-  const verifyLink = `${APP_URL}/verify-email?token=${token}`;
-
+export async function sendOtpEmail(to: string, code: string) {
   await resend.emails.send({
     from: "noreply@rsdate.com",
     to,
@@ -84,12 +82,16 @@ export async function sendVerificationEmail(to: string, token: string) {
             <a href="${APP_URL}" class="logo">RSDate</a>
           </div>
           <div class="card">
-            <h1 class="title">Welcome to RSDate</h1>
+            <h1 class="title">Verification Code</h1>
             <p class="text">
-              Please verify your email address by clicking the button below.<br>
-              This link will expire in 24 hours.
+              Your 6-digit code is below. It will expire in 10 minutes.
             </p>
-            <a href="${verifyLink}" class="btn">Verify Email</a>
+            <div style="background: rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 24px; margin: 32px 0; border: 1px solid rgba(212, 168, 83, 0.2);">
+              <span style="font-size: 32px; font-weight: 700; letter-spacing: 0.2em; color: #f0c97a;">${code}</span>
+            </div>
+            <p class="text" style="font-size: 13px;">
+              If you didn't request this code, you can safely ignore this email.
+            </p>
           </div>
         </div>
       </body>

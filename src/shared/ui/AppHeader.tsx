@@ -6,7 +6,6 @@ import { useState, useEffect } from "react";
 
 export function AppHeader() {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<{ role: string } | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -37,32 +36,11 @@ export function AppHeader() {
     return () => clearInterval(interval);
   }, [user]);
 
-  useEffect(() => setMenuOpen(false), [pathname]);
-
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false);
-    };
-    const onClickOutside = (e: MouseEvent) => {
-      if (menuOpen && !(e.target as Element).closest('header')) {
-        setMenuOpen(false);
-      }
-    };
-    if (menuOpen) {
-      document.addEventListener("keydown", onKeyDown);
-      document.addEventListener("mousedown", onClickOutside);
-    }
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      document.removeEventListener("mousedown", onClickOutside);
-    };
-  }, [menuOpen]);
 
   // Logged-out: no nav links (Login / Join Now buttons handle auth)
   const guestNavLinks: { href: string; label: string }[] = [];
@@ -126,7 +104,7 @@ export function AppHeader() {
         </nav>
 
         {/* Right side actions */}
-        <div className="hidden md:flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Messages icon - only when logged in */}
           {user && (
             <Link
@@ -150,11 +128,11 @@ export function AppHeader() {
           )}
 
           {!user ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {/* Login — ghost border button */}
               <Link
                 href="/login"
-                className="focus-outline inline-flex min-h-[42px] items-center justify-center rounded-full border px-5 text-sm font-semibold text-white/85 transition-all duration-200 hover:border-[rgba(212,168,83,0.6)] hover:bg-[rgba(212,168,83,0.08)] hover:text-[#f0c97a]"
+                className="focus-outline inline-flex min-h-[42px] items-center justify-center rounded-full border px-4 sm:px-5 text-sm font-semibold text-white/85 transition-all duration-200 hover:border-[rgba(212,168,83,0.6)] hover:bg-[rgba(212,168,83,0.08)] hover:text-[#f0c97a]"
                 style={{ borderColor: "rgba(255,255,255,0.22)" }}
               >
                 Login
@@ -162,7 +140,7 @@ export function AppHeader() {
               {/* Sign Up — solid gold-to-pink pill */}
               <Link
                 href="/register"
-                className="focus-outline pill-button-primary inline-flex min-h-[42px] items-center justify-center rounded-full px-5 text-sm font-bold"
+                className="focus-outline pill-button-primary inline-flex min-h-[42px] items-center justify-center rounded-full px-4 sm:px-5 text-sm font-bold"
               >
                 Sign Up ✦
               </Link>
@@ -178,94 +156,6 @@ export function AppHeader() {
             </form>
           )}
         </div>
-
-        {/* Mobile hamburger */}
-        <button
-          type="button"
-          onClick={() => setMenuOpen((o) => !o)}
-          className="focus-outline flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-200 hover:bg-white/10 active:scale-95 md:hidden"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-        >
-          <span className="relative flex w-6 flex-col justify-center gap-[6px]">
-            <span className={`block bg-white w-6 h-0.5 transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
-            <span className={`block bg-white w-6 h-0.5 transition-all duration-300 ${menuOpen ? "opacity-0" : ""}`} />
-            <span className={`block bg-white w-6 h-0.5 transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
-          </span>
-        </button>
-      </div>
-
-      {/* Mobile menu overlay */}
-      <div
-        className={`fixed inset-x-0 bottom-0 z-[9999] md:hidden w-full bg-[#0a0a0f] backdrop-blur-xl border-t border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.9)] transition-all duration-300 ease-in-out overflow-hidden ${menuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'}`}
-        style={{ top: "64px" }}
-        aria-hidden={!menuOpen}
-      >
-        <nav className="flex flex-col" aria-label="Main mobile">
-          {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="focus-outline min-h-[56px] px-6 py-4 text-base text-white border-b border-white/8 hover:bg-[#d4a853]/10 hover:text-[#d4a853] w-full flex items-center transition-colors duration-200"
-              onClick={() => setMenuOpen(false)}
-            >
-              {label}
-            </Link>
-          ))}
-
-          {/* Messages link in mobile with badge */}
-          {user && (
-            <Link
-              href="/messages"
-              className="focus-outline min-h-[56px] px-6 py-4 text-base text-white border-b border-white/8 hover:bg-[#d4a853]/10 hover:text-[#d4a853] w-full flex items-center justify-between transition-colors duration-200"
-              onClick={() => setMenuOpen(false)}
-            >
-              <span className="flex items-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-                Messages
-              </span>
-              {unreadCount > 0 && (
-                <span className="flex h-6 min-w-[24px] items-center justify-center rounded-full bg-[#ff2d78] px-2 text-xs font-bold text-white">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              )}
-            </Link>
-          )}
-
-          {!user && (
-            <>
-              <Link
-                href="/login"
-                className="focus-outline min-h-[56px] px-6 py-4 text-base text-white border-b border-white/8 hover:bg-[#d4a853]/10 hover:text-[#d4a853] w-full flex items-center transition-colors duration-200"
-                onClick={() => setMenuOpen(false)}
-              >
-                Login
-              </Link>
-              <div className="px-6 py-4">
-                <Link
-                  href="/register"
-                  className="w-full bg-[#d4a853] text-black font-bold rounded-full py-4 text-center mt-2 flex items-center justify-center text-base"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Sign Up ✦
-                </Link>
-              </div>
-            </>
-          )}
-
-          {user && (
-            <form action="/api/auth/logout" method="POST" className="w-full">
-              <button
-                type="submit"
-                className="focus-outline min-h-[56px] px-6 py-4 text-base text-white border-b border-white/8 hover:bg-[#d4a853]/10 hover:text-[#d4a853] w-full flex items-center transition-colors duration-200"
-              >
-                Log out
-              </button>
-            </form>
-          )}
-        </nav>
       </div>
     </header>
   );

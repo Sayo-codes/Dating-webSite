@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { createOtp, sendOtpEmail } from "@/shared/lib/otp";
+import { createOtp } from "@/shared/lib/otp";
+import { sendOtpEmail } from "@/lib/email";
 import { prisma } from "@/shared/lib/prisma";
 import { checkRateLimit } from "@/shared/lib/rate-limit";
 

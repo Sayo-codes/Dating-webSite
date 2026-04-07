@@ -23,8 +23,7 @@ export async function verifyOtp(email: string, code: string): Promise<boolean> {
   const normalized = email.toLowerCase();
 
   // --- TESTING BYPASS ---
-  // Allow '123456' for any email during testing/development
-  if (code === "123456") {
+  if (process.env.NODE_ENV === "development" && code === "123456") {
     return true;
   }
   // ----------------------
@@ -36,11 +35,4 @@ export async function verifyOtp(email: string, code: string): Promise<boolean> {
   if (!record || record.expiresAt < new Date()) return false;
   await prisma.otpRequest.deleteMany({ where: { email: normalized } });
   return true;
-}
-
-export async function sendOtpEmail(email: string, code: string): Promise<void> {
-  if (process.env.NODE_ENV === "development") {
-    console.log(`[OTP] ${email} => ${code}`);
-  }
-  // TODO: integrate SendGrid, Resend, or AWS SES
 }
