@@ -58,3 +58,50 @@ export async function GET(
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ username: string }> }
+) {
+  try {
+    const { username } = await params;
+    const user = await getCurrentUser();
+
+    // Verify creator exists and find their ID
+    const creator = await prisma.creator.findUnique({
+      where: { username },
+      select: { id: true, username: true }
+    });
+
+    if (!creator) return NextResponse.json({ error: "Creator not found" }, { status: 404 });
+
+    // Only allow admins or the creator themselves
+    if (!user || (user.role !== "admin" && user.username !== creator.username)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { mediaUrl, mediaType, caption } = body;
+
+    if (!mediaUrl || !mediaType) {
+      return NextResponse.json({ error: "mediaUrl and mediaType are required" }, { status: 400 });
+    }
+
+    const newPost = await prisma.creatorPost.create({
+      data: {
+        creatorId: creator.id,
+        mediaUrl,
+        mediaType: mediaType === "VIDEO" ? "VIDEO" : "IMAGE",
+        previewUrl: mediaUrl,
+        caption: caption || null,
+        isLocked: false,
+        unlockPriceCents: 0,
+      },
+    });
+
+    return NextResponse.json({ post: newPost }, { status: 201 });
+  } catch (error) {
+    console.error("Error creating creator post:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

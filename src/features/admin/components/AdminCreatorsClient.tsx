@@ -363,6 +363,7 @@ export function AdminCreatorsClient() {
         <NewPostModal
           isOpen={true}
           creatorId={postTarget.id}
+          creatorUsername={postTarget.username}
           creatorName={postTarget.displayName}
           onClose={() => setPostTarget(null)}
           onSuccess={fetchCreators}

@@ -5,6 +5,7 @@ import { X, Upload, FileText, Image as ImageIcon, Video, CheckCircle2 } from "lu
 
 type NewPostModalProps = {
   creatorId: string;
+  creatorUsername: string;
   creatorName: string;
   isOpen: boolean;
   onClose: () => void;
@@ -14,6 +15,7 @@ type NewPostModalProps = {
 
 export function NewPostModal({
   creatorId,
+  creatorUsername,
   creatorName,
   isOpen,
   onClose,
@@ -75,7 +77,7 @@ export function NewPostModal({
       if (!uploadRes.ok) throw new Error("File upload failed");
 
       // 3. Create post in database
-      const createPostRes = await fetch(`/api/creators/${creatorId}/posts`, {
+      const createPostRes = await fetch(`/api/creators/${creatorUsername}/posts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
