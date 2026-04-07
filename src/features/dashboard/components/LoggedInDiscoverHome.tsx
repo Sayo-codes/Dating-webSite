@@ -8,6 +8,7 @@ type UserBrief = {
   id: string;
   username: string;
   email: string;
+  role: string;
 };
 
 type Props = {
@@ -26,6 +27,7 @@ export function LoggedInDiscoverHome({ user, unreadCount, creators }: Props) {
           username: user.username,
           email: user.email,
           avatarUrl: null,
+          role: user.role,
         }}
       />
 

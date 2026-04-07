@@ -12,6 +12,7 @@ type Props = {
     username: string;
     email: string;
     avatarUrl: string | null;
+    role?: string;
   };
 };
 
@@ -46,6 +47,15 @@ export function DashboardHeader({ title, unreadCount, user }: Props) {
         </h1>
 
         <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+          {user.role === "admin" && (
+            <Link
+              href="/admin/messages"
+              className="mr-2 hidden items-center justify-center rounded-full border border-[#d4a853]/40 bg-[#d4a853]/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-[#f0c97a] transition hover:bg-[#d4a853]/20 sm:flex"
+            >
+              Admin Panel
+            </Link>
+          )}
+
           <Link
             href="/messages"
             className="group relative flex h-11 w-11 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/[0.08] hover:text-[#ff2d78]"
@@ -102,6 +112,16 @@ export function DashboardHeader({ title, unreadCount, user }: Props) {
                 role="menu"
               >
                 <p className="border-b border-white/10 px-4 py-2 text-xs text-white/45 truncate">{user.email}</p>
+                {user.role === "admin" && (
+                  <Link
+                    href="/admin/messages"
+                    role="menuitem"
+                    className="block px-4 py-2.5 text-sm font-semibold text-[#f0c97a] hover:bg-white/8 sm:hidden"
+                    onClick={() => setOpen(false)}
+                  >
+                    Admin Panel
+                  </Link>
+                )}
                 <Link
                   href="/creators"
                   role="menuitem"

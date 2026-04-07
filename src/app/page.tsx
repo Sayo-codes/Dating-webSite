@@ -26,7 +26,7 @@ export default async function Home() {
 
     return (
       <LoggedInDiscoverHome
-        user={{ id: user.id, username: user.username, email: user.email }}
+        user={{ id: user.id, username: user.username, email: user.email, role: user.role }}
         unreadCount={unreadCount}
         creators={creators}
       />
