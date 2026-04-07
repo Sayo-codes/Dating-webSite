@@ -13,7 +13,7 @@ type Props = {
 
 export function LockedPostCard({ post, creatorName, creatorId }: Props) {
   const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(post.likeCount);
+  const [likeCount, setlikeCount] = useState(post.likeCount);
   const [isLiking, setIsLiking] = useState(false);
   const priceLabel = (post.unlockPriceCents / 100).toFixed(2);
   const subscribeHref = `/premium?creator=${encodeURIComponent(creatorId)}`;
@@ -25,8 +25,8 @@ export function LockedPostCard({ post, creatorName, creatorId }: Props) {
       const action = isLiked ? "unlike" : "like";
       // Optimistic update
       setIsLiked(!isLiked);
-      setLikeCount(prev => isLiked ? prev - 1 : prev + 1);
-      
+      setlikeCount(prev => isLiked ? prev - 1 : prev + 1);
+
       await fetch(`/api/posts/${post.id}/like`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -35,7 +35,7 @@ export function LockedPostCard({ post, creatorName, creatorId }: Props) {
     } catch (e) {
       // Revert on error
       setIsLiked(!isLiked);
-      setLikeCount(post.likeCount);
+      setlikeCount(post.likeCount);
     } finally {
       setIsLiking(false);
     }
@@ -70,16 +70,15 @@ export function LockedPostCard({ post, creatorName, creatorId }: Props) {
             <p className="locked-post__caption">{post.caption}</p>
           )}
           <div className="locked-post__stats flex items-center gap-4">
-            <button 
+            <button
               onClick={toggleLike}
-              disabled={isLiking}
-              className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
-                isLiked ? "text-red-500" : "text-[var(--text-muted)] hover:text-white"
-              }`}
+              disabled={isLiking || post.likesLocked}
+              className={`flex items-center gap-1.5 transition-colors ${isLiked ? "text-red-500" : "text-[var(--text-muted)] hover:text-white"
+                } ${post.likesLocked ? "cursor-default opacity-80" : "cursor-pointer"}`}
             >
-              <svg 
-                width="20" height="20" viewBox="0 0 24 24" 
-                fill={isLiked ? "currentColor" : "none"} 
+              <svg
+                width="20" height="20" viewBox="0 0 24 24"
+                fill={isLiked ? "currentColor" : "none"}
                 stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
               >
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />

@@ -114,7 +114,7 @@ function PostCard({
   creatorId,
 }: PostCardProps) {
   const [isLiked, setIsLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(post.likeCount);
+  const [likeCount, setlikeCount] = useState(post.likeCount);
   const [isLiking, setIsLiking] = useState(false);
 
   const avatarSrc = creatorAvatar ?? avatarFallback;
@@ -127,7 +127,7 @@ function PostCard({
     const wasLiked = isLiked;
     // Optimistic
     setIsLiked(!wasLiked);
-    setLikeCount((prev) => (wasLiked ? prev - 1 : prev + 1));
+    setlikeCount((prev) => (wasLiked ? prev - 1 : prev + 1));
     try {
       await fetch(`/api/posts/${post.id}/like`, {
         method: "POST",
@@ -137,7 +137,7 @@ function PostCard({
     } catch {
       // Revert
       setIsLiked(wasLiked);
-      setLikeCount(post.likeCount);
+      setlikeCount(post.likeCount);
     } finally {
       setIsLiking(false);
     }
@@ -186,25 +186,34 @@ function PostCard({
       </div>
 
       {/* ── Media ── */}
-      <div className="relative w-full" style={{ aspectRatio: "10 / 14" }}>
+      <div
+        className="relative mx-auto w-full max-w-[600px] overflow-hidden bg-black/20"
+        style={{
+          maxHeight: "450px",
+          minHeight: "280px"
+        }}
+      >
         {post.mediaType === "VIDEO" && mediaSrc ? (
           <video
             src={mediaSrc}
             controls
             playsInline
             preload="metadata"
-            className="h-full w-full object-cover"
-            style={{ aspectRatio: "10 / 14" }}
+            className="mx-auto h-full max-h-[450px] w-full object-contain"
           />
         ) : (
-          <Image
-            src={mediaSrc}
-            alt={post.caption ?? `Post by ${creatorName}`}
-            fill
-            className="object-cover"
-            sizes="(max-width: 640px) 100vw, 600px"
-            unoptimized
-          />
+          <div className="flex h-full w-full items-center justify-center">
+            <Image
+              src={mediaSrc}
+              alt={post.caption ?? `Post by ${creatorName}`}
+              width={600}
+              height={450}
+              className="h-auto max-h-[450px] w-full object-contain transition-all duration-300"
+              sizes="(max-width: 640px) 100vw, 600px"
+              loading="lazy"
+              quality={85}
+            />
+          </div>
         )}
       </div>
 
@@ -213,12 +222,11 @@ function PostCard({
         <button
           type="button"
           onClick={toggleLike}
-          disabled={isLiking}
-          className={`flex min-h-[44px] min-w-[44px] items-center gap-1.5 rounded-lg px-2 transition-colors ${
-            isLiked
+          disabled={isLiking || post.likesLocked}
+          className={`flex min-h-[44px] min-w-[44px] items-center gap-1.5 rounded-lg px-2 transition-colors ${isLiked
               ? "text-red-500"
               : "text-white/60 hover:text-white active:text-white"
-          }`}
+            } ${post.likesLocked ? "cursor-default opacity-90" : "cursor-pointer"}`}
           aria-label={isLiked ? "Unlike" : "Like"}
         >
           <HeartIcon filled={isLiked} />

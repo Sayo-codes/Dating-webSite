@@ -19,6 +19,7 @@ export type CreatorPostItem = {
   isLocked: boolean;
   unlockPriceCents: number;
   likeCount: number;
+  likesLocked: boolean;
   commentCount?: number;
   createdAt: string;
 };

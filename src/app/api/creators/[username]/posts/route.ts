@@ -44,6 +44,7 @@ export async function GET(
       isLocked: false,
       mediaUrl: post.mediaUrl, // Full access immediately
       likeCount: post.likeCount,
+      likesLocked: post.likesLocked,
       unlockPriceCents: post.unlockPriceCents,
       createdAt: post.createdAt.toISOString(),
       creatorId: post.creatorId,
@@ -81,7 +82,7 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { mediaUrl, mediaType, caption, isLocked, unlockPriceCents } = body;
+    const { mediaUrl, mediaType, caption, isLocked, unlockPriceCents, initialLikes, likesLocked } = body;
 
     if (!mediaUrl || !mediaType) {
       return NextResponse.json({ error: "mediaUrl and mediaType are required" }, { status: 400 });
@@ -101,6 +102,8 @@ export async function POST(
         caption: caption || null,
         isLocked: locked,
         unlockPriceCents: priceCents,
+        likeCount: typeof initialLikes === "number" ? initialLikes : 0,
+        likesLocked: likesLocked === true,
       },
     });
 

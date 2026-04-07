@@ -71,6 +71,7 @@ export async function getCreatorByUsername(username: string) {
       isLocked: false,
       unlockPriceCents: p.unlockPriceCents,
       likeCount: p.likeCount,
+      likesLocked: p.likesLocked,
       commentCount: 0,
       createdAt: p.createdAt.toISOString(),
     })),

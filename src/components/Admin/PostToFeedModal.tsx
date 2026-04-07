@@ -69,6 +69,8 @@ export function PostToFeedModal({
   const [caption, setCaption] = useState("");
   const [isLocked, setIsLocked] = useState(false);
   const [priceCents, setPriceCents] = useState(999);
+  const [initialLikes, setInitialLikes] = useState(42);
+  const [likesLocked, setLikesLocked] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -79,6 +81,8 @@ export function PostToFeedModal({
     setCaption("");
     setIsLocked(false);
     setPriceCents(999);
+    setInitialLikes(42);
+    setLikesLocked(false);
     setUploadProgress(0);
     setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
@@ -149,6 +153,8 @@ export function PostToFeedModal({
           caption: caption.trim() || null,
           isLocked,
           unlockPriceCents: isLocked ? priceCents : 0,
+          initialLikes: Number(initialLikes),
+          likesLocked: likesLocked === true,
         }),
       });
 
@@ -258,6 +264,49 @@ export function PostToFeedModal({
                   )}
                 </button>
               ))}
+            </div>
+
+            {/* ADMIN OVERRIDES: Likes */}
+            <div className="grid grid-cols-2 gap-4 border-t border-white/[0.06] pt-5 mt-5">
+              <div>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">
+                  Initial Likes
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  value={initialLikes}
+                  onChange={(e) => setInitialLikes(parseInt(e.target.value) || 0)}
+                  className={`${fieldClass}`}
+                />
+              </div>
+              <div className="flex flex-col">
+                <label className="text-xs font-medium uppercase tracking-wider text-[#f0c97a]/70">
+                  Lock Likes
+                </label>
+                <div className="mt-2.5 flex items-center gap-3">
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={likesLocked}
+                    onClick={() => setLikesLocked((v) => !v)}
+                    className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border-2 transition-colors ${
+                      likesLocked
+                        ? "border-[#d4a853] bg-[#d4a853]"
+                        : "border-white/20 bg-white/10"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                        likesLocked ? "translate-x-5" : "translate-x-0.5"
+                      }`}
+                    />
+                  </button>
+                  <span className="text-xs text-white/50">
+                    {likesLocked ? "Always Fixed" : "Users can Like"}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
