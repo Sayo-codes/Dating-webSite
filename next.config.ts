@@ -17,6 +17,7 @@ const s3Pattern = s3RemotePattern();
 const nextConfig: NextConfig = {
   experimental: {
     cssChunking: false,
+    optimisticClientCache: true,
   },
   images: {
     remotePatterns: [

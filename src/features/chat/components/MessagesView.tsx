@@ -271,7 +271,7 @@ export function MessagesView({ user }: MessagesViewProps) {
         <div className="flex-1 overflow-y-auto overflow-x-hidden">
           {loading ? (
             <div className="p-4 sm:p-5">
-              <SkeletonConversationList count={5} />
+              <SkeletonConversationList count={8} />
             </div>
           ) : conversations.length === 0 ? (
             <div className="p-6 text-center text-sm text-[var(--text-muted)]">
@@ -290,7 +290,7 @@ export function MessagesView({ user }: MessagesViewProps) {
                     <button
                       type="button"
                       onClick={() => setSelectedId(c.id)}
-                      className={`flex w-full min-h-[44px] items-center gap-3 p-4 text-left transition-colors hover:bg-white/5 sm:min-h-0 sm:p-3 ${isSelected ? "bg-white/10" : ""}`}
+                      className={`flex w-full min-h-[44px] items-center gap-3 p-4 text-left transition-all duration-150 active:opacity-70 hover:bg-white/5 sm:min-h-0 sm:p-3 ${isSelected ? "bg-white/10" : ""}`}
                     >
                       <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white/10">
                         <Image
@@ -328,7 +328,7 @@ export function MessagesView({ user }: MessagesViewProps) {
               <button
                 type="button"
                 onClick={() => setSelectedId(null)}
-                className="focus-outline -ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white/80 hover:bg-white/10 hover:text-white sm:hidden"
+                className="focus-outline -ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white/80 transition-all duration-150 active:scale-90 hover:bg-white/10 hover:text-white sm:hidden"
                 aria-label="Back to conversations"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -481,22 +481,22 @@ export function MessagesView({ user }: MessagesViewProps) {
                     if (f) uploadAndSendMedia(f);
                   }}
                 />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={sending || uploadingMedia}
-                  className="focus-outline shrink-0 flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-white/70 hover:bg-white/10 hover:text-white disabled:opacity-50"
-                  title="Attach photo or video"
-                  aria-label="Attach photo or video"
-                >
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={sending || uploadingMedia}
+                    className="focus-outline shrink-0 flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-white/70 transition-all duration-150 active:scale-90 hover:bg-white/10 hover:text-white disabled:opacity-50"
+                    title="Attach photo or video"
+                    aria-label="Attach photo or video"
+                  >
                   <AttachIcon />
                 </button>
                 <div className="relative shrink-0">
-                  <button
+                   <button
                     type="button"
                     onClick={requestCameraAndOpenInput}
                     disabled={sending || uploadingMedia}
-                    className="focus-outline flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-white/70 hover:bg-white/10 hover:text-white disabled:opacity-50"
+                    className="focus-outline flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-white/70 transition-all duration-150 active:scale-90 hover:bg-white/10 hover:text-white disabled:opacity-50"
                     title="Take photo or video"
                     aria-label="Take photo or video"
                   >
@@ -513,13 +513,13 @@ export function MessagesView({ user }: MessagesViewProps) {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type a message…"
-                  className="input-base focus-outline min-h-[44px] min-w-0 flex-1 rounded-full px-4 py-3 text-base sm:text-sm"
+                  className="input-base focus-outline min-h-[44px] min-w-0 flex-1 rounded-full px-4 py-3 text-[16px] sm:text-[16px]"
                   disabled={sending}
                 />
                 <button
                   type="submit"
                   disabled={sending || (!input.trim() && !uploadingMedia)}
-                  className="pill-button-primary focus-outline shrink-0 min-h-[44px] min-w-[44px] px-4 py-3 text-sm font-medium disabled:opacity-50"
+                  className="pill-button-primary focus-outline shrink-0 min-h-[44px] min-w-[44px] px-4 py-3 text-sm font-medium transition-all duration-150 active:scale-95 disabled:opacity-50"
                 >
                   {uploadingMedia ? "…" : "Send"}
                 </button>

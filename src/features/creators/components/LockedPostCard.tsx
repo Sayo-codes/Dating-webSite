@@ -42,7 +42,7 @@ export function LockedPostCard({ post, creatorName, creatorId }: Props) {
   };
 
   return (
-    <div className="locked-post glass-card w-full mb-4" id={`post-${post.id}`}>
+    <div className="locked-post glass-card w-full mb-4 transition-all duration-150 active:opacity-90" id={`post-${post.id}`}>
       {/* Post media preview */}
       <div className="locked-post__preview">
         {post.mediaType === "VIDEO" && post.mediaUrl ? (
@@ -73,7 +73,7 @@ export function LockedPostCard({ post, creatorName, creatorId }: Props) {
             <button
               onClick={toggleLike}
               disabled={isLiking || post.likesLocked}
-              className={`flex items-center gap-1.5 transition-colors ${isLiked ? "text-red-500" : "text-[var(--text-muted)] hover:text-white"
+              className={`flex items-center gap-1.5 transition-all duration-150 active:scale-95 ${isLiked ? "text-red-500" : "text-[var(--text-muted)] hover:text-white"
                 } ${post.likesLocked ? "cursor-default opacity-80" : "cursor-pointer"}`}
             >
               <svg

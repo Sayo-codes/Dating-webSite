@@ -65,13 +65,14 @@ function FeaturedModelsSkeleton() {
   return (
     <div className="-mx-4 flex gap-5 overflow-x-auto px-4 pb-2">
       {Array.from({ length: 3 }).map((_, index) => (
-        <GlassCard
-          key={`skeleton-${index}`}
-          className="aspect-[10/14] min-w-[260px] shrink-0 skeleton"
-          aria-hidden="true"
-        >
-          <span className="sr-only">Loading</span>
-        </GlassCard>
+        <div key={index} className="w-[min(100%,280px)] shrink-0 snap-start">
+          <GlassCard
+            className="aspect-[10/14] w-full skeleton border-white/10"
+            aria-hidden="true"
+          >
+            <span className="sr-only">Loading</span>
+          </GlassCard>
+        </div>
       ))}
     </div>
   );

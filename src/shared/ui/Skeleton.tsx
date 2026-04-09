@@ -60,11 +60,11 @@ export function SkeletonCard({
 }) {
   return (
     <div
-      className={`flex flex-col overflow-hidden rounded-[var(--radius-card)] border border-white/10 bg-[var(--bg-elevated)] ${className}`.trim()}
+      className={`flex flex-col overflow-hidden bg-[#07070b] max-md:rounded-[20px] md:rounded-[41px] border border-white/10 ${className}`.trim()}
       aria-hidden
     >
       {hasImage && (
-        <Skeleton className="aspect-[4/5] w-full shrink-0" />
+        <Skeleton className="aspect-[10/14] w-full shrink-0 rounded-none!" />
       )}
       <div className="flex flex-1 flex-col gap-3 p-4">
         <Skeleton className="h-5 w-2/3" />
@@ -80,9 +80,9 @@ export function SkeletonList({
   className = "",
 }: { count?: number; className?: string }) {
   return (
-    <ul className={`space-y-3 ${className}`.trim()} aria-hidden>
+    <ul className={`divide-y divide-white/5 ${className}`.trim()} aria-hidden>
       {Array.from({ length: count }).map((_, i) => (
-        <li key={i} className="flex items-center gap-4">
+        <li key={i} className="flex min-h-[44px] items-center gap-3 p-4 sm:p-3">
           <SkeletonAvatar className="h-12 w-12" />
           <div className="min-w-0 flex-1 space-y-2">
             <Skeleton className="h-4 w-1/3" />

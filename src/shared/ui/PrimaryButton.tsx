@@ -28,7 +28,7 @@ export function PrimaryButton({
     <button
       type={type}
       disabled={disabled ?? loading}
-      className={`pill-button-primary focus-outline inline-flex items-center justify-center font-medium transition-opacity disabled:pointer-events-none disabled:opacity-50 ${sizeClasses[size]} ${className}`.trim()}
+      className={`pill-button-primary focus-outline inline-flex items-center justify-center font-medium transition-all active:scale-95 duration-150 disabled:pointer-events-none disabled:opacity-50 ${sizeClasses[size]} ${className}`.trim()}
       aria-label={ariaLabel}
       aria-busy={loading}
       {...props}

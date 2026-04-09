@@ -19,6 +19,7 @@ export function LandingNav() {
         {/* Logo */}
         <Link
           href="/"
+          prefetch={true}
           className="focus-outline flex items-center gap-2 min-h-[44px] shrink-0"
           aria-label="Rsdate home"
         >
@@ -48,6 +49,7 @@ export function LandingNav() {
         <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/login"
+            prefetch={true}
             className="focus-outline inline-flex min-h-[40px] items-center justify-center rounded-full border px-4 text-sm font-semibold text-white/85 transition-all duration-200 hover:border-[rgba(212,168,83,0.6)] hover:bg-[rgba(212,168,83,0.08)] hover:text-[#f0c97a] sm:px-5"
             style={{ borderColor: "rgba(255,255,255,0.22)" }}
           >
@@ -55,6 +57,7 @@ export function LandingNav() {
           </Link>
           <Link
             href="/register"
+            prefetch={true}
             className="focus-outline pill-button-primary inline-flex min-h-[40px] items-center justify-center rounded-full px-4 text-sm font-bold text-white sm:px-5"
           >
             Sign Up ✦

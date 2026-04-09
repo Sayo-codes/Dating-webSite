@@ -79,7 +79,7 @@ export function WhyRsdateSection() {
         {FEATURES.map((f, i) => (
           <div
             key={f.title}
-            className="glass-card glass-card--interactive animate-fade-up flex flex-col gap-5 p-7"
+            className="glass-card glass-card--interactive animate-fade-up flex flex-col gap-5 p-7 transition-all duration-150 active:opacity-80"
             style={{ animationDelay: `${i * 80}ms` }}
           >
             {/* Icon */}

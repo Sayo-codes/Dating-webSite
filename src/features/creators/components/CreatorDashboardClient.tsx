@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { Skeleton, SkeletonBox, SkeletonText, SkeletonAvatar } from "@/shared/ui/Skeleton";
 import Image from "next/image";
 import Link from "next/link";
 import { GlassCard } from "@/shared/ui/GlassCard";
@@ -146,9 +147,18 @@ export function CreatorDashboardClient() {
 
   if (loading) {
     return (
-      <GlassCard className="p-8">
-        <p className="text-white/60">Loading…</p>
-      </GlassCard>
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <GlassCard className="p-6">
+           <div className="flex items-center gap-6">
+             <SkeletonAvatar className="h-28 w-28" />
+             <Skeleton className="h-10 w-40 rounded-full" />
+           </div>
+        </GlassCard>
+      </div>
     );
   }
 
@@ -207,7 +217,7 @@ export function CreatorDashboardClient() {
               type="button"
               onClick={() => avatarInputRef.current?.click()}
               disabled={uploadingAvatar}
-              className="pill-button-primary focus-outline px-4 py-2 text-sm font-medium disabled:opacity-50"
+              className="pill-button-primary focus-outline px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-95 disabled:opacity-50"
             >
               {uploadingAvatar ? "Uploading…" : "Upload new photo"}
             </button>
@@ -241,7 +251,7 @@ export function CreatorDashboardClient() {
             type="button"
             onClick={() => galleryInputRef.current?.click()}
             disabled={uploadingGallery}
-            className="pill-button-primary focus-outline px-4 py-2 text-sm font-medium disabled:opacity-50"
+            className="pill-button-primary focus-outline px-4 py-2 text-sm font-medium transition-all duration-150 active:scale-95 disabled:opacity-50"
           >
             {uploadingGallery ? "Uploading…" : "Choose from device"}
           </button>
@@ -249,7 +259,7 @@ export function CreatorDashboardClient() {
             type="button"
             onClick={() => galleryCameraRef.current?.click()}
             disabled={uploadingGallery}
-            className="focus-outline rounded-full border border-white/30 bg-white/5 px-4 py-2 text-sm font-medium text-white hover:bg-white/10 disabled:opacity-50"
+            className="focus-outline rounded-full border border-white/30 bg-white/5 px-4 py-2 text-sm font-medium text-white transition-all duration-150 active:scale-95 hover:bg-white/10 disabled:opacity-50"
           >
             Take photo / video
           </button>

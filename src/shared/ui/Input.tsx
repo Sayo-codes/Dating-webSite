@@ -26,7 +26,7 @@ export function Input({
       )}
       <input
         id={id}
-        className={`input-base focus-outline ${error ? "border-red-400/50" : ""} ${className}`.trim()}
+        className={`input-base focus-outline text-[16px] ${error ? "border-red-400/50" : ""} ${className}`.trim()}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
         {...props}

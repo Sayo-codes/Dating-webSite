@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/shared/lib/auth";
 import { CreatorDashboardClient } from "@/features/creators/components/CreatorDashboardClient";
@@ -16,9 +17,9 @@ export default async function CreatorDashboardPage() {
   return (
     <PageContainer>
       <div className="flex flex-col gap-6">
-        <a href="/" className="text-sm text-white/60 hover:text-white/80">
+        <Link href="/" prefetch={true} className="text-sm text-white/60 hover:text-white/80">
           ← Home
-        </a>
+        </Link>
         <CreatorDashboardClient />
       </div>
     </PageContainer>

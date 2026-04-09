@@ -188,7 +188,7 @@ export function HeroSection() {
             <Link
               href="/register"
               id="hero-cta-primary"
-              className="pill-button-primary focus-outline inline-flex min-h-[58px] w-full items-center justify-center rounded-full px-10 text-base font-bold tracking-wide sm:w-auto sm:text-lg"
+              className="pill-button-primary focus-outline inline-flex min-h-[58px] w-full items-center justify-center rounded-full px-10 text-base font-bold tracking-wide transition-all duration-150 active:scale-95 sm:w-auto sm:text-lg"
             >
               Join Here ✦
             </Link>

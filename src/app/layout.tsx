@@ -6,11 +6,13 @@ const headingFont = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-heading",
   weight: ["500", "600", "700"],
+  display: "swap",
 });
 
 const bodyFont = Inter({
   subsets: ["latin"],
   variable: "--font-body",
+  display: "swap",
 });
 
 export const viewport: Viewport = {
@@ -45,6 +47,7 @@ export const metadata: Metadata = {
 };
 
 import { GlobalAppHeader } from "@/shared/ui/GlobalAppHeader";
+import { PageTransition } from "@/components/PageTransition";
 
 export default function RootLayout({
   children,
@@ -52,8 +55,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" className="dark scroll-smooth" suppressHydrationWarning>
       <head>
+        <meta name="theme-color" content="#0a0a0f" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <script
           dangerouslySetInnerHTML={{
             __html: `document.documentElement.classList.add('dark');`,
@@ -61,10 +67,10 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${headingFont.variable} ${bodyFont.variable} antialiased bg-background text-foreground overflow-x-hidden`}
+        className={`${headingFont.variable} ${bodyFont.variable} antialiased bg-background text-foreground overflow-x-hidden min-h-screen`}
       >
         <GlobalAppHeader />
-        {children}
+        <PageTransition>{children}</PageTransition>
       </body>
     </html>
   );

@@ -50,6 +50,7 @@ export function DashboardHeader({ title, unreadCount, user }: Props) {
           {user.role === "admin" && (
             <Link
               href="/admin/messages"
+              prefetch={true}
               className="mr-2 hidden items-center justify-center rounded-full border border-[#d4a853]/40 bg-[#d4a853]/10 px-3 py-1.5 text-xs font-semibold tracking-wide text-[#f0c97a] transition hover:bg-[#d4a853]/20 sm:flex"
             >
               Admin Panel
@@ -58,6 +59,7 @@ export function DashboardHeader({ title, unreadCount, user }: Props) {
 
           <Link
             href="/messages"
+            prefetch={true}
             className="group relative flex h-11 w-11 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/[0.08] hover:text-[#ff2d78]"
             aria-label={`Messages${unreadCount > 0 ? `, ${unreadCount} unread` : ""}`}
           >
@@ -115,6 +117,7 @@ export function DashboardHeader({ title, unreadCount, user }: Props) {
                 {user.role === "admin" && (
                   <Link
                     href="/admin/messages"
+                    prefetch={true}
                     role="menuitem"
                     className="block px-4 py-2.5 text-sm font-semibold text-[#f0c97a] hover:bg-white/8 sm:hidden"
                     onClick={() => setOpen(false)}
@@ -124,6 +127,7 @@ export function DashboardHeader({ title, unreadCount, user }: Props) {
                 )}
                 <Link
                   href="/creators"
+                  prefetch={true}
                   role="menuitem"
                   className="block px-4 py-2.5 text-sm text-white/85 hover:bg-white/8"
                   onClick={() => setOpen(false)}
@@ -132,6 +136,7 @@ export function DashboardHeader({ title, unreadCount, user }: Props) {
                 </Link>
                 <Link
                   href="/premium"
+                  prefetch={true}
                   role="menuitem"
                   className="block px-4 py-2.5 text-sm text-white/85 hover:bg-white/8"
                   onClick={() => setOpen(false)}

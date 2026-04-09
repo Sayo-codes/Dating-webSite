@@ -39,6 +39,7 @@ export function LandingFooter() {
             {/* Logo */}
             <Link
               href="/"
+              prefetch={true}
               className="flex items-center gap-2.5 focus-outline w-fit"
               aria-label="Rsdate home"
             >
@@ -108,6 +109,7 @@ export function LandingFooter() {
                     <li key={label}>
                       <Link
                         href={href}
+                        prefetch={true}
                         className="focus-outline text-sm text-white/45 transition-colors duration-200 hover:text-white/80"
                       >
                         {label}

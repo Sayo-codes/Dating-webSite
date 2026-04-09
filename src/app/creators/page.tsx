@@ -4,7 +4,7 @@ import { CreatorCard } from "@/features/creators/components/CreatorCard";
 import { PageContainer } from "@/shared/ui/PageContainer";
 import { GlassCard } from "@/shared/ui/GlassCard";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata = {
   title: "Explore Creators ✦ Rsdate",

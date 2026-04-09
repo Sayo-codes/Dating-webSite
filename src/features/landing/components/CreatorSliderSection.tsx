@@ -94,7 +94,7 @@ export function CreatorSliderSection() {
                         <button
                             key={dir}
                             onClick={() => scroll(dir)}
-                            className="focus-outline flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-200 hover:border-[rgba(212,168,83,0.5)] hover:bg-[rgba(212,168,83,0.08)] hover:shadow-[0_0_12px_rgba(212,168,83,0.2)]"
+                            className="focus-outline flex h-10 w-10 items-center justify-center rounded-full border transition-all duration-150 active:scale-90 hover:border-[rgba(212,168,83,0.5)] hover:bg-[rgba(212,168,83,0.08)] hover:shadow-[0_0_12px_rgba(212,168,83,0.2)]"
                             style={{ borderColor: "rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)" }}
                             aria-label={`Scroll ${dir}`}
                         >
@@ -174,7 +174,7 @@ export function CreatorSliderSection() {
                             {/* CTA */}
                             <Link
                                 href="/creators"
-                                className="focus-outline flex w-full items-center justify-center rounded-full py-2.5 text-center text-xs font-semibold text-white transition-all duration-200 hover:scale-105 hover:shadow-[0_4px_20px_rgba(212,168,83,0.4)]"
+                                className="focus-outline flex w-full items-center justify-center rounded-full py-2.5 text-center text-xs font-semibold text-white transition-all duration-150 active:scale-95 hover:scale-105 hover:shadow-[0_4px_20px_rgba(212,168,83,0.4)]"
                                 style={{ background: "var(--gradient-primary)" }}
                                 aria-label={`Chat with ${creator.name}`}
                             >

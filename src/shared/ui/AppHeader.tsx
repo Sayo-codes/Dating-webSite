@@ -56,6 +56,7 @@ export function AppHeader() {
         {/* Logo - Minimal & Centered for absolute brand focus */}
         <LinkNext
           href="/"
+          prefetch={true}
           className="flex items-center gap-2.5 transition-transform hover:scale-[1.02] active:scale-[0.98]"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl shadow-[0_0_15px_rgba(212,168,83,0.3)]"

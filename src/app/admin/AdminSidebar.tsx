@@ -25,7 +25,7 @@ export function AdminSidebar() {
     >
       {/* Header — hidden on mobile, visible on desktop */}
       <div className="hidden sm:flex items-center justify-between border-b border-white/10 p-4 sm:px-4">
-        <Link href="/admin" className="font-[var(--font-heading)] text-lg font-semibold text-white">
+        <Link href="/admin" prefetch={true} className="font-[var(--font-heading)] text-lg font-semibold text-white">
           {collapsed ? "A" : "Admin"}
         </Link>
         <button
@@ -48,6 +48,7 @@ export function AdminSidebar() {
         {/* Mobile "Back" button */}
         <Link
           href="/"
+          prefetch={true}
           className="flex items-center justify-center sm:hidden shrink-0 min-h-[40px] w-10 rounded-full bg-white/5 border border-white/10 text-white/60 text-sm hover:text-white hover:bg-white/10 transition-colors"
           title="Back to site"
         >
@@ -60,6 +61,7 @@ export function AdminSidebar() {
             <Link
               key={href}
               href={href}
+              prefetch={true}
               className={`flex items-center text-sm font-medium transition-colors duration-200 max-sm:shrink-0 max-sm:whitespace-nowrap max-sm:rounded-full max-sm:px-4 max-sm:py-2 max-sm:min-h-[40px] max-sm:text-[0.8125rem] sm:min-h-[44px] sm:rounded-xl sm:py-3 ${
                 isActive
                   ? "bg-white/10 text-white"
@@ -80,6 +82,7 @@ export function AdminSidebar() {
       <div className={`hidden sm:block border-t border-white/10 p-4 ${collapsed ? "sm:px-2" : ""}`}>
         <Link
           href="/"
+          prefetch={true}
           className={`flex min-h-[44px] items-center text-sm text-[var(--text-muted)] transition-colors duration-200 hover:text-white ${
             collapsed ? "justify-center text-[11px]" : ""
           }`}

@@ -81,7 +81,7 @@ export function CreatorCard({
 
   return (
     <article
-      className={`group/cc relative w-full max-w-full origin-center overflow-visible transition-transform duration-300 ease-out hover:z-10 hover:scale-[1.02] aspect-[10/14] max-md:max-h-[70vw] md:max-h-none ${className}`.trim()}
+      className={`group/cc relative w-full max-w-full origin-center overflow-visible transition-all duration-300 ease-out hover:z-10 hover:scale-[1.02] active:opacity-80 aspect-[10/14] max-md:max-h-[70vw] md:max-h-none ${className}`.trim()}
     >
       {/* Frame: thinner on mobile, full glow on md+ */}
       <div
@@ -91,6 +91,7 @@ export function CreatorCard({
           <div className="relative w-full h-full">
             <Link
               href={profileHref}
+              prefetch={true}
               className="absolute inset-x-0 top-0 z-[1] block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a853] focus-visible:ring-offset-2 focus-visible:ring-offset-[#07070b] bottom-[3.35rem] max-md:bottom-[3.2rem] sm:bottom-[3.85rem] md:bottom-[4.5rem] lg:bottom-[4.75rem]"
               aria-label={`Open ${name} profile`}
             />
@@ -156,6 +157,7 @@ export function CreatorCard({
                 <div className="flex shrink-0 flex-row items-center gap-1 sm:gap-1.5 md:gap-2">
                   <Link
                     href={tipHref}
+                    prefetch={true}
                     onClick={(e) => e.stopPropagation()}
                     className="focus-outline flex h-8 w-8 items-center justify-center rounded-lg bg-white/95 text-[#ff2d78] shadow-[0_2px_8px_rgba(0,0,0,0.25)] transition-transform hover:scale-[1.05] active:scale-95 sm:h-9 sm:w-9 sm:rounded-xl md:h-10 md:w-10 md:rounded-[13px] lg:h-[42px] lg:w-[42px]"
                     aria-label={`Send a tip to ${name}`}
@@ -164,6 +166,7 @@ export function CreatorCard({
                   </Link>
                   <Link
                     href={chatHref}
+                    prefetch={true}
                     onClick={(e) => e.stopPropagation()}
                     className="focus-outline flex h-8 w-8 items-center justify-center rounded-full bg-[#ff2d78] text-white shadow-[0_2px_10px_rgba(255,45,120,0.4)] transition-transform hover:scale-[1.05] active:scale-95 sm:h-9 sm:w-9 md:h-10 md:w-10 lg:h-[42px] lg:w-[42px]"
                     aria-label={`Message ${name}`}

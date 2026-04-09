@@ -1,5 +1,5 @@
 "use client";
-
+import { Skeleton, SkeletonText, SkeletonBox, SkeletonAvatar } from "@/shared/ui/Skeleton";
 import Image from "next/image";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { formatDistanceToNow } from "date-fns";
@@ -223,7 +223,7 @@ function PostCard({
           type="button"
           onClick={toggleLike}
           disabled={isLiking || post.likesLocked}
-          className={`flex min-h-[44px] min-w-[44px] items-center gap-1.5 rounded-lg px-2 transition-colors ${isLiked
+          className={`flex min-h-[44px] min-w-[44px] items-center gap-1.5 rounded-lg px-2 transition-all duration-150 active:scale-95 ${isLiked
               ? "text-red-500"
               : "text-white/60 hover:text-white active:text-white"
             } ${post.likesLocked ? "cursor-default opacity-90" : "cursor-pointer"}`}
@@ -235,7 +235,7 @@ function PostCard({
 
         <button
           type="button"
-          className="flex min-h-[44px] min-w-[44px] items-center gap-1.5 rounded-lg px-2 text-white/60 transition-colors hover:text-white active:text-white"
+          className="flex min-h-[44px] min-w-[44px] items-center gap-1.5 rounded-lg px-2 text-white/60 transition-all duration-150 active:scale-95 hover:text-white active:text-white"
           aria-label="Comments"
         >
           <CommentIcon />
@@ -249,7 +249,7 @@ function PostCard({
         <button
           type="button"
           onClick={handleShare}
-          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg px-2 text-white/60 transition-colors hover:text-white active:text-white"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg px-2 text-white/60 transition-all duration-150 active:scale-95 hover:text-white active:text-white"
           aria-label="Share"
         >
           <ShareIcon />
@@ -349,8 +349,16 @@ export function ClientPostFeed({
       })}
 
       {isLoading && (
-        <div className="flex justify-center p-6">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--accent-primary)] border-t-transparent" />
+        <div className="flex flex-col gap-4 border-t border-white/5 p-4 animate-pulse">
+           <div className="flex items-center gap-3">
+             <SkeletonAvatar className="h-8 w-8" />
+             <Skeleton className="h-4 w-24" />
+           </div>
+           <SkeletonBox className="aspect-square w-full max-w-[600px] rounded-xl" />
+           <div className="flex gap-4">
+             <Skeleton className="h-6 w-12 rounded-full" />
+             <Skeleton className="h-6 w-12 rounded-full" />
+           </div>
         </div>
       )}
 

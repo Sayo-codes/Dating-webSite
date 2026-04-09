@@ -215,8 +215,7 @@ model CreatorPost {
   mediaType        CreatorMediaType @default(IMAGE)
   isLocked         Boolean          @default(true)
   unlockPriceCents Int              @default(1999)
-  likeCount        Int              @default(0) // Legacy
-  likeCount       Int              @default(0) @map("likes_count")
+  likeCount        Int              @default(0) @map("likes_count")
   likesLocked      Boolean          @default(false) @map("likes_locked")
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
