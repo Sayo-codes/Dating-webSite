@@ -56,9 +56,9 @@ function CameraIcon() {
 
 /* ── Main Component ── */
 export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Props) {
-  const avatarSrc = creator.avatarUrl ?? avatarPlaceholder;
+  const avatarSrc = creator?.avatarUrl ?? avatarPlaceholder;
   const chatHref = isLoggedIn
-    ? `/messages?creator=${encodeURIComponent(creator.id)}`
+    ? `/messages?creator=${encodeURIComponent(creator?.id || "")}`
     : "/login";
 
   return (
@@ -89,10 +89,10 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Pro
           </div>
           <div className="flex min-w-0 items-center gap-1.5">
             <span className="truncate text-[15px] font-semibold text-white">
-              {creator.displayName}
+              {creator?.displayName || "Creator"}
             </span>
             <span className="hidden truncate text-[14px] text-white/50 sm:inline">
-              @{creator.username}
+              @{creator?.username || "creator"}
             </span>
           </div>
         </div>
@@ -112,8 +112,8 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Pro
       <section className="px-4 pt-6 pb-2">
         {/* Display Name */}
         <h1 className="text-[20px] font-medium text-white">
-          {creator.displayName}
-          {creator.verified && (
+          {creator?.displayName}
+          {creator?.verified && (
             <svg
               width="18"
               height="18"
@@ -141,10 +141,10 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Pro
         </h1>
 
         {/* Handle */}
-        <p className="mt-0.5 text-[14px] text-white/50">@{creator.username}</p>
+        <p className="mt-0.5 text-[14px] text-white/50">@{creator?.username}</p>
 
         {/* Location */}
-        {creator.location && (
+        {creator?.location && (
           <p className="mt-1.5 flex items-center gap-1 text-[14px] text-white/50">
             <svg
               width="14"
@@ -164,7 +164,7 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Pro
         )}
 
         {/* Bio */}
-        {creator.bio && (
+        {creator?.bio && (
           <p className="mt-3 text-[15px] leading-[1.6] text-white/80 whitespace-pre-wrap">
             {creator.bio}
           </p>
@@ -173,13 +173,13 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Pro
         {/* Stats row: Posts · Fans · Likes */}
         <div className="mt-4 flex items-stretch border-y border-white/[0.08]">
           <StatItem
-            value={formatCount(creator.posts.length + (creator.photoCount ?? 0))}
+            value={formatCount((creator?.posts?.length || 0) + (creator?.photoCount ?? 0))}
             label="Posts"
           />
           <div className="w-px bg-white/[0.08]" />
-          <StatItem value={formatCount(creator.followerCount)} label="Fans" />
+          <StatItem value={formatCount(creator?.followerCount || 0)} label="Fans" />
           <div className="w-px bg-white/[0.08]" />
-          <StatItem value={formatCount(creator.totalLikes)} label="Likes" />
+          <StatItem value={formatCount(creator?.totalLikes || 0)} label="Likes" />
         </div>
       </section>
 
@@ -187,13 +187,13 @@ export function PremiumCreatorProfile({ creator, isLoggedIn, isOwnProfile }: Pro
           POST FEED
          ═══════════════════════════════════ */}
       <section className="flex-1">
-        {creator.posts.length > 0 ? (
+        {(creator?.posts?.length ?? 0) > 0 ? (
           <ClientPostFeed
-            creatorId={creator.id}
-            creatorName={creator.displayName}
-            creatorAvatar={creator.avatarUrl}
-            creatorHandle={creator.username}
-            initialPosts={creator.posts}
+            creatorId={creator?.id || ""}
+            creatorName={creator?.displayName || ""}
+            creatorAvatar={creator?.avatarUrl || null}
+            creatorHandle={creator?.username || ""}
+            initialPosts={creator?.posts || []}
           />
         ) : (
           /* ── Empty state ── */

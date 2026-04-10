@@ -42,6 +42,7 @@ export const getCreatorByUsername = unstable_cache(
         },
       },
     });
+
     if (!creator) return null;
 
     const photoCount = creator.media.filter((m: any) => m.type === "IMAGE").length;
@@ -67,19 +68,23 @@ export const getCreatorByUsername = unstable_cache(
       totalLikes: creator.totalLikes,
       photoCount,
       videoCount,
-      gallery: creator.media.map((m: any) => ({ id: m.id, url: m.url, type: m.type })),
-      posts: creator.posts.map((p: any) => ({
-        id: p.id,
-        caption: p.caption,
-        previewUrl: p.previewUrl,
-        mediaUrl: p.mediaUrl,
-        mediaType: p.mediaType,
-        isLocked: false,
-        unlockPriceCents: p.unlockPriceCents,
-        likeCount: p.likeCount,
-        likesLocked: p.likesLocked,
+      gallery: (creator.media || []).map((m: any) => ({ 
+        id: m?.id || "", 
+        url: m?.url || "", 
+        type: m?.type || "IMAGE" 
+      })),
+      posts: (creator.posts || []).map((p: any) => ({
+        id: p?.id || "",
+        caption: p?.caption || null,
+        previewUrl: p?.previewUrl || "",
+        mediaUrl: p?.mediaUrl || null,
+        mediaType: p?.mediaType || "IMAGE",
+        isLocked: p?.isLocked ?? false,
+        unlockPriceCents: p?.unlockPriceCents ?? 0,
+        likeCount: p?.likeCount ?? 0,
+        likesLocked: p?.likesLocked ?? false,
         commentCount: 0,
-        createdAt: p.createdAt.toISOString(),
+        createdAt: p?.createdAt ? p.createdAt.toISOString() : new Date().toISOString(),
       })),
     };
   },
