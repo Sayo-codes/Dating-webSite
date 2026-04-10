@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const REGION = process.env.S3_REGION ?? "us-east-1";
@@ -92,4 +92,31 @@ export function buildKey(params: {
     return `messages/${params.conversationId}/${params.ownerId}/${uuid}${ext}`;
   }
   return `${params.context}/${params.ownerId}/${uuid}${ext}`;
+}
+export async function deleteFile(url: string): Promise<boolean> {
+  const s3 = getClient();
+  if (!s3 || !PUBLIC_BASE || !url) return false;
+
+  try {
+    // Extract key from URL
+    // Public URL is typically PUBLIC_BASE + key
+    const baseUrl = PUBLIC_BASE.replace(/\/$/, "");
+    if (!url.startsWith(baseUrl)) {
+       console.warn("URL does not match S3 base URL, skipping S3 delete:", url);
+       return false;
+    }
+    
+    const key = url.replace(baseUrl, "").replace(/^\//, "");
+    
+    const command = new DeleteObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+    });
+
+    await s3.send(command);
+    return true;
+  } catch (error) {
+    console.error("S3 delete error:", error);
+    return false;
+  }
 }

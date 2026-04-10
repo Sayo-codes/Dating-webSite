@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { ExternalLink, Pencil, Send, Trash2 } from "lucide-react";
+import { ExternalLink, Pencil, Send, Trash2, Layout } from "lucide-react";
+import { ManagePostsModal } from "@/features/admin/components/ManagePostsModal";
 import { deleteModel } from "@/actions/deleteModel";
 
 export type AdminModelRow = {
@@ -32,6 +33,7 @@ type Props = {
 
 export function ModelList({ models, onChanged, onToast, onPostToFeed }: Props) {
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [manageTarget, setManageTarget] = useState<AdminModelRow | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -105,8 +107,16 @@ export function ModelList({ models, onChanged, onToast, onPostToFeed }: Props) {
                   Post to Feed
                 </button>
               )}
-              <Link
-                href={`/admin/models/${m.id}/edit`}
+                  <button
+                    type="button"
+                    onClick={() => setManageTarget(m)}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-2 text-xs text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                  >
+                    <Layout className="h-3.5 w-3.5" aria-hidden />
+                    Manage Feed
+                  </button>
+                  <Link
+                    href={`/admin/models/${m.id}/edit`}
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/5 px-3 py-2 text-xs text-white/80 transition-colors hover:bg-white/10 hover:text-white"
               >
                 <Pencil className="h-3.5 w-3.5" aria-hidden />
@@ -200,6 +210,15 @@ export function ModelList({ models, onChanged, onToast, onPostToFeed }: Props) {
                         <Send className="h-4 w-4" aria-hidden />
                       </button>
                     )}
+                    <button
+                      type="button"
+                      onClick={() => setManageTarget(m)}
+                      className="rounded-lg p-2 text-white/60 transition-colors hover:bg-white/5 hover:text-white"
+                      aria-label="Manage feed"
+                      title="Manage feed"
+                    >
+                      <Layout className="h-4 w-4" aria-hidden />
+                    </button>
                     <Link
                       href={`/creators/${m.username}`}
                       target="_blank"
@@ -260,6 +279,16 @@ export function ModelList({ models, onChanged, onToast, onPostToFeed }: Props) {
             </div>
           </div>
         </div>
+      )}
+      {manageTarget && (
+        <ManagePostsModal
+          isOpen={true}
+          creatorId={manageTarget.id}
+          creatorUsername={manageTarget.username}
+          creatorName={manageTarget.displayName}
+          onClose={() => setManageTarget(null)}
+          onToast={onToast}
+        />
       )}
     </>
   );

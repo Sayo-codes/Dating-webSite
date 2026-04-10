@@ -4,8 +4,9 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ImageCropUploader } from "@/components/ImageCropUploader";
-import { PlusCircle, Send, PlusSquare, FilePlus } from "lucide-react";
 import { NewPostModal } from "./NewPostModal";
+import { ManagePostsModal } from "./ManagePostsModal";
+import { PlusCircle, Send, PlusSquare, FilePlus, Layout } from "lucide-react";
 
 type Creator = {
   id: string;
@@ -59,6 +60,7 @@ export function AdminCreatorsClient() {
   const [galleryTargetId, setGalleryTargetId] = useState<string | null>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const [postTarget, setPostTarget] = useState<Creator | null>(null);
+  const [manageTarget, setManageTarget] = useState<Creator | null>(null);
   const [toast, setToast] = useState<{ message: string; tone: "success" | "error" } | null>(null);
 
   useEffect(() => {
@@ -325,6 +327,14 @@ export function AdminCreatorsClient() {
                       <PlusSquare className="h-4 w-4" />
                       <span>New Post</span>
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setManageTarget(c)}
+                      className="inline-flex min-h-[44px] items-center gap-1.5 px-3 py-2 rounded-lg text-white/70 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
+                    >
+                      <Layout className="h-4 w-4" />
+                      <span>Manage Feed</span>
+                    </button>
                     <Link href={`/creators/${c.username}`} target="_blank" className="inline-flex min-h-[44px] items-center text-white/70 hover:text-white px-2">
                       View
                     </Link>
@@ -367,6 +377,16 @@ export function AdminCreatorsClient() {
           creatorName={postTarget.displayName}
           onClose={() => setPostTarget(null)}
           onSuccess={fetchCreators}
+          onToast={(message, tone) => setToast({ message, tone })}
+        />
+      )}
+      {manageTarget && (
+        <ManagePostsModal
+          isOpen={true}
+          creatorId={manageTarget.id}
+          creatorUsername={manageTarget.username}
+          creatorName={manageTarget.displayName}
+          onClose={() => setManageTarget(null)}
           onToast={(message, tone) => setToast({ message, tone })}
         />
       )}
