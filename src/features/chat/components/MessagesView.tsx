@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useSocket } from "../useSocket";
-import { SkeletonConversationList } from "@/shared/ui/Skeleton";
+import { SkeletonConversationList, SkeletonChatBubbles } from "@/shared/ui/Skeleton";
 
 type User = { id: string; username: string; role: string };
 
@@ -49,20 +49,32 @@ type MessagesViewProps = { user: User };
 const avatarPlaceholder =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Ccircle fill='%23333' cx='24' cy='24' r='24'/%3E%3C/svg%3E";
 
-function AttachIcon() {
+function BackIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 12H5M12 19l-7-7 7-7" />
     </svg>
   );
 }
 
-function CameraIcon() {
+function SendIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-      <circle cx="12" cy="13" r="4" />
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13" />
+      <polygon points="22 2 15 22 11 13 2 9 22 2" />
     </svg>
+  );
+}
+
+function DateDivider({ label }: { label: string }) {
+  return (
+    <div className="flex items-center my-6 px-4">
+      <div className="flex-1 h-[1px] bg-white/10" />
+      <span className="px-3 text-[11px] font-bold uppercase tracking-wider text-white/30 whitespace-nowrap">
+        {label}
+      </span>
+      <div className="flex-1 h-[1px] bg-white/10" />
+    </div>
   );
 }
 
@@ -73,14 +85,10 @@ export function MessagesView({ user }: MessagesViewProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+  const [messagesLoading, setMessagesLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [input, setInput] = useState("");
-  const [uploadingMedia, setUploadingMedia] = useState(false);
-  const [pendingUpload, setPendingUpload] = useState<{ url: string; mediaType: "IMAGE" | "VIDEO" } | null>(null);
-  const [cameraError, setCameraError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
   const { connected, join, leave, onMessageNew } = useSocket();
 
   const isCreator = user.role === "creator";
@@ -92,6 +100,10 @@ export function MessagesView({ user }: MessagesViewProps) {
       ? selectedConversation.user
       : selectedConversation.creator
     : null;
+
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   const fetchConversations = useCallback(async () => {
     const res = await fetch(baseUrl);
@@ -121,10 +133,6 @@ export function MessagesView({ user }: MessagesViewProps) {
     })();
   }, [creatorIdFromQuery, baseUrl, fetchConversations]);
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
-
   useEffect(() => {
     if (!selectedId) {
       setMessages([]);
@@ -133,11 +141,14 @@ export function MessagesView({ user }: MessagesViewProps) {
     leave(selectedId);
     join(selectedId);
     (async () => {
+      setMessagesLoading(true);
       const res = await fetch(`${baseUrl}/${selectedId}/messages`);
-      if (!res.ok) return;
-      const data = (await res.json()) as { messages: Message[] };
-      setMessages(data.messages ?? []);
-      setTimeout(scrollToBottom, 100);
+      if (res.ok) {
+        const data = (await res.json()) as { messages: Message[] };
+        setMessages(data.messages ?? []);
+        setTimeout(scrollToBottom, 100);
+      }
+      setMessagesLoading(false);
     })();
     return () => leave(selectedId);
   }, [selectedId, baseUrl, join, leave, scrollToBottom]);
@@ -145,14 +156,11 @@ export function MessagesView({ user }: MessagesViewProps) {
   useEffect(() => {
     return onMessageNew((data: any) => {
       const msg = data as Message;
-      
-      // If for current conversation, add to thread
       if (msg.conversationId === selectedId) {
         setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
         setTimeout(scrollToBottom, 50);
       }
 
-      // Update conversation list item
       setConversations((prev) => {
         const next = prev.map((c) => {
           if (c.id === msg.conversationId) {
@@ -173,23 +181,10 @@ export function MessagesView({ user }: MessagesViewProps) {
           }
           return c;
         });
-        // Sort by most recent
-        return [...next].sort(
-          (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-        );
+        return [...next].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
       });
     });
   }, [onMessageNew, selectedId, scrollToBottom]);
-
-  useEffect(() => {
-    if (messages.length > 0) {
-      scrollToBottom();
-    }
-  }, [messages, scrollToBottom]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   const sendMessage = async () => {
     const text = input.trim();
@@ -214,156 +209,84 @@ export function MessagesView({ user }: MessagesViewProps) {
     }
   };
 
-  const requestCameraAndOpenInput = useCallback(async () => {
-    setCameraError(null);
-    if (!navigator.mediaDevices?.getUserMedia) {
-      setCameraError("Camera not supported in this browser.");
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach((t) => t.stop());
-      cameraInputRef.current?.click();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Camera access denied.";
-      setCameraError(message);
-      setTimeout(() => setCameraError(null), 4000);
-    }
-  }, []);
+  const groupedMessages = useMemo(() => {
+    const groups: { date: string; messages: Message[] }[] = [];
+    [...messages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()).forEach((m) => {
+      const date = new Date(m.createdAt);
+      const today = new Date();
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
 
-  const uploadAndSendMedia = async (file: File) => {
-    if (!selectedId) return;
-    const isImage = file.type.startsWith("image/");
-    const isVideo = file.type.startsWith("video/");
-    if (!isImage && !isVideo) return;
-    const mediaType = isImage ? "IMAGE" : "VIDEO";
-    const localUrl = URL.createObjectURL(file);
-    setPendingUpload({ url: localUrl, mediaType });
-    setUploadingMedia(true);
-    try {
-      const presignRes = await fetch("/api/upload/presign", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          filename: file.name,
-          contentType: file.type,
-          context: "message",
-          conversationId: selectedId,
-          size: file.size,
-        }),
-      });
-      if (!presignRes.ok) {
-        const err = (await presignRes.json()) as { error?: string };
-        throw new Error(err.error ?? "Upload failed");
+      let label = date.toLocaleDateString(undefined, { month: "long", day: "numeric" });
+      if (date.toDateString() === today.toDateString()) label = "Today";
+      else if (date.toDateString() === yesterday.toDateString()) label = "Yesterday";
+      else if (date.getFullYear() !== today.getFullYear()) {
+        label = date.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
       }
-      const { uploadUrl, publicUrl } = (await presignRes.json()) as {
-        uploadUrl: string;
-        publicUrl: string;
-      };
-      const putRes = await fetch(uploadUrl, {
-        method: "PUT",
-        body: file,
-        headers: { "Content-Type": file.type },
-      });
-      if (!putRes.ok) throw new Error("Upload failed");
 
-      const msgRes = await fetch(`${baseUrl}/${selectedId}/messages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          body: input.trim() || undefined,
-          mediaUrl: publicUrl,
-          mediaType,
-        }),
-      });
-      if (msgRes.ok) {
-        const data = (await msgRes.json()) as { message: Message };
-        setMessages((prev) => [...prev, data.message]);
-        setInput("");
+      const lastGroup = groups[groups.length - 1];
+      if (lastGroup && lastGroup.date === label) {
+        lastGroup.messages.push(m);
+      } else {
+        groups.push({ date: label, messages: [m] });
       }
-    } finally {
-      setUploadingMedia(false);
-      if (localUrl) {
-        URL.revokeObjectURL(localUrl);
-        setPendingUpload(null);
-      }
-      fileInputRef.current && (fileInputRef.current.value = "");
-      cameraInputRef.current && (cameraInputRef.current.value = "");
-    }
-  };
+    });
+    return groups;
+  }, [messages]);
 
   const showListOnMobile = !selectedId;
   const showThreadOnMobile = !!selectedId;
 
   return (
-    <div className="flex h-[calc(100dvh-6rem)] min-h-[320px] max-h-[840px] flex-col overflow-hidden rounded-[var(--radius-card)] border border-white/10 bg-[var(--bg-elevated)] shadow-[var(--shadow-card)] sm:max-h-none sm:h-[calc(100vh-8rem)] sm:min-h-[420px] sm:flex-row">
-      {/* Conversation list - on mobile hidden when thread is open */}
+    <div className="flex h-[calc(100dvh-6rem)] min-h-[400px] flex-col overflow-hidden bg-[#05060b] sm:flex-row sm:rounded-2xl sm:border sm:border-white/10 sm:h-[calc(100vh-10rem)]">
+      {/* Search/List Sidebar */}
       <aside
-        className={`flex w-full flex-col border-b border-white/10 sm:h-full sm:w-80 sm:border-b-0 sm:border-r ${
+        className={`flex w-full flex-col bg-[#05060b] sm:w-[360px] sm:border-r sm:border-white/10 ${
           showThreadOnMobile ? "hidden sm:flex" : "flex"
         }`}
       >
-        <div className="border-b border-white/10 px-4 py-3 sm:px-5 sm:py-4">
-          <h1 className="font-[var(--font-heading)] text-lg font-semibold text-white">
-            Messages
-          </h1>
-          {connected && (
-            <p className="mt-1.5 text-xs text-[var(--status-online)]">Live</p>
-          )}
+        <div className="flex min-h-[64px] items-center justify-between border-b border-white/10 px-6 py-4">
+          <h1 className="text-[17px] font-bold text-white">Messages</h1>
+          {connected && <div className="h-2 w-2 rounded-full bg-[var(--status-online)] shadow-[0_0_8px_var(--status-online)]" />}
         </div>
+        
         <div className="flex-1 overflow-y-auto overflow-x-hidden">
           {loading ? (
-            <div className="p-4 sm:p-5">
-              <SkeletonConversationList count={8} />
-            </div>
+            <div className="p-4"><SkeletonConversationList count={10} /></div>
           ) : conversations.length === 0 ? (
-            <div className="p-6 text-center text-sm text-[var(--text-muted)]">
-              No conversations yet.
-            </div>
+            <div className="p-12 text-center text-[15px] text-white/30">No conversations yet</div>
           ) : (
             <ul className="divide-y divide-white/5">
               {conversations.map((c) => {
-                const name = isCreator
-                  ? (c.user?.username ?? "User")
-                  : (c.creator?.displayName ?? c.creator?.username ?? "Creator");
-                const avatar = isCreator ? null : (c.creator?.avatarUrl ?? null);
                 const isSelected = c.id === selectedId;
+                const name = isCreator ? (c.user?.username ?? "User") : (c.creator?.displayName ?? c.creator?.username ?? "Creator");
+                const avatar = isCreator ? null : (c.creator?.avatarUrl ?? null);
+                
                 return (
                   <li key={c.id}>
                     <button
-                      type="button"
                       onClick={() => {
                         setSelectedId(c.id);
-                        setConversations((prev) =>
-                          prev.map((conv) =>
-                            conv.id === c.id ? { ...conv, unreadCount: 0 } : conv
-                          )
-                        );
+                        setConversations(p => p.map(conv => conv.id === c.id ? { ...conv, unreadCount: 0 } : conv));
                       }}
-                      className={`flex w-full min-h-[44px] items-center gap-3 p-4 text-left transition-all duration-150 active:opacity-70 hover:bg-white/5 sm:min-h-0 sm:p-3 ${isSelected ? "bg-white/10" : ""}`}
+                      className={`flex min-h-[64px] w-full items-center gap-4 px-6 py-4 text-left transition-colors hover:bg-white/5 ${
+                        isSelected ? "bg-white/5 border-l-[3px] border-[#d4a853]" : "border-l-[3px] border-transparent"
+                      }`}
                     >
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white/10">
-                        <Image
-                          src={avatar ?? avatarPlaceholder}
-                          alt=""
-                          fill
-                          className="object-cover"
-                          unoptimized={!!avatar && !avatar.startsWith("/")}
-                        />
+                      <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-white/5">
+                        <Image src={avatar ?? avatarPlaceholder} alt="" fill className="object-cover" unoptimized={!!avatar && !avatar.startsWith("/")} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="truncate text-sm font-medium text-white">{name}</p>
+                        <div className="mb-0.5 flex items-center justify-between">
+                          <span className="truncate text-[15px] font-bold text-white">{name}</span>
                           {c.unreadCount ? (
-                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent-primary)] text-[10px] font-bold text-[#05060a]">
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white">
                               {c.unreadCount}
                             </span>
                           ) : null}
                         </div>
-                        <p className={`truncate text-xs ${c.unreadCount ? "font-semibold text-white" : "text-[var(--text-muted)]"}`}>
-                          {c.lastMessage
-                            ? c.lastMessage.body ?? "Media"
-                            : "No messages"}
+                        <p className={`truncate text-[13px] ${c.unreadCount ? "font-bold text-white" : "text-white/40"}`}>
+                          {c.lastMessage?.body ?? (c.lastMessage?.mediaType ? "Media Attachment" : "No messages")}
                         </p>
                       </div>
                     </button>
@@ -375,217 +298,106 @@ export function MessagesView({ user }: MessagesViewProps) {
         </div>
       </aside>
 
-      {/* Thread + composer - on mobile only visible when conversation selected */}
-      <section
-        className={`flex flex-1 flex-col min-w-0 ${showListOnMobile ? "hidden sm:flex" : "flex"}`}
-      >
+      {/* Chat View */}
+      <section className={`relative flex flex-1 flex-col bg-[#05060b] min-w-0 ${showListOnMobile ? "hidden sm:flex" : "flex"}`}>
         {selectedConversation && otherParty ? (
           <>
-            <header className="flex min-h-[56px] shrink-0 items-center gap-3 border-b border-white/10 px-3 py-2 sm:p-3">
+            <header className="flex min-h-[64px] items-center gap-3 border-b border-white/10 bg-[#05060b]/90 px-4 py-2 backdrop-blur-md">
               <button
-                type="button"
                 onClick={() => setSelectedId(null)}
-                className="focus-outline -ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white/80 transition-all duration-150 active:scale-90 hover:bg-white/10 hover:text-white sm:hidden"
-                aria-label="Back to conversations"
+                className="flex h-[44px] w-[44px] items-center justify-center rounded-full text-white/70 hover:bg-white/5 sm:hidden"
+                aria-label="Back"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
+                <BackIcon />
               </button>
-              <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-white/10">
+              <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-white/5">
                 {!isCreator && selectedConversation.creator?.avatarUrl ? (
-                  <Image
-                    src={selectedConversation.creator.avatarUrl}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    unoptimized={!selectedConversation.creator.avatarUrl.startsWith("/")}
-                  />
-                ) : (
-                  <div className="h-full w-full bg-white/10" />
-                )}
+                  <Image src={selectedConversation.creator.avatarUrl} alt="" fill className="object-cover" unoptimized={!selectedConversation.creator.avatarUrl.startsWith("/")} />
+                ) : <div className="h-full w-full bg-white/5" />}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-white">
-                  {isCreator
-                    ? otherParty.username
-                    : selectedConversation.creator?.displayName ?? selectedConversation.creator?.username}
+                <p className="truncate text-[15px] font-bold text-white">
+                  {isCreator ? otherParty.username : selectedConversation.creator?.displayName ?? selectedConversation.creator?.username}
                 </p>
-                <p className="text-xs text-white/50">
-                  {connected ? "Online" : "Offline"}
-                </p>
+                <p className="text-[11px] font-medium text-[var(--status-online)]">Online</p>
               </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto overflow-x-hidden p-3 space-y-3 sm:p-4">
-              {messages.map((m) => {
-                const isMe =
-                  (isCreator && m.senderType === "CREATOR") ||
-                  (!isCreator && m.senderType === "USER");
-                return (
-                  <div
-                    key={m.id}
-                    className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-                  >
-                    <div
-                      className={`max-w-[85%] min-w-0 rounded-2xl px-4 py-2.5 shadow-[var(--shadow-soft-subtle)] ${
-                        isMe
-                          ? "bg-[var(--accent-primary)]/90 text-[#05060a]"
-                          : "border border-white/10 bg-white/10 text-white"
-                      }`}
-                    >
-                      {m.body && <p className="text-sm whitespace-pre-wrap break-words">{m.body}</p>}
-                      {m.mediaUrl && (
-                        <div className="mt-2">
-                          {m.mediaType === "IMAGE" && (
-                            <a
-                              href={m.mediaUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block overflow-hidden rounded-lg"
-                            >
-                              <img
-                                src={m.mediaUrl}
-                                alt=""
-                                className="max-h-48 w-auto object-cover"
-                              />
-                            </a>
-                          )}
-                          {m.mediaType === "VIDEO" && (
-                            <video
-                              src={m.mediaUrl}
-                              controls
-                              className="max-h-48 rounded-lg"
-                              preload="metadata"
-                            />
-                          )}
-                          {m.mediaType === "VOICE" && (
-                            <a
-                              href={m.mediaUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs underline"
-                            >
-                              Voice message
-                            </a>
-                          )}
-                        </div>
-                      )}
-                      <p className={`mt-1 text-xs ${isMe ? "text-[#05060a]/70" : "text-white/50"}`}>
-                        {new Date(m.createdAt).toLocaleTimeString(undefined, {
-                          hour: "2-digit",
-                          minute: "2-digit",
+            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-[100px] scrollbar-hide">
+              {messagesLoading ? (
+                <div className="pt-4"><SkeletonChatBubbles count={5} /></div>
+              ) : (
+                <>
+                  {groupedMessages.map((group) => (
+                    <div key={group.date}>
+                      <DateDivider label={group.date} />
+                      <div className="space-y-3">
+                        {group.messages.map((m) => {
+                          const isMe = (isCreator && m.senderType === "CREATOR") || (!isCreator && m.senderType === "USER");
+                          return (
+                            <div key={m.id} className={`flex w-full ${isMe ? "justify-end" : "justify-start"}`}>
+                              <div
+                                className={`max-w-[75%] px-[14px] py-[10px] text-[15px] leading-[1.4] shadow-sm ${
+                                  isMe
+                                    ? "bg-[#d4a853] text-black rounded-[18px_18px_4px_18px]"
+                                    : "bg-[#1a1a2e] text-white rounded-[18px_18px_18px_4px]"
+                                }`}
+                              >
+                                {m.body && <p className="whitespace-pre-wrap break-words">{m.body}</p>}
+                                {m.mediaUrl && (
+                                  <div className="mt-2 overflow-hidden rounded-lg">
+                                    {m.mediaType === "IMAGE" ? (
+                                      <img src={m.mediaUrl} alt="" className="max-h-[300px] w-auto rounded-lg object-contain" />
+                                    ) : m.mediaType === "VIDEO" ? (
+                                      <video src={m.mediaUrl} controls className="max-h-[300px] w-full rounded-lg" />
+                                    ) : null}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
                         })}
-                      </p>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
-              {pendingUpload && (
-                <div className="flex justify-end">
-                  <div className="max-w-[85%] min-w-0 rounded-2xl border border-white/10 bg-white/10 px-4 py-2.5 text-white shadow-[var(--shadow-soft-subtle)]">
-                    <p className="text-xs text-white/60">Uploading…</p>
-                    <div className="mt-2">
-                      {pendingUpload.mediaType === "IMAGE" && (
-                        <img
-                          src={pendingUpload.url}
-                          alt="Uploading preview"
-                          className="max-h-40 w-auto rounded-lg object-cover opacity-80"
-                        />
-                      )}
-                      {pendingUpload.mediaType === "VIDEO" && (
-                        <video
-                          src={pendingUpload.url}
-                          className="max-h-40 rounded-lg opacity-80"
-                          autoPlay
-                          muted
-                          loop
-                        />
-                      )}
-                    </div>
-                  </div>
-                </div>
+                  ))}
+                  <div ref={messagesEndRef} className="h-4" />
+                </>
               )}
-              <div ref={messagesEndRef} />
             </div>
 
-            <div className="shrink-0 border-t border-white/10 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+            {/* Sticky Input Bar */}
+            <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/10 bg-[#0a0a0f] p-3 pb-[calc(12px+env(safe-area-inset-bottom))] sm:absolute">
               <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  sendMessage();
-                }}
-                className="flex items-center gap-2"
+                onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
+                className="mx-auto flex max-w-4xl items-center gap-3"
               >
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) uploadAndSendMedia(f);
-                  }}
-                />
-                <input
-                  ref={cameraInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  capture="environment"
-                  className="hidden"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) uploadAndSendMedia(f);
-                  }}
-                />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={sending || uploadingMedia}
-                    className="focus-outline shrink-0 flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-white/70 transition-all duration-150 active:scale-90 hover:bg-white/10 hover:text-white disabled:opacity-50"
-                    title="Attach photo or video"
-                    aria-label="Attach photo or video"
-                  >
-                  <AttachIcon />
-                </button>
-                <div className="relative shrink-0">
-                   <button
-                    type="button"
-                    onClick={requestCameraAndOpenInput}
-                    disabled={sending || uploadingMedia}
-                    className="focus-outline flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-white/70 transition-all duration-150 active:scale-90 hover:bg-white/10 hover:text-white disabled:opacity-50"
-                    title="Take photo or video"
-                    aria-label="Take photo or video"
-                  >
-                    <CameraIcon />
-                  </button>
-                  {cameraError && (
-                    <p className="absolute bottom-full left-0 right-0 mb-1 whitespace-nowrap text-xs text-red-300" role="alert">
-                      {cameraError}
-                    </p>
-                  )}
-                </div>
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type a message…"
-                  className="input-base focus-outline min-h-[44px] min-w-0 flex-1 rounded-full px-4 py-3 text-[16px] sm:text-[16px]"
+                  placeholder="Type a message..."
+                  className="h-[44px] min-w-0 flex-1 rounded-full bg-[#1a1a2e] px-5 text-[16px] text-white placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-[#d4a853]"
                   disabled={sending}
                 />
                 <button
                   type="submit"
-                  disabled={sending || (!input.trim() && !uploadingMedia)}
-                  className="pill-button-primary focus-outline shrink-0 min-h-[44px] min-w-[44px] px-4 py-3 text-sm font-medium transition-all duration-150 active:scale-95 disabled:opacity-50"
+                  disabled={sending || !input.trim()}
+                  className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full bg-[#d4a853] text-black transition-transform active:scale-90 disabled:opacity-50"
+                  aria-label="Send"
                 >
-                  {uploadingMedia ? "…" : "Send"}
+                  <SendIcon />
                 </button>
               </form>
             </div>
           </>
         ) : (
-          <div className="flex flex-1 items-center justify-center px-6 py-12 text-center text-sm text-[var(--text-muted)]">
-            Select a conversation or message a creator from their profile.
+          <div className="hidden flex-1 items-center justify-center px-6 text-center sm:flex">
+            <div className="space-y-6">
+              <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-white/5">
+                <svg className="h-10 w-10 text-white/10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+              </div>
+              <p className="text-[17px] font-medium text-white/30">Select a conversation to start chatting</p>
+            </div>
           </div>
         )}
       </section>

@@ -102,3 +102,24 @@ export function SkeletonConversationList({ count = 6 }: { count?: number }) {
     </div>
   );
 }
+
+export function SkeletonChatBubbles({ count = 4 }: { count?: number }) {
+  return (
+    <div className="space-y-4" aria-hidden>
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className={`flex w-full ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
+        >
+          <Skeleton
+            className={`h-12 w-2/3 max-w-[300px] ${
+              i % 2 === 0
+                ? "rounded-[18px_18px_18px_4px]"
+                : "rounded-[18px_18px_4px_18px]"
+            }`}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
