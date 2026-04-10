@@ -31,6 +31,7 @@ type ConversationItem = {
     createdAt: string;
   } | null;
   updatedAt: string;
+  unreadCount?: number;
 };
 
 type Message = {
@@ -120,6 +121,10 @@ export function MessagesView({ user }: MessagesViewProps) {
     })();
   }, [creatorIdFromQuery, baseUrl, fetchConversations]);
 
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
   useEffect(() => {
     if (!selectedId) {
       setMessages([]);
@@ -132,18 +137,55 @@ export function MessagesView({ user }: MessagesViewProps) {
       if (!res.ok) return;
       const data = (await res.json()) as { messages: Message[] };
       setMessages(data.messages ?? []);
+      setTimeout(scrollToBottom, 100);
     })();
     return () => leave(selectedId);
-  }, [selectedId, baseUrl, join, leave]);
+  }, [selectedId, baseUrl, join, leave, scrollToBottom]);
 
   useEffect(() => {
-    return onMessageNew((data: unknown) => {
+    return onMessageNew((data: any) => {
       const msg = data as Message;
+      
+      // If for current conversation, add to thread
       if (msg.conversationId === selectedId) {
         setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
+        setTimeout(scrollToBottom, 50);
       }
+
+      // Update conversation list item
+      setConversations((prev) => {
+        const next = prev.map((c) => {
+          if (c.id === msg.conversationId) {
+            const isUnread = msg.conversationId !== selectedId;
+            return {
+              ...c,
+              lastMessage: {
+                id: msg.id,
+                body: msg.body,
+                mediaUrl: msg.mediaUrl,
+                mediaType: msg.mediaType,
+                senderType: msg.senderType,
+                createdAt: msg.createdAt,
+              },
+              unreadCount: isUnread ? (c.unreadCount || 0) + 1 : 0,
+              updatedAt: msg.createdAt,
+            };
+          }
+          return c;
+        });
+        // Sort by most recent
+        return [...next].sort(
+          (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+        );
+      });
     });
-  }, [onMessageNew, selectedId]);
+  }, [onMessageNew, selectedId, scrollToBottom]);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages, scrollToBottom]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -163,6 +205,7 @@ export function MessagesView({ user }: MessagesViewProps) {
       if (res.ok) {
         const data = (await res.json()) as { message: Message };
         setMessages((prev) => [...prev, data.message]);
+        setTimeout(scrollToBottom, 50);
       } else {
         setInput(text);
       }
@@ -289,7 +332,14 @@ export function MessagesView({ user }: MessagesViewProps) {
                   <li key={c.id}>
                     <button
                       type="button"
-                      onClick={() => setSelectedId(c.id)}
+                      onClick={() => {
+                        setSelectedId(c.id);
+                        setConversations((prev) =>
+                          prev.map((conv) =>
+                            conv.id === c.id ? { ...conv, unreadCount: 0 } : conv
+                          )
+                        );
+                      }}
                       className={`flex w-full min-h-[44px] items-center gap-3 p-4 text-left transition-all duration-150 active:opacity-70 hover:bg-white/5 sm:min-h-0 sm:p-3 ${isSelected ? "bg-white/10" : ""}`}
                     >
                       <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-white/10">
@@ -302,8 +352,15 @@ export function MessagesView({ user }: MessagesViewProps) {
                         />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-white">{name}</p>
-                        <p className="truncate text-xs text-[var(--text-muted)]">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="truncate text-sm font-medium text-white">{name}</p>
+                          {c.unreadCount ? (
+                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--accent-primary)] text-[10px] font-bold text-[#05060a]">
+                              {c.unreadCount}
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className={`truncate text-xs ${c.unreadCount ? "font-semibold text-white" : "text-[var(--text-muted)]"}`}>
                           {c.lastMessage
                             ? c.lastMessage.body ?? "Media"
                             : "No messages"}
