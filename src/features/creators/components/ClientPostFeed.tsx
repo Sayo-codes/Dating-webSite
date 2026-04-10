@@ -178,11 +178,6 @@ function PostCard({
             @{creatorHandle}
           </span>
         </div>
-        {timeAgo && (
-          <span className="shrink-0 text-[13px] text-white/40">
-            {timeAgo} ago
-          </span>
-        )}
       </div>
 
       {/* ── Media ── */}
