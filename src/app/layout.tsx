@@ -70,7 +70,9 @@ export default function RootLayout({
         className={`${headingFont.variable} ${bodyFont.variable} antialiased bg-background text-foreground overflow-x-hidden min-h-screen`}
       >
         <GlobalAppHeader />
-        <PageTransition>{children}</PageTransition>
+        <main key="main-content" className="page-wrapper">
+          <PageTransition>{children}</PageTransition>
+        </main>
       </body>
     </html>
   );

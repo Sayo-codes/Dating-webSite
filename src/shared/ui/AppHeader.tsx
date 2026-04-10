@@ -2,6 +2,7 @@
 
 import LinkNext from "next/link";
 import { useState, useEffect, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
 
 /**
  * Ultra-minimal Rsdate Brand Bar.
@@ -15,6 +16,10 @@ export function AppHeader() {
   const [isVisible, setIsVisible] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const lastScrollY = useRef(0);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const isHomeOrExplore = pathname === "/" || pathname === "/explore";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,8 +56,20 @@ export function AppHeader() {
         willChange: "transform, background-color, border-color, backdrop-filter",
       }}
     >
-      <div className="mx-auto flex w-full max-w-7xl items-center justify-center px-4 sm:px-6 lg:px-10">
+      <div className="relative mx-auto flex w-full max-w-7xl items-center justify-center px-4 sm:px-6 lg:px-10 h-full">
         
+        {!isHomeOrExplore && (
+          <button
+            onClick={() => router.back()}
+            className="absolute left-4 flex h-11 w-11 items-center justify-center text-white transition-opacity hover:opacity-70 active:scale-95"
+            aria-label="Go back"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
+        )}
+
         {/* Logo - Minimal & Centered for absolute brand focus */}
         <LinkNext
           href="/"
